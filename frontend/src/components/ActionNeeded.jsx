@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Bell, ChevronRight } from 'lucide-react'
 import { Empty, ViewAll, number } from './ui'
 
@@ -17,7 +18,7 @@ export default function ActionNeeded({ items, total, title = 'Action Needed', to
         <h3 className="flex-1 text-[16px] font-bold">{title}</h3>
         <div className="text-right">
           <div className={`text-[12px] ${style.accent}`}>{total} items</div>
-          {viewAll && <ViewAll />}
+          {viewAll && <ViewAll to="/inventory?filter=low" />}
         </div>
       </div>
       {items.length === 0 && <Empty>Nothing needs your attention.</Empty>}
@@ -25,10 +26,12 @@ export default function ActionNeeded({ items, total, title = 'Action Needed', to
         {items.map((item) => {
           const urgent = item.stock <= item.reorderLevel / 2  // out of stock, or under half the reorder level
           return (
-            <li key={item.name} className="flex items-center gap-3 py-3 text-[14px]">
-              <span className={`h-3 w-3 rounded-full ${urgent ? 'bg-red-500' : 'bg-[#f5b324]'}`} />
-              <span className="flex-1">{item.name} – {item.status === 'OUT' ? 'out of stock' : `${number(item.stock)} ${item.unit} left`}</span>
-              <ChevronRight size={18} />
+            <li key={item.name}>
+              <Link to={`/inventory?search=${encodeURIComponent(item.name)}`} className="flex items-center gap-3 py-3 text-[14px] hover:opacity-70">
+                <span className={`h-3 w-3 rounded-full ${urgent ? 'bg-red-500' : 'bg-[#f5b324]'}`} />
+                <span className="flex-1">{item.name} – {item.status === 'OUT' ? 'out of stock' : `${number(item.stock)} ${item.unit} left`}</span>
+                <ChevronRight size={18} />
+              </Link>
             </li>
           )
         })}

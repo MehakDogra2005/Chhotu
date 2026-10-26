@@ -4,7 +4,7 @@ export const STEPS = [
   ['Log in', 'Use your mobile number, your email or Google. A new shop is set up in about a minute.'],
   ['See your shop at a glance', 'Home shows your sales, pending udhaar, low stock and recent conversations.'],
   ['Keep your stock in check', 'Inventory shows what is low, what is out of stock and what is already on order.'],
-  ['Talk to Saathi', 'Say what you need in Hindi, Hinglish or English. Voice is coming soon.'],
+  ['Talk to Saathi', 'Tap the mic and say what you need (tap it again to stop), or type it. Saathi answers, and asks you before it changes anything.'],
 ]
 
 export const VOICE_GROUPS = [
@@ -26,6 +26,14 @@ export const FAQ = [
     'No sales have been recorded for that day yet. Choose Last 7 days or Last 30 days at the top of Home to see more.'],
   ['Can other shops see my data?',
     'No. Everything you see belongs to your shop only, and the server checks this on every request.'],
-  ['When will voice work?',
-    'The voice assistant is still being built. The mic and the voice buttons show where it will be. Your voice choices in Settings are saved and will be used once it is ready.'],
+  ['How do I put Dukaan Saathi on my phone?',
+    'On Android, open the website in Chrome, tap the ⋮ menu and choose Install app. On iPhone, open it in Safari, tap Share and choose Add to Home Screen. It then opens full-screen from your home screen, like any other app. The Settings page also has an Install app button.'],
+  ['How do I reorder stock that is running low?',
+    'Open Inventory and tap Generate Restocking List. Saathi suggests how much to order for each low item. You can change the numbers, share the list on WhatsApp with your supplier, and tap Place order to save it. The items then show as On Order. When the delivery arrives, tap the three dots on the item and choose Mark order received: your stock goes up by itself.'],
+  ['How do I add a new item or fix a wrong price?',
+    'On Inventory, tap Add Item and fill in the form. To change an existing item, tap the three dots at the end of its row and choose Edit item. Use Add stock when more arrives, and Archive item to hide something you no longer sell (its history is kept).'],
+  ['Is the microphone always on?',
+    'No. Saathi listens only after you tap the mic, and stops when you finish speaking or tap the mic again. Closing the Saathi window switches the microphone off.'],
+  ['Does the voice assistant work?',
+    'Yes. Tap the mic (Chrome works best) and speak, or type the same sentence in the box. Saathi understands English and Hindi written in English letters, like "Ramesh ne 500 de diye". Before it adds stock or records a payment, it shows you exactly what it will do and waits for your Yes. Hindi in Devanagari letters and other languages will come later.'],
 ]

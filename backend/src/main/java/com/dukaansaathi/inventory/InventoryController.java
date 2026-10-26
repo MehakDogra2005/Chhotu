@@ -19,6 +19,12 @@ public class InventoryController {
         this.inventory = inventory;
     }
 
+    /** "View Stock Report": what the stock is worth, per category and per product. */
+    @GetMapping("/report")
+    public StockReport report(@RequestHeader(value = "Authorization", defaultValue = "") String authHeader) {
+        return inventory.report(auth.requireShop(authHeader));
+    }
+
     /** filter is all, low, out or order; search matches product name or category. The shop comes from the login session. */
     @GetMapping
     public InventoryResponse get(@RequestHeader(value = "Authorization", defaultValue = "") String authHeader,

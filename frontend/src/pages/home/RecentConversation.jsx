@@ -6,7 +6,7 @@ export default function RecentConversation({ messages }) {
     <Card className="p-5">
       <div className="flex items-center justify-between">
         <h3 className="text-[16px] font-bold">Recent Conversation</h3>
-        <ViewAll />
+        <ViewAll to="/conversations" />
       </div>
       {messages.length === 0 && <Empty>No conversations yet.</Empty>}
       <ul className="mt-3 space-y-4">

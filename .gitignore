@@ -2,3 +2,7 @@ node_modules/
 dist/
 target/
 backend/data/
+# the finished website, produced by "npm run build" in frontend/
+backend/src/main/resources/static/
+# private settings (email password, ...)
+backend/config/local.properties

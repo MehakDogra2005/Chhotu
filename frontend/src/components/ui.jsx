@@ -1,7 +1,9 @@
+import { Link } from 'react-router-dom'
 import { ArrowDown, ArrowRight, ArrowUp, CircleCheck, CircleX, TriangleAlert } from 'lucide-react'
 
 // The backend sends money in paise (1 rupee = 100 paise).
 export const rupees = (paise) => '₹' + Math.round(paise / 100).toLocaleString('en-IN')
+export const toPaise = (rupees) => Math.round(Number(rupees || 0) * 100)
 export const number = (n) => Number(n).toLocaleString('en-IN', { maximumFractionDigits: 1 })
 export const shortDate = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
 
@@ -10,9 +12,9 @@ export function Card({ className = '', children }) {
 }
 
 /** A number with an icon, a label and a small line underneath (used at the top of Home and Inventory). */
-export function StatCard({ icon, tint, value, label, footer }) {
-  return (
-    <Card className="flex items-start gap-3 p-4">
+export function StatCard({ icon, tint, value, label, footer, to, onClick }) {
+  const card = (
+    <Card className={`flex h-full flex-col items-start gap-2 p-4 sm:flex-row sm:gap-3 ${to || onClick ? 'hover:border-brand' : ''}`}>
       <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-xl ${tint}`}>{icon}</span>
       <div className="min-w-0">
         <div className="text-[22px] font-extrabold leading-tight">{value}</div>
@@ -21,6 +23,9 @@ export function StatCard({ icon, tint, value, label, footer }) {
       </div>
     </Card>
   )
+  // `to` makes the whole card a link to a page, `onClick` makes it a button
+  if (onClick) return <button onClick={onClick} className="block w-full text-left">{card}</button>
+  return to ? <Link to={to} className="block">{card}</Link> : card
 }
 
 const STATUS = {
@@ -48,8 +53,8 @@ export function relativeDay(iso, today) {
   return new Date(iso + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-export function ViewAll() {
-  return <button className="flex items-center gap-1 text-[13px] font-semibold text-brand">View all <ArrowRight size={14} /></button>
+export function ViewAll({ to }) {
+  return <Link to={to} className="flex items-center gap-1 text-[13px] font-semibold text-brand">View all <ArrowRight size={14} /></Link>
 }
 
 /** "↑ 12% vs last month". Shows nothing useful when there is no earlier period to compare with. */
@@ -65,7 +70,7 @@ export function Change({ pct, label = '' }) {
 }
 
 /** Header used by the three bottom cards: icon tile, title, subtitle and a "View all" link. */
-export function CardHeader({ icon, tint, title, note, subtitle, viewAll = true }) {
+export function CardHeader({ icon, tint, title, note, subtitle, to }) {
   return (
     <div className="flex items-start gap-3">
       <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${tint}`}>{icon}</span>
@@ -73,7 +78,7 @@ export function CardHeader({ icon, tint, title, note, subtitle, viewAll = true }
         <div className="text-[16px] font-bold">{title} {note && <span className="text-[12px] font-semibold">{note}</span>}</div>
         <div className="mt-0.5 text-[12.5px] text-muted">{subtitle}</div>
       </div>
-      {viewAll && <ViewAll />}
+      {to && <ViewAll to={to} />}
     </div>
   )
 }
@@ -95,7 +100,9 @@ export function Field({ label, children }) {
 /** An on/off switch with a title and a line of explanation. */
 export function Toggle({ checked, onChange, label, description }) {
   return (
-    <label className="flex cursor-pointer items-center gap-4 py-3">
+    // `relative` keeps the hidden checkbox inside this row; without it the browser puts it at the bottom of the whole
+    // page and the window grows a second scrollbar.
+    <label className="relative flex cursor-pointer items-center gap-4 py-3">
       <span className="flex-1">
         <span className="block text-[15px] font-semibold">{label}</span>
         <span className="block text-[13px] text-muted">{description}</span>

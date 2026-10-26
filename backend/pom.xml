@@ -22,6 +22,11 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-jdbc</artifactId>
     </dependency>
+    <!-- Sends the login code by email (only active once a mail server is set up in local.properties) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-mail</artifactId>
+    </dependency>
     <!-- Local database. To move to PostgreSQL, swap this for the postgresql driver and change spring.datasource.* -->
     <dependency>
       <groupId>com.h2database</groupId>

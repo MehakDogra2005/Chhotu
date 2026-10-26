@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [lang, setLang] = useState('English')
 
   return (
-    <div className="min-h-screen bg-cream min-[1400px]:flex">
+    <div className="min-h-dvh bg-cream min-[1400px]:flex">
       <Landing lang={lang} setLang={setLang} />
       <AuthCard mode={mode} setMode={setMode} lang={lang} onLogin={login} />
     </div>

@@ -9,6 +9,7 @@ import BusinessAdvisor from './pages/advisor/BusinessAdvisor'
 import Customers from './pages/customers/Customers'
 import Settings from './pages/settings/Settings'
 import Help from './pages/help/Help'
+import Conversations from './pages/conversations/Conversations'
 
 export default function App() {
   const [token, setToken] = useState(() => localStorage.getItem('token'))
@@ -32,6 +33,7 @@ export default function App() {
               <Route path="customers" element={<Customers />} />
               <Route path="settings" element={<Settings />} />
               <Route path="help" element={<Help />} />
+              <Route path="conversations" element={<Conversations />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>

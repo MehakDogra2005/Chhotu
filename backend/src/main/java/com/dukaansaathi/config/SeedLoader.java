@@ -12,16 +12,18 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /** Loads the sample CSVs from db/ into every table that is still empty (so a new table gets filled on the next start). */
 @Component
+@Order(1) // before DemoAccount
 public class SeedLoader implements ApplicationRunner {
     // Parent tables first, so foreign keys are satisfied.
     private static final List<String> TABLES = List.of(
-            "shops", "users", "user_shops", "customers", "products", "purchases", "purchase_items", "sales",
-            "sale_items", "credit_transactions", "inventory_movements", "voice_utterances", "audio_recordings");
+            "shops", "users", "user_shops", "suppliers", "customers", "products", "purchases", "purchase_items", "sales",
+            "sale_items", "credit_transactions", "inventory_movements", "voice_utterances", "audio_recordings", "product_aliases", "audit_log");
 
     private final JdbcTemplate jdbc;
     private final Path seedDir;

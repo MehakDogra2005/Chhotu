@@ -65,13 +65,13 @@ public class DashboardRepository {
 
     public List<Debtor> topDebtors(String shopId, int limit) {
         return jdbc.query("""
-                SELECT customer_name, total_credit_paise, balance_paise
+                SELECT customer_id, customer_name, total_credit_paise, balance_paise
                 FROM customer_balance
                 WHERE shop_id = ? AND balance_paise > 0
                 ORDER BY balance_paise DESC
                 LIMIT ?
                 """,
-                (rs, i) -> new Debtor(rs.getString("customer_name"), rs.getLong("total_credit_paise"), rs.getLong("balance_paise")),
+                (rs, i) -> new Debtor(rs.getString("customer_id"), rs.getString("customer_name"), rs.getLong("total_credit_paise"), rs.getLong("balance_paise")),
                 shopId, limit);
     }
 
@@ -83,19 +83,33 @@ public class DashboardRepository {
                 ORDER BY created_at DESC, utterance_id DESC
                 LIMIT ?
                 """,
-                (rs, i) -> new Message(rs.getString("raw_transcript"), rs.getObject("created_at", LocalDate.class)), shopId, limit);
+                (rs, i) -> new Message(rs.getString("raw_transcript"), rs.getObject("created_at", java.time.LocalDateTime.class).toLocalDate()), shopId, limit);
     }
 
     public List<Recording> recordings(String shopId, String type, int limit) {
         return jdbc.query("""
-                SELECT file_name, status, uploaded_at
+                SELECT file_name, status, uploaded_at, transcript
                 FROM audio_recordings
                 WHERE shop_id = ? AND recording_type = ?
                 ORDER BY uploaded_at DESC
                 LIMIT ?
                 """,
                 (rs, i) -> new Recording(rs.getString("file_name"), rs.getString("status"),
-                        rs.getTimestamp("uploaded_at").toLocalDateTime().toLocalDate()),
+                        rs.getTimestamp("uploaded_at").toLocalDateTime().toLocalDate(), rs.getString("transcript")),
                 shopId, type, limit);
+    }
+
+    /** The product that earned the most gross profit in the period, or null when nothing was sold. */
+    public String bestProductByProfit(String shopId, LocalDate from, LocalDate to) {
+        return jdbc.queryForList("""
+                SELECT p.product_name
+                FROM sale_items si
+                JOIN sales s ON s.sale_id = si.sale_id
+                JOIN products p ON p.product_id = si.product_id
+                WHERE s.shop_id = ? AND s.status = 'COMPLETED' AND s.sale_date BETWEEN ? AND ?
+                GROUP BY p.product_name
+                ORDER BY SUM(si.net_amount_paise - si.cost_amount_paise) DESC
+                LIMIT 1
+                """, String.class, shopId, from, to).stream().findFirst().orElse(null);
     }
 }

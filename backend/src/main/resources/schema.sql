@@ -40,6 +40,14 @@ CREATE TABLE IF NOT EXISTS shop_settings (
   payment_reminders BOOLEAN DEFAULT TRUE NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS suppliers (
+  supplier_id VARCHAR(40) PRIMARY KEY,
+  shop_id VARCHAR(40) NOT NULL REFERENCES shops(shop_id),
+  supplier_name VARCHAR(200) NOT NULL,
+  contact_phone_masked VARCHAR(20),
+  payment_terms_days INTEGER DEFAULT 0 NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS customers (
   customer_id VARCHAR(40) PRIMARY KEY,
   shop_id VARCHAR(40) NOT NULL REFERENCES shops(shop_id),
@@ -85,6 +93,16 @@ CREATE TABLE IF NOT EXISTS purchase_items (
   unit VARCHAR(30) NOT NULL,
   unit_cost_paise BIGINT NOT NULL,
   line_total_paise BIGINT NOT NULL
+);
+
+-- Other names shopkeepers use for a product ("paani bottle" = Bottled Water). Used to understand voice commands.
+CREATE TABLE IF NOT EXISTS product_aliases (
+  alias_id VARCHAR(40) PRIMARY KEY,
+  shop_id VARCHAR(40) NOT NULL REFERENCES shops(shop_id),
+  product_id VARCHAR(40) NOT NULL REFERENCES products(product_id),
+  alias_text VARCHAR(200) NOT NULL,
+  language VARCHAR(20) NOT NULL,
+  source VARCHAR(30) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS sales (
@@ -159,8 +177,10 @@ CREATE TABLE IF NOT EXISTS voice_utterances (
   matched_product_id VARCHAR(40),
   match_method VARCHAR(30) NOT NULL,
   confirmation_status VARCHAR(30) NOT NULL,
-  created_at DATE NOT NULL
+  created_at TIMESTAMP NOT NULL
 );
+-- For databases created when this column only held the date
+ALTER TABLE voice_utterances ALTER COLUMN created_at SET DATA TYPE TIMESTAMP;
 
 CREATE TABLE IF NOT EXISTS audio_recordings (
   recording_id VARCHAR(40) PRIMARY KEY,
@@ -180,11 +200,26 @@ CREATE TABLE IF NOT EXISTS audio_recordings (
   UNIQUE (shop_id, content_hash)
 );
 
+-- Who changed what, and when. Rows are only ever added.
+CREATE TABLE IF NOT EXISTS audit_log (
+  audit_id VARCHAR(40) PRIMARY KEY,
+  shop_id VARCHAR(40) NOT NULL REFERENCES shops(shop_id),
+  actor_user_id VARCHAR(40),
+  entity_type VARCHAR(40) NOT NULL,
+  entity_id VARCHAR(40) NOT NULL,
+  action VARCHAR(30) NOT NULL,
+  old_value_json VARCHAR(2000),
+  new_value_json VARCHAR(2000),
+  source VARCHAR(10) NOT NULL,             -- UI, VOICE, AUDIO or IMPORT
+  created_at TIMESTAMP NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_sales_shop_date ON sales(shop_id, sale_date);
 CREATE INDEX IF NOT EXISTS idx_sale_items_sale ON sale_items(sale_id);
 CREATE INDEX IF NOT EXISTS idx_credit_customer ON credit_transactions(shop_id, customer_id);
 CREATE INDEX IF NOT EXISTS idx_movements_product ON inventory_movements(shop_id, product_id);
 CREATE INDEX IF NOT EXISTS idx_utterances_shop_date ON voice_utterances(shop_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_log(shop_id, entity_type, entity_id);
 CREATE INDEX IF NOT EXISTS idx_purchase_items_product ON purchase_items(product_id);
 
 -- Current stock of each product = opening stock + all its movements.

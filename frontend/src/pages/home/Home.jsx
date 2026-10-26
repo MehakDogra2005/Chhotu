@@ -31,10 +31,10 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex items-start justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-[30px] font-extrabold tracking-tight">Namaste, {firstName} ji! 👋</h1>
-          <p className="mt-1 text-[18px] text-muted">Your shop at a glance today.</p>
+          <h1 className="text-[24px] font-extrabold tracking-tight sm:text-[30px]">Namaste, {firstName} ji! 👋</h1>
+          <p className="mt-1 text-[16px] text-muted sm:text-[18px]">Your shop at a glance today.</p>
         </div>
         <div className="flex items-center gap-4">
           <label className="relative flex items-center gap-2 rounded-xl border border-edge bg-white px-4 py-2.5 text-[15px] font-medium shadow-sm">
@@ -44,14 +44,14 @@ export default function Home() {
             </select>
             <ChevronDown size={16} className="pointer-events-none absolute right-3" />
           </label>
-          <span className="text-[16px] text-muted">{today}</span>
+          <span className="hidden text-[16px] text-muted md:inline">{today}</span>
         </div>
       </div>
 
       <div className="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-[1fr_330px]">
         <div className="space-y-4">
           <Summary summary={data.summary} periodInfo={periodInfo} />
-          <VoicePanel firstProduct={data.inventory[0]?.name} />
+          <VoicePanel firstProduct={data.inventory[0]?.name} firstCustomer={data.customers[0]?.name} />
         </div>
         <div className="space-y-4">
           <RecentConversation messages={data.conversations} />

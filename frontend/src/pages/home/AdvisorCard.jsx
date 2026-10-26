@@ -1,5 +1,6 @@
 import { ArrowRight, ChartNoAxesColumnIncreasing, Mic } from 'lucide-react'
 import { Card, CardHeader, Change, rupees, shortDate } from '../../components/ui'
+import { useAssistant } from '../../components/AssistantContext'
 
 /** Rounds the biggest day up to a tidy number (e.g. 8,300 -> 9,000) so the axis labels are simple. */
 function niceMax(rupeeValue) {
@@ -20,12 +21,13 @@ function Figure({ value, label, change, className = '' }) {
 }
 
 export default function AdvisorCard({ advisor, periodInfo }) {
+  const { ask } = useAssistant()
   const max = niceMax(Math.max(...advisor.trend.map((d) => d.salesPaise / 100)))
 
   return (
     <Card className="flex flex-col p-5">
       <CardHeader icon={<ChartNoAxesColumnIncreasing size={22} strokeWidth={3} />} tint="bg-[#fdebd0] text-orange"
-        title="Business Advisor" note="(Profit & Loss)" subtitle="Understand your business and increase profits." />
+        title="Business Advisor" note="(Profit & Loss)" to="/advisor" subtitle="Understand your business and increase profits." />
 
       <div className="mt-4 grid grid-cols-3 gap-2">
         <Figure value={rupees(advisor.salesPaise)} label="Total Sales" change={<Change pct={advisor.salesChangePct} />} />
@@ -54,8 +56,7 @@ export default function AdvisorCard({ advisor, periodInfo }) {
         </div>
       </div>
 
-      {/* Business insights are not built yet */}
-      <button className="mt-auto flex h-13 w-full items-center gap-3 rounded-xl bg-[#e6effd] px-5 text-[15px] font-semibold text-[#1f5fbf]">
+      <button onClick={() => ask({ text: 'Give me business insights' })} className="mt-auto flex h-13 w-full items-center gap-3 rounded-xl bg-[#e6effd] px-5 text-[15px] font-semibold text-[#1f5fbf]">
         <Mic size={20} /> <span className="flex-1 text-center">Ask for Business Insights</span> <ArrowRight size={18} />
       </button>
     </Card>

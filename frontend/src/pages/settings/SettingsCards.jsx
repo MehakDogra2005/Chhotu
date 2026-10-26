@@ -1,8 +1,9 @@
 import { NavLink } from 'react-router-dom'
-import { AudioLines, Bell, CircleHelp, Mail, Mic, Phone, ShieldCheck, Store, UserRound } from 'lucide-react'
+import { Bell, CircleHelp, Mail, Mic, Phone, ShieldCheck, Smartphone, Store, UserRound } from 'lucide-react'
 import { CATEGORIES } from '../../categories'
 import { Card, CardHeader, Field, Toggle, inputStyle } from '../../components/ui'
 import useMicPermission from './useMicPermission'
+import useInstallPrompt from './useInstallPrompt'
 
 const LANGUAGES = ['English', 'Hindi', 'Hinglish']
 
@@ -15,7 +16,7 @@ export function ShopProfile({ form, change }) {
 
   return (
     <Card className="p-5">
-      <CardHeader viewAll={false} icon={<Store size={22} />} tint="bg-[#e1f5e8] text-brand"
+      <CardHeader icon={<Store size={22} />} tint="bg-[#e1f5e8] text-brand"
         title="Shop Profile" subtitle="How you and your shop appear in Saathi." />
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <Field label="Your name"><input {...text('ownerName')} /></Field>
@@ -36,11 +37,6 @@ export function ShopProfile({ form, change }) {
   )
 }
 
-const MODES = [
-  ['PUSH_TO_TALK', Mic, 'Push to talk', 'Press the mic when you want to speak.'],
-  ['HANDS_FREE', AudioLines, 'Hands-free', 'Saathi keeps listening until you pause it.'],
-]
-
 const MIC_STATUS = {
   granted: ['text-brand', 'Allowed: your browser lets Saathi use the microphone.'],
   denied: ['text-red-600', "Blocked: allow the microphone in your browser's site settings, then reload."],
@@ -54,24 +50,8 @@ export function VoicePreferences({ form, change }) {
 
   return (
     <Card className="p-5">
-      <CardHeader viewAll={false} icon={<Mic size={22} />} tint="bg-[#e3ecfb] text-[#2563c9]"
-        title="Voice Preferences" subtitle="Choose how you talk to Saathi. Voice is coming soon; your choices are saved for it." />
-
-      <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        {MODES.map(([value, Icon, title, text]) => {
-          const selected = form.voiceMode === value
-          return (
-            <button key={value} type="button" aria-pressed={selected} onClick={() => change('voiceMode', value)}
-              className={`flex items-start gap-3 rounded-xl border p-4 text-left ${selected ? 'border-brand bg-mint' : 'border-line bg-white hover:bg-stone-50'}`}>
-              <Icon size={22} className={selected ? 'text-brand' : 'text-muted'} />
-              <span>
-                <span className="block text-[15px] font-semibold">{title}</span>
-                <span className="block text-[13px] text-muted">{text}</span>
-              </span>
-            </button>
-          )
-        })}
-      </div>
+      <CardHeader icon={<Mic size={22} />} tint="bg-[#e3ecfb] text-[#2563c9]"
+        title="Voice Preferences" subtitle="Saathi listens only while you use the mic: tap it to start, tap it again to stop." />
 
       <div className="mt-2 divide-y divide-edge">
         <Toggle checked={form.voiceReplies} onChange={(v) => change('voiceReplies', v)}
@@ -95,7 +75,7 @@ export function VoicePreferences({ form, change }) {
 export function Notifications({ form, change }) {
   return (
     <Card className="p-5">
-      <CardHeader viewAll={false} icon={<Bell size={22} />} tint="bg-[#fdebd0] text-orange"
+      <CardHeader icon={<Bell size={22} />} tint="bg-[#fdebd0] text-orange"
         title="Notifications" subtitle="Choose what Saathi should tell you about." />
       <div className="mt-3 divide-y divide-edge">
         <Toggle checked={form.lowStockAlerts} onChange={(v) => change('lowStockAlerts', v)}
@@ -151,5 +131,37 @@ export function NeedHelp() {
         Open Help
       </NavLink>
     </div>
+  )
+}
+
+/** Put the app on the phone's home screen. The button shows when the browser allows a one-tap install. */
+export function InstallApp() {
+  const install = useInstallPrompt()
+  const alreadyInstalled = window.matchMedia('(display-mode: standalone)').matches
+
+  return (
+    <Card className="p-5">
+      <div className="flex items-center gap-3">
+        <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#e3ecfb] text-[#2563c9]"><Smartphone size={22} /></span>
+        <h3 className="text-[16px] font-bold">Install the app</h3>
+      </div>
+      {alreadyInstalled ? (
+        <p className="mt-3 text-[13px] text-brand">You are using the installed app.</p>
+      ) : (
+        <>
+          <p className="mt-3 text-[13px] leading-relaxed text-muted">
+            Add Dukaan Saathi to your phone's home screen. It opens full-screen, like any other app.
+          </p>
+          {install ? (
+            <button onClick={install} className="mt-4 h-11 w-full rounded-xl bg-brand text-[14px] font-semibold text-white hover:bg-brand-dark">Install app</button>
+          ) : (
+            <ul className="mt-3 space-y-2 text-[13px] text-muted">
+              <li><b className="text-ink">Android (Chrome):</b> tap the ⋮ menu, then <b>Install app</b>.</li>
+              <li><b className="text-ink">iPhone (Safari):</b> tap Share, then <b>Add to Home Screen</b>.</li>
+            </ul>
+          )}
+        </>
+      )}
+    </Card>
   )
 }

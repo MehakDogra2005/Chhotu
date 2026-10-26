@@ -9,6 +9,9 @@ public class SettingsRepository {
                            String voiceMode, boolean voiceReplies, boolean lowStockAlerts, boolean paymentReminders,
                            String phone, String email) {}
 
+    /** The switches on the Settings page (all on until the shop changes them). */
+    public record Switches(boolean lowStockAlerts, boolean paymentReminders, boolean voiceReplies) {}
+
     private final JdbcTemplate jdbc;
 
     public SettingsRepository(JdbcTemplate jdbc) {
@@ -52,8 +55,9 @@ public class SettingsRepository {
         }
     }
 
-    public boolean lowStockAlertsEnabled(String shopId) {
-        return jdbc.queryForList("SELECT low_stock_alerts FROM shop_settings WHERE shop_id = ?", Boolean.class, shopId)
-                .stream().findFirst().orElse(true);
+    public Switches switches(String shopId) {
+        return jdbc.query("SELECT low_stock_alerts, payment_reminders, voice_replies FROM shop_settings WHERE shop_id = ?",
+                (rs, i) -> new Switches(rs.getBoolean(1), rs.getBoolean(2), rs.getBoolean(3)), shopId)
+                .stream().findFirst().orElse(new Switches(true, true, true));
     }
 }

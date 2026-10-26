@@ -25,7 +25,6 @@ export default function Help() {
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-full bg-white text-brand shadow-sm"><Mic size={20} /></span>
             <h2 className="flex-1 text-[16px] font-bold">What you can say to Saathi</h2>
-            <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-orange">Coming soon</span>
           </div>
           <div className="mt-4 space-y-4">
             {VOICE_GROUPS.map(([group, examples]) => (

@@ -21,9 +21,8 @@ public class AuthController {
     }
 
     @PostMapping("/auth/send-otp")
-    public Map<String, String> sendOtp(@RequestBody PhoneRequest req) {
-        auth.sendOtp(req.phone());
-        return Map.of("message", "OTP sent");
+    public AuthService.CodeSent sendOtp(@RequestBody PhoneRequest req) {
+        return auth.sendOtp(req.phone());
     }
 
     @PostMapping("/auth/verify-otp")
@@ -32,9 +31,8 @@ public class AuthController {
     }
 
     @PostMapping("/auth/send-email-otp")
-    public Map<String, String> sendEmailOtp(@RequestBody EmailRequest req) {
-        auth.sendEmailOtp(req.email());
-        return Map.of("message", "OTP sent");
+    public AuthService.CodeSent sendEmailOtp(@RequestBody EmailRequest req) {
+        return auth.sendEmailOtp(req.email());
     }
 
     @PostMapping("/auth/verify-email-otp")

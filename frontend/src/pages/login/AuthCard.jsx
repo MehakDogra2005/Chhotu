@@ -3,6 +3,7 @@ import { Check, ChevronDown, ChevronLeft, Lock, Mail } from 'lucide-react'
 import Logo, { hideBroken } from '../../components/Logo'
 import { post } from '../../api'
 import useGoogleLogin from './useGoogleLogin'
+import useCountdown, { clock } from './useCountdown'
 import { CATEGORIES } from '../../categories'
 
 const STEPS = ['Phone Verification', 'Shop Details', 'All Set!']
@@ -34,6 +35,8 @@ export default function AuthCard({ mode, setMode, lang, onLogin }) {
   const [token, setToken] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [secondsLeft, setSecondsLeft] = useCountdown() // how long the code still works
+  const [delivery, setDelivery] = useState('') // 'email', or 'log' when this server cannot send the code yet
 
   const switchMode = (m) => { setMode(m); setStep('phone'); setOtp(''); setError('') }
   const goTo = (nextStep) => { setStep(nextStep); setError('') }
@@ -55,15 +58,23 @@ export default function AuthCard({ mode, setMode, lang, onLogin }) {
     setStep('shop')
   }
 
-  const sendOtp = submit(async () => {
-    await post('/api/auth/send-otp', { phone })
-    setMethod('phone')
+  // A code was sent: start the countdown the server told us about and show the code box.
+  const codeSent = (res) => {
+    setSecondsLeft(res.expiresInSeconds)
+    setDelivery(res.delivery)
+    setOtp('')
     setStep('otp')
+  }
+  const sendOtp = submit(async () => {
+    codeSent(await post('/api/auth/send-otp', { phone }))
+    setMethod('phone')
   })
   const sendEmailOtp = submit(async () => {
-    await post('/api/auth/send-email-otp', { email })
+    codeSent(await post('/api/auth/send-email-otp', { email }))
     setMethod('email')
-    setStep('otp')
+  })
+  const resend = submit(async () => {
+    codeSent(method === 'email' ? await post('/api/auth/send-email-otp', { email }) : await post('/api/auth/send-otp', { phone }))
   })
   const verifyOtp = submit(async () => {
     finishLogin(method === 'email'
@@ -91,7 +102,7 @@ export default function AuthCard({ mode, setMode, lang, onLogin }) {
   }[step]
 
   return (
-    <section className="flex min-h-screen flex-1 items-center justify-center p-4">
+    <section className="flex min-h-dvh flex-1 items-center justify-center p-4">
       <div className="w-full max-w-[440px] overflow-hidden rounded-[26px] border border-[#f0ebe1] bg-card px-7 pb-8 pt-7 shadow-[0_2px_10px_rgba(0,0,0,0.03)]">
         <div className="flex items-center justify-between text-[13px]">
           {signup ? (
@@ -157,7 +168,12 @@ export default function AuthCard({ mode, setMode, lang, onLogin }) {
             <form onSubmit={verifyOtp} className="space-y-4">
               <input value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} maxLength={6} inputMode="numeric" autoFocus
                 placeholder="6-digit OTP" className={`${inputCls} text-center text-xl tracking-widest`} />
-              <button disabled={busy} className={buttonCls}>Verify &amp; Continue</button>
+              <button disabled={busy || secondsLeft === 0} className={buttonCls}>Verify &amp; Continue</button>
+              {secondsLeft > 0
+                ? <p className="text-center text-[13px] text-muted">The code works for <b className="text-ink">{clock(secondsLeft)}</b> more</p>
+                : <p className="text-center text-[13px] text-red-600">This code has expired.</p>}
+              {secondsLeft === 0 && <button type="button" onClick={resend} disabled={busy} className="h-11 w-full rounded-[10px] border border-brand text-[14px] font-semibold text-brand hover:bg-mint">Send a new code</button>}
+              {delivery === 'log' && secondsLeft > 0 && <p className="text-center text-[12px] text-muted">This server cannot send the code yet, so it is shown in the server window (for testing).</p>}
               <button type="button" onClick={() => goTo(method)} className="w-full text-sm text-brand">
                 {method === 'email' ? 'Change email' : 'Change number'}
               </button>

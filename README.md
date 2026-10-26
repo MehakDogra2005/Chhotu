@@ -20,9 +20,63 @@ npm run dev                  # the page: http://localhost:5173
 
 The first start creates `backend/data/` and loads the sample CSVs from `db/` into it. Delete that folder to start fresh.
 
+## The voice assistant (Saathi)
+
+Tap any mic on the Home page, or one of the example sentences, and Saathi opens. **The microphone listens only between your taps**: tap the mic to start, tap it again (or just stop talking, or close the window) to stop. It is never on by itself. Say it (Chrome and Android Chrome have speech built in) or type it. It answers questions and, for changes, shows what it will do and waits for your Yes.
+
+| You say | What happens |
+|---|---|
+| "Chocolate ka stock kitna hai?" | tells you the stock |
+| "Aaj ki sale batao" / "is mahine profit batao" | sales or gross profit for today / this week / this month |
+| "Rahul ka udhaar kitna hai?" | what that customer owes |
+| "10 Chocolate add karo" | proposes adding stock, then you confirm |
+| "Ramesh ne 500 de diye" | proposes recording the payment, then you confirm |
+| "Ramesh ko 300 ka udhaar diya" | proposes giving credit, then you confirm |
+| "Restocking list bana do", "kaun sa samaan khatam hone wala hai?", "business insights" | lists and summaries |
+
+If two customers share a name, Saathi asks which one (showing phone and pending amount). Every change is saved in the credit ledger / stock movements and in `audit_log`, and every sentence is kept in `voice_utterances` (see Conversations). Answers always come from the database, never from guessing.
+
+How it works: `assistant/CommandParser.java` finds the intent with keywords; `AssistantService.java` runs only checked actions. A proposed change is stored on the server and can be confirmed once, so it cannot be changed or repeated from the browser. The parser is deliberately simple; to understand more sentences add keywords there, or replace it with an LLM or the Gnani speech service later (nothing else needs to change).
+
+## What the Inventory page can do
+
+- **Add Item / Edit item / Archive item:** products are checked (no blank names, no duplicates, no negative prices) and every change is written to `audit_log`. An archived product disappears everywhere but its history is kept; a product that is waiting for a delivery cannot be archived.
+- **Add stock and Stock history:** stock is never typed over. Each change is a movement, so the history always explains the number.
+- **Generate Restocking List:** suggests an amount for each low or out-of-stock item (enough to reach twice its reorder level), with the cost. It can be shared on WhatsApp or copied. **Place order** saves one purchase order per supplier; those items then show as **On Order**. **Mark order received** (the ⋮ menu of an On Order item) adds the ordered amounts to the stock.
+- **Tick rows:** "Restocking list for these" makes a list for just the ticked items.
+- **View Stock Report** (also the Inventory Value card): stock value by category, and a spreadsheet (CSV) of every item.
+- The number cards, the Low Stock Alert and the tabs filter the table; the search and tab live in the address (`/inventory?filter=low&search=bulb`).
+
+## Use it on a phone, and install it as an app
+
+Every page works on a phone: the menu becomes a bar along the bottom, and tables and cards fit the screen. The website is also an installable app (a "PWA"): once opened on a phone it can be added to the home screen, opens full-screen with its own icon, and starts even on a weak connection. Shop data is never stored on the phone by the app itself.
+
+To make the one file that holds everything (website + API), double-click **`build.bat`**, then run
+`java -jar backend	argetackend-0.0.1.jar` and open http://localhost:8080.
+
+To use it on shopkeepers' phones, that jar has to run on a computer on the internet with a **https** address (any host that runs Java works: Render, Railway, a small server...). Then on the phone:
+- **Android (Chrome):** open the address, tap the ⋮ menu, **Install app** (the Settings page also has an **Install app** button).
+- **iPhone (Safari):** open the address, tap Share, **Add to Home Screen**.
+
+Installing needs https. On your own Wi-Fi (`http://192.168.x.x:8080`) the pages work and can be tried on a phone, but the phone will only offer a plain shortcut, not a real install. For a real deployment use PostgreSQL instead of the local H2 file (see below), and add the https address to your Google client ID's allowed origins.
+
+After you change the website, run `build.bat` again to refresh the jar. While developing, keep using `start.bat`.
+
+## Your private settings: email, demo account
+
+Copy `backend/config/local.properties.example` to `backend/config/local.properties` and fill it in (that file is private and is never shared). Restart the backend afterwards.
+
+1. **Emailing the login code.** For Gmail you need an *App password*: Google Account, Security, turn on 2-Step Verification, then App passwords, create one. Put your Gmail address and that password in the file (the example shows where). Any other email service works too; only the host, port, username and password change.
+2. **A demo account with data.** Set `dukaan.demo-email` to an email address you can read. Logging in with it opens **Sharma General Store**, which already has products, sales, udhaar, conversations and orders. If that email already made an account earlier, delete the `backend/data` folder and start again.
+3. **Continue with Google** (optional): see below.
+
 ## Log in
 
-OTPs are not sent as SMS yet: after you press **Send OTP**, copy the 6-digit code from the backend terminal (`OTP for ...`).
+A login code (6 digits) works for **60 seconds**; the page shows a countdown, and a "Send a new code" button once it runs out. After 5 wrong tries the code is cancelled, and a new one can be asked for only after 30 seconds.
+
+**Mobile numbers:** SMS is not set up yet, so after you press **Send OTP** copy the code from the backend window (`OTP for ...`).
+
+**Email:** the code is emailed once you add your mail settings (next section). Until then it is shown in the backend window, and the page tells you so. If an email already has an account, logging in with it opens that account; a new account is only made for a new email (capital letters do not matter).
 
 | Phone | Owner | Shop |
 |---|---|---|
@@ -34,8 +88,6 @@ OTPs are not sent as SMS yet: after you press **Send OTP**, copy the 6-digit cod
 | 9999900006 | Manoj Khanna | Om Household Mart |
 
 Any other 10-digit number starting 6-9 signs up as a new shop (empty dashboard).
-
-**Continue with Email** works the same way: enter any email address, press Send OTP, and copy the code from the backend terminal. Nothing is emailed yet.
 
 **Continue with Google** needs a Google client ID, which only you can create (free, about 5 minutes):
 1. Go to https://console.cloud.google.com/apis/credentials and create a project if you don't have one.
@@ -54,25 +106,28 @@ backend/src/main/java/com/dukaansaathi/
   auth/        login + sign-up (controller -> service -> repository)
   profile/     /api/me: who is logged in (used by the top bar on every page)
   dashboard/   the Home page data (controller -> service -> repository)
-  inventory/   the Inventory page data + the stock queries Home and the top bar also use
+  inventory/   the Inventory page, and adding / editing / archiving products, stock history and the stock report
+  restock/     what to order, purchase orders, and receiving a delivery (which adds the stock)
   settings/    the Settings page: shop profile + preferences (saved in shops, users and shop_settings)
   config/      loads the sample CSVs on first start
 backend/src/main/resources/schema.sql   tables + two views (product_stock, customer_balance)
 frontend/src/
   App.jsx        the pages and their addresses (/, /inventory, /advisor, /customers, /settings, /help)
-  components/    shared by every page: AppLayout (top bar + sidebar frame), TopBar, Sidebar, PageHeader,
+  components/    shared by every page: AppLayout (top bar + menu frame), TopBar, Sidebar (laptop), BottomNav (phone),
+                 navItems (the list of pages), PageHeader,
                  ActionNeeded (restock list), ui (Card, StatCard, StatusPill, ₹ and date formatting)
   pages/
     login/       landing + login / sign-up
     home/        Home page, one small file per section
-    inventory/   Inventory page: Inventory.jsx, ItemsTable.jsx, SideCards.jsx
+    inventory/   Inventory page: Inventory.jsx (the page and its dialogs), ItemsTable.jsx, SideCards.jsx,
+                 ItemFormDialogs / StockDialogs / RestockDialog / ReportDialog / RowActionsDialog (one per button)
     settings/    Settings page: Settings.jsx (the form), SettingsCards.jsx (one card per section)
     help/        Help page: Help.jsx, and helpContent.js where all the text is written
     advisor/ customers/   placeholders, to be built
 db/              sample data + the full PostgreSQL schema
 ```
 
-To add a page: make `pages/<name>/<Name>.jsx`, add a `<Route>` in `App.jsx`, and add a line to `PAGES` in `components/Sidebar.jsx`. The top bar, sidebar and highlighted box come for free.
+To add a page: make `pages/<name>/<Name>.jsx`, add a `<Route>` in `App.jsx`, add its address to `SpaController.java`, and add a line to `components/navItems.js` (the sidebar and the phone bar both read it). The top bar, sidebar and highlighted box come for free.
 
 Rules the code follows: the shop always comes from the login session, never from the request; every query filters on `shop_id`; money is whole paise; stock and customer balances are always calculated from movements / ledger rows, never stored.
 
@@ -80,4 +135,4 @@ To move from the local H2 file to PostgreSQL: swap the `h2` dependency in `backe
 
 ## Not built yet
 
-The voice assistant (the mic, the voice buttons), the other pages (Business Advisor, Customer Handling), adding / editing products, "Record Payment", and SMS for OTPs. Their buttons are in the design but do nothing yet. Voice and payment-reminder choices in Settings are saved but only take effect once those features exist (the low-stock alert switch already controls the bell).
+The other pages (Business Advisor, Customer Handling), adding / editing products, recording sales, Hindi in Devanagari letters and the language selector (multilingual), hands-free "always listening" mode, the Gnani speech service, and SMS/email for OTPs. Everything on the Home and Inventory pages works except the language selector.

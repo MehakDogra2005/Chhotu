@@ -1,0 +1,22 @@
+# Copy this file to "local.properties" (same folder) and fill it in. local.properties is private: it is not shared.
+# Restart the backend after changing it.
+
+# ---- 1. Sending login codes by email (Gmail example) -------------------------------------------
+# For Gmail you need an "App password", not your normal password:
+#   Google Account > Security > turn on 2-Step Verification > App passwords > create one (16 letters).
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=your.address@gmail.com
+spring.mail.password=your-16-letter-app-password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+# The "from" address on the email (usually the same as the username)
+dukaan.mail-from=your.address@gmail.com
+
+# ---- 2. A demo account with data ----------------------------------------------------------------
+# Logging in with this email opens "Sharma General Store", which already has products, sales and udhaar.
+# Use an email address you can read.
+dukaan.demo-email=your.address@gmail.com
+
+# ---- 3. Continue with Google (optional) ---------------------------------------------------------
+# google.client-id=xxxxxxxx.apps.googleusercontent.com

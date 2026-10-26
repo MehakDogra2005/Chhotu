@@ -7,30 +7,29 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dukaansaathi.auth.AuthService;
 import com.dukaansaathi.auth.ShopContext;
-import com.dukaansaathi.inventory.InventoryRepository;
+import com.dukaansaathi.notifications.NotificationService;
 import com.dukaansaathi.settings.SettingsRepository;
 
-/** What the top bar shows on every page: who is logged in, their shop, and how many alerts there are. */
+/** What the top bar needs on every page: who is logged in, their shop, the bell's count, and whether to read answers aloud. */
 @RestController
 @RequestMapping("/api/me")
 public class ProfileController {
-    public record Me(String userName, String shopName, String city, int alerts) {}
+    public record Me(String userName, String shopName, String city, int alerts, boolean voiceReplies) {}
 
     private final AuthService auth;
-    private final InventoryRepository inventory;
+    private final NotificationService notifications;
     private final SettingsRepository settings;
 
-    public ProfileController(AuthService auth, InventoryRepository inventory, SettingsRepository settings) {
+    public ProfileController(AuthService auth, NotificationService notifications, SettingsRepository settings) {
         this.auth = auth;
-        this.inventory = inventory;
+        this.notifications = notifications;
         this.settings = settings;
     }
 
     @GetMapping
     public Me get(@RequestHeader(value = "Authorization", defaultValue = "") String authHeader) {
         ShopContext who = auth.requireShop(authHeader);
-        // The shopkeeper can switch low-stock alerts off in Settings; then the bell shows no number.
-        int alerts = settings.lowStockAlertsEnabled(who.shopId()) ? inventory.lowStockCount(who.shopId()) : 0;
-        return new Me(who.userName(), who.shopName(), who.city(), alerts);
+        return new Me(who.userName(), who.shopName(), who.city(), notifications.list(who).total(),
+                settings.switches(who.shopId()).voiceReplies());
     }
 }

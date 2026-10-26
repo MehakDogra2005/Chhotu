@@ -1,13 +1,15 @@
 import { ChartNoAxesColumnIncreasing, CirclePlus, ListChecks, Mic } from 'lucide-react'
+import { useAssistant } from '../../components/AssistantContext'
 import { Card } from '../../components/ui'
 
-// Voice is not connected yet, so these are examples of what the shopkeeper will be able to say.
+/** Sentences to try. Tapping one sends it to Saathi. names are products of this shop. */
 export function TalkToSaathi({ names }) {
-  const first = names[0] || 'Maggi'
+  const { ask } = useAssistant()
+  const first = names[0] || 'Chocolate'
   const second = names[1] || first
   const examples = [
     `${first} ka stock kitna hai?`,
-    `10 packet ${second} add karo`,
+    `10 ${second} add karo`,
     'Kaun sa samaan khatam hone wala hai?',
     'Restocking list bana do',
   ]
@@ -20,8 +22,10 @@ export function TalkToSaathi({ names }) {
       </div>
       <ul className="mt-4 space-y-2">
         {examples.map((text) => (
-          <li key={text} className="flex items-center gap-2 rounded-full border border-[#d5ecdd] bg-white/80 px-3 py-2 text-[13px]">
-            <Mic size={13} className="shrink-0 text-muted" /> “{text}”
+          <li key={text}>
+            <button onClick={() => ask({ text })} className="flex w-full items-center gap-2 rounded-full border border-[#d5ecdd] bg-white/80 px-3 py-2 text-left text-[13px] hover:border-brand">
+              <Mic size={13} className="shrink-0 text-muted" /> “{text}”
+            </button>
           </li>
         ))}
       </ul>
@@ -29,21 +33,21 @@ export function TalkToSaathi({ names }) {
   )
 }
 
-const ACTIONS = [
-  [Mic, 'Update Stock by Voice', 'bg-[#e3f5e8] text-brand'],
-  [ListChecks, 'Generate Restocking List', 'bg-[#e3ecfb] text-[#2563c9]'],
-  [CirclePlus, 'Add New Item', 'bg-[#fde8e5] text-red-500'],
-  [ChartNoAxesColumnIncreasing, 'View Stock Report', 'bg-[#ece6fb] text-[#6d4bc8]'],
-]
+/** The four big buttons. Each one is handled by the Inventory page. */
+export function QuickActions({ onVoice, onRestock, onAdd, onReport }) {
+  const actions = [
+    [Mic, 'Update Stock by Voice', 'bg-[#e3f5e8] text-brand', onVoice],
+    [ListChecks, 'Generate Restocking List', 'bg-[#e3ecfb] text-[#2563c9]', onRestock],
+    [CirclePlus, 'Add New Item', 'bg-[#fde8e5] text-red-500', onAdd],
+    [ChartNoAxesColumnIncreasing, 'View Stock Report', 'bg-[#ece6fb] text-[#6d4bc8]', onReport],
+  ]
 
-// None of these are built yet.
-export function QuickActions() {
   return (
     <Card className="p-5">
       <h3 className="text-[16px] font-bold">Quick Actions</h3>
       <div className="mt-3 grid grid-cols-2 gap-3">
-        {ACTIONS.map(([Icon, label, colours]) => (
-          <button key={label} className={`flex h-24 flex-col items-center justify-center gap-2 rounded-xl px-2 text-center text-[13px] ${colours}`}>
+        {actions.map(([Icon, label, colours, onClick]) => (
+          <button key={label} onClick={onClick} className={`flex h-24 flex-col items-center justify-center gap-2 rounded-xl px-2 text-center text-[13px] hover:opacity-80 ${colours}`}>
             <Icon size={26} />
             <span className="text-[#1c2b24]">{label}</span>
           </button>

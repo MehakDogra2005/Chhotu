@@ -6,7 +6,7 @@ import { useAuth } from '../../AuthContext'
 import useFetch from '../../useFetch'
 import PageHeader from '../../components/PageHeader'
 import { Card } from '../../components/ui'
-import { AccountCard, NeedHelp, Notifications, ShopProfile, VoicePreferences } from './SettingsCards'
+import { AccountCard, InstallApp, NeedHelp, Notifications, ShopProfile, VoicePreferences } from './SettingsCards'
 
 export default function Settings() {
   const { reloadMe } = useOutletContext() // refreshes the name and shop in the top bar after saving
@@ -29,7 +29,7 @@ export default function Settings() {
   const save = async () => {
     setSaving(true)
     try {
-      setForm(await put('/api/settings', form, token))
+      setForm(await put('/api/settings', { ...form, voiceMode: 'PUSH_TO_TALK' }, token))
       setStatus({ ok: true, text: 'Your settings are saved.' })
       reloadMe()
     } catch (err) {
@@ -60,6 +60,7 @@ export default function Settings() {
 
         <div className="space-y-4">
           <AccountCard settings={form} onLogout={logout} />
+          <InstallApp />
           <NeedHelp />
         </div>
       </div>

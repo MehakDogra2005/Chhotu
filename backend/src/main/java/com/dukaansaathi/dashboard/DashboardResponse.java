@@ -29,7 +29,7 @@ public record DashboardResponse(
 
     public record DayTotal(LocalDate date, long salesPaise) {}
 
-    public record Debtor(String name, long totalCreditPaise, long pendingPaise) {}
+    public record Debtor(String customerId, String name, long totalCreditPaise, long pendingPaise) {}
 
-    public record Recording(String fileName, String status, LocalDate uploadedOn) {}
+    public record Recording(String fileName, String status, LocalDate uploadedOn, String transcript) {}
 }
