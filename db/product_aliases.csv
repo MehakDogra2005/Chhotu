@@ -1,0 +1,96 @@
+alias_id,shop_id,product_id,alias_text,language,source
+ALS-00001,SHOP001,PRD-001-001,paani bottle,hi,seeded
+ALS-00002,SHOP001,PRD-001-001,water bottle,hi,seeded
+ALS-00003,SHOP001,PRD-001-002,dant manjan,hi,seeded
+ALS-00004,SHOP001,PRD-001-002,toothpaste,hi-Latn,seeded
+ALS-00005,SHOP001,PRD-001-003,dishwash bar,hi,seeded
+ALS-00006,SHOP001,PRD-001-004,chips,hi,seeded
+ALS-00007,SHOP001,PRD-001-005,led bulb,en,seeded
+ALS-00008,SHOP001,PRD-001-006,aa battery,hi-Latn,seeded
+ALS-00009,SHOP001,PRD-001-007,tissue box,hi,seeded
+ALS-00010,SHOP001,PRD-001-008,sabun,en,seeded
+ALS-00011,SHOP001,PRD-001-008,soap,hi,seeded
+ALS-00012,SHOP001,PRD-001-009,detergent,en,seeded
+ALS-00013,SHOP001,PRD-001-010,chocolate,hi-Latn,seeded
+ALS-00014,SHOP001,PRD-001-011,garbage bags,hi-Latn,seeded
+ALS-00015,SHOP001,PRD-001-012,soft drink,hi,seeded
+ALS-00016,SHOP002,PRD-002-001,copy,hi,seeded
+ALS-00017,SHOP002,PRD-002-001,notebook,en,seeded
+ALS-00018,SHOP002,PRD-002-001,register,en,seeded
+ALS-00019,SHOP002,PRD-002-002,ball pen,hi,seeded
+ALS-00020,SHOP002,PRD-002-002,pen,hi-Latn,seeded
+ALS-00021,SHOP002,PRD-002-003,pencil,hi,seeded
+ALS-00022,SHOP002,PRD-002-003,pencill,en,seeded
+ALS-00023,SHOP002,PRD-002-004,eraser,hi,seeded
+ALS-00024,SHOP002,PRD-002-005,geometry box,hi-Latn,seeded
+ALS-00025,SHOP002,PRD-002-006,A4 paper,en,seeded
+ALS-00026,SHOP002,PRD-002-006,paper ream,en,seeded
+ALS-00027,SHOP002,PRD-002-007,marker,hi,seeded
+ALS-00028,SHOP002,PRD-002-008,glue stick,en,seeded
+ALS-00029,SHOP002,PRD-002-009,file folder,hi-Latn,seeded
+ALS-00030,SHOP002,PRD-002-010,stapler,en,seeded
+ALS-00031,SHOP002,PRD-002-011,crayons,hi,seeded
+ALS-00032,SHOP002,PRD-002-012,chart paper,hi,seeded
+ALS-00033,SHOP003,PRD-003-001,chaawal,hi-Latn,seeded
+ALS-00034,SHOP003,PRD-003-001,chawal,hi-Latn,seeded
+ALS-00035,SHOP003,PRD-003-001,rice,hi-Latn,seeded
+ALS-00036,SHOP003,PRD-003-002,atta,en,seeded
+ALS-00037,SHOP003,PRD-003-002,gehun ka atta,hi-Latn,seeded
+ALS-00038,SHOP003,PRD-003-002,wheat flour,hi-Latn,seeded
+ALS-00039,SHOP003,PRD-003-003,cheeni,en,seeded
+ALS-00040,SHOP003,PRD-003-003,shakkar,hi-Latn,seeded
+ALS-00041,SHOP003,PRD-003-003,sugar,hi,seeded
+ALS-00042,SHOP003,PRD-003-004,toor dal,hi-Latn,seeded
+ALS-00043,SHOP003,PRD-003-005,chai patti,hi,seeded
+ALS-00044,SHOP003,PRD-003-005,tea,hi-Latn,seeded
+ALS-00045,SHOP003,PRD-003-006,biscuits,hi-Latn,seeded
+ALS-00046,SHOP003,PRD-003-007,instant noodles,hi-Latn,seeded
+ALS-00047,SHOP003,PRD-003-007,maggi,en,seeded
+ALS-00048,SHOP003,PRD-003-007,noodles,hi-Latn,seeded
+ALS-00049,SHOP003,PRD-003-008,doodh,en,seeded
+ALS-00050,SHOP003,PRD-003-008,milk,hi-Latn,seeded
+ALS-00051,SHOP003,PRD-003-009,cooking oil,en,seeded
+ALS-00052,SHOP003,PRD-003-009,tel,en,seeded
+ALS-00053,SHOP003,PRD-003-010,salt,hi,seeded
+ALS-00054,SHOP003,PRD-003-011,sabun,en,seeded
+ALS-00055,SHOP003,PRD-003-011,soap,hi,seeded
+ALS-00056,SHOP003,PRD-003-012,detergent,en,seeded
+ALS-00057,SHOP004,PRD-004-001,mustard oil,hi,seeded
+ALS-00058,SHOP004,PRD-004-001,sarson ka tel,hi-Latn,seeded
+ALS-00059,SHOP004,PRD-004-002,sunflower oil,hi-Latn,seeded
+ALS-00060,SHOP004,PRD-004-003,groundnut oil,hi,seeded
+ALS-00061,SHOP004,PRD-004-004,rice bran oil,hi-Latn,seeded
+ALS-00062,SHOP004,PRD-004-005,olive oil,hi-Latn,seeded
+ALS-00063,SHOP004,PRD-004-006,ghee,hi,seeded
+ALS-00064,SHOP004,PRD-004-007,coconut oil,hi,seeded
+ALS-00065,SHOP004,PRD-004-008,sesame oil,en,seeded
+ALS-00066,SHOP004,PRD-004-009,refined oil tin,hi-Latn,seeded
+ALS-00067,SHOP004,PRD-004-010,empty bottle 500ml,hi,seeded
+ALS-00068,SHOP004,PRD-004-011,empty bottle 1l,hi,seeded
+ALS-00069,SHOP004,PRD-004-012,oil pouch 1l,en,seeded
+ALS-00070,SHOP005,PRD-005-001,bread,hi,seeded
+ALS-00071,SHOP005,PRD-005-002,eggs,en,seeded
+ALS-00072,SHOP005,PRD-005-003,curd,hi-Latn,seeded
+ALS-00073,SHOP005,PRD-005-004,frozen peas,en,seeded
+ALS-00074,SHOP005,PRD-005-005,coffee,en,seeded
+ALS-00075,SHOP005,PRD-005-006,cornflakes,en,seeded
+ALS-00076,SHOP005,PRD-005-007,handwash,hi-Latn,seeded
+ALS-00077,SHOP005,PRD-005-008,sanitary pads,hi-Latn,seeded
+ALS-00078,SHOP005,PRD-005-009,aluminium foil,hi-Latn,seeded
+ALS-00079,SHOP005,PRD-005-010,cling film,en,seeded
+ALS-00080,SHOP005,PRD-005-011,lighter,en,seeded
+ALS-00081,SHOP005,PRD-005-012,matchbox,en,seeded
+ALS-00082,SHOP006,PRD-006-001,balti,hi-Latn,seeded
+ALS-00083,SHOP006,PRD-006-001,bucket,en,seeded
+ALS-00084,SHOP006,PRD-006-002,lota,hi,seeded
+ALS-00085,SHOP006,PRD-006-002,mug,hi-Latn,seeded
+ALS-00086,SHOP006,PRD-006-003,steel plate,en,seeded
+ALS-00087,SHOP006,PRD-006-004,storage container,hi,seeded
+ALS-00088,SHOP006,PRD-006-005,scrub pad,hi-Latn,seeded
+ALS-00089,SHOP006,PRD-006-006,mop,en,seeded
+ALS-00090,SHOP006,PRD-006-007,broom,en,seeded
+ALS-00091,SHOP006,PRD-006-008,lunch box,en,seeded
+ALS-00092,SHOP006,PRD-006-009,water bottle,hi,seeded
+ALS-00093,SHOP006,PRD-006-010,extension board,hi,seeded
+ALS-00094,SHOP006,PRD-006-011,screwdriver set,hi,seeded
+ALS-00095,SHOP006,PRD-006-012,plastic rope,hi-Latn,seeded

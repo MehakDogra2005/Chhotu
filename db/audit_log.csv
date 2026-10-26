@@ -1,0 +1,154 @@
+audit_id,shop_id,actor_user_id,entity_type,entity_id,action,old_value_json,new_value_json,source,created_at
+AUD-000001,SHOP004,USR-004,credit_transaction,CRD-000267,CREATE,,"{""type"": ""ADJUSTMENT"", ""amount_paise"": 2200, ""status"": ""RECORDED""}",UI,2026-01-07 20:53:40
+AUD-000002,SHOP005,USR-005,sale,SAL-00410,STATUS_CHANGE,"{""status"": ""COMPLETED""}","{""status"": ""CANCELLED""}",UI,2026-01-19 11:44:27
+AUD-000003,SHOP006,USR-006,inventory_movement,VOU-00210,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 17, ""product_id"": ""PRD-006-003""}",VOICE,2026-01-26 09:24:16
+AUD-000004,SHOP005,USR-005,inventory_movement,VOU-00214,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 18, ""product_id"": ""PRD-005-002""}",VOICE,2026-02-04 14:27:26
+AUD-000005,SHOP001,USR-001,inventory_movement,VOU-00132,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 19, ""product_id"": ""PRD-001-003""}",VOICE,2026-02-28 15:17:59
+AUD-000006,SHOP001,USR-001,sale,SAL-00025,STATUS_CHANGE,"{""status"": ""COMPLETED""}","{""status"": ""RETURNED""}",UI,2026-03-01 10:05:24
+AUD-000007,SHOP004,USR-004,inventory_movement,VOU-00182,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 8, ""product_id"": ""PRD-004-008""}",VOICE,2026-03-05 12:14:04
+AUD-000008,SHOP001,USR-001,inventory_movement,ADJ-0003,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": 2, ""product_id"": ""PRD-001-002""}",UI,2026-03-12 13:05:54
+AUD-000009,SHOP003,USR-003,credit_transaction,CRD-000242,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 3000, ""status"": ""RECORDED""}",VOICE,2026-03-16 09:35:15
+AUD-000010,SHOP004,USR-004,credit_transaction,CRD-000237,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 31500, ""status"": ""RECORDED""}",VOICE,2026-03-17 12:43:19
+AUD-000011,SHOP004,USR-004,extracted_draft,DRF-0001,CONFIRM,"{""status"": ""PENDING_REVIEW""}","{""status"": ""CONFIRMED"", ""credit_txn_id"": ""CRD-000237""}",UI,2026-03-17 13:16:14
+AUD-000012,SHOP004,USR-004,extracted_draft,DRF-0001,CREATE,,"{""type"": ""PAYMENT_RECEIVED"", ""status"": ""CONFIRMED""}",AUDIO,2026-03-17 20:29:17
+AUD-000013,SHOP001,USR-001,inventory_movement,VOU-00119,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 10, ""product_id"": ""PRD-001-010""}",VOICE,2026-03-18 17:46:15
+AUD-000014,SHOP001,USR-001,sale,SAL-00072,STATUS_CHANGE,"{""status"": ""COMPLETED""}","{""status"": ""RETURNED""}",UI,2026-03-20 17:07:59
+AUD-000015,SHOP001,USR-001,inventory_movement,ADJ-0001,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -5, ""product_id"": ""PRD-001-007""}",UI,2026-03-21 13:53:40
+AUD-000016,SHOP004,USR-004,inventory_movement,ADJ-0017,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -4, ""product_id"": ""PRD-004-002""}",UI,2026-03-22 10:48:34
+AUD-000017,SHOP002,USR-002,inventory_movement,VOU-00155,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 9, ""product_id"": ""PRD-002-002""}",VOICE,2026-03-23 19:10:50
+AUD-000018,SHOP003,USR-003,extracted_draft,DRF-0004,CREATE,,"{""type"": ""PAYMENT_RECEIVED"", ""status"": ""CONFIRMED""}",AUDIO,2026-03-27 09:36:18
+AUD-000019,SHOP002,USR-002,credit_transaction,CRD-000268,CREATE,,"{""type"": ""ADJUSTMENT"", ""amount_paise"": 2500, ""status"": ""RECORDED""}",UI,2026-03-27 13:54:43
+AUD-000020,SHOP003,USR-003,credit_transaction,CRD-000240,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 19000, ""status"": ""RECORDED""}",VOICE,2026-03-27 15:15:09
+AUD-000021,SHOP003,USR-003,extracted_draft,DRF-0004,CONFIRM,"{""status"": ""PENDING_REVIEW""}","{""status"": ""CONFIRMED"", ""credit_txn_id"": ""CRD-000240""}",UI,2026-03-27 16:30:28
+AUD-000022,SHOP006,USR-006,credit_transaction,CRD-000265,CREATE,,"{""type"": ""ADJUSTMENT"", ""amount_paise"": 1700, ""status"": ""RECORDED""}",VOICE,2026-03-29 10:37:01
+AUD-000023,SHOP002,USR-002,sale,SAL-00153,STATUS_CHANGE,"{""status"": ""COMPLETED""}","{""status"": ""RETURNED""}",UI,2026-04-01 10:22:54
+AUD-000024,SHOP004,USR-004,inventory_movement,ADJ-0018,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": 4, ""product_id"": ""PRD-004-003""}",UI,2026-04-02 17:10:16
+AUD-000025,SHOP005,USR-005,credit_transaction,CRD-000258,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 23500, ""status"": ""RECORDED""}",UI,2026-04-03 18:42:01
+AUD-000026,SHOP002,USR-002,inventory_movement,ADJ-0009,CREATE,,"{""type"": ""WASTAGE"", ""qty"": -1, ""product_id"": ""PRD-002-005""}",UI,2026-04-05 20:35:34
+AUD-000027,SHOP005,USR-005,inventory_movement,VOU-00078,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 6, ""product_id"": ""PRD-005-008""}",VOICE,2026-04-08 19:41:41
+AUD-000028,SHOP006,USR-006,inventory_movement,ADJ-0030,CREATE,,"{""type"": ""WASTAGE"", ""qty"": -2, ""product_id"": ""PRD-006-004""}",UI,2026-04-12 16:30:13
+AUD-000029,SHOP006,USR-006,credit_transaction,CRD-000235,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 4500, ""status"": ""RECORDED""}",UI,2026-04-17 12:32:30
+AUD-000030,SHOP006,USR-006,credit_transaction,CRD-000260,CREATE,,"{""type"": ""ADJUSTMENT"", ""amount_paise"": 4500, ""status"": ""RECORDED""}",VOICE,2026-04-18 15:20:13
+AUD-000031,SHOP002,USR-002,inventory_movement,ADJ-0007,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -5, ""product_id"": ""PRD-002-002""}",UI,2026-04-24 20:20:13
+AUD-000032,SHOP005,USR-005,inventory_movement,ADJ-0021,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -1, ""product_id"": ""PRD-005-010""}",UI,2026-04-26 10:45:40
+AUD-000033,SHOP001,USR-001,credit_transaction,CRD-000257,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 55500, ""status"": ""RECORDED""}",VOICE,2026-04-26 11:39:34
+AUD-000034,SHOP005,USR-005,inventory_movement,ADJ-0022,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -1, ""product_id"": ""PRD-005-001""}",UI,2026-04-28 09:55:21
+AUD-000035,SHOP003,USR-003,inventory_movement,VOU-00104,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 11, ""product_id"": ""PRD-003-009""}",VOICE,2026-04-28 11:23:48
+AUD-000036,SHOP001,USR-001,sale,SAL-00079,STATUS_CHANGE,"{""status"": ""COMPLETED""}","{""status"": ""CANCELLED""}",UI,2026-04-28 12:45:41
+AUD-000037,SHOP002,USR-002,inventory_movement,ADJ-0006,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -1, ""product_id"": ""PRD-002-001""}",UI,2026-04-28 14:25:17
+AUD-000038,SHOP005,USR-005,inventory_movement,VOU-00060,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 6, ""product_id"": ""PRD-005-002""}",VOICE,2026-04-28 15:46:21
+AUD-000039,SHOP006,USR-006,inventory_movement,VOU-00007,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 20, ""product_id"": ""PRD-006-009""}",VOICE,2026-04-30 11:12:18
+AUD-000040,SHOP004,USR-004,inventory_movement,ADJ-0016,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -1, ""product_id"": ""PRD-004-005""}",UI,2026-05-01 12:56:36
+AUD-000041,SHOP006,USR-006,inventory_movement,ADJ-0026,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -2, ""product_id"": ""PRD-006-002""}",UI,2026-05-03 12:34:28
+AUD-000042,SHOP001,USR-001,sale,SAL-00069,STATUS_CHANGE,"{""status"": ""COMPLETED""}","{""status"": ""CANCELLED""}",UI,2026-05-05 13:51:55
+AUD-000043,SHOP003,USR-003,inventory_movement,VOU-00121,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 8, ""product_id"": ""PRD-003-001""}",VOICE,2026-05-06 14:56:53
+AUD-000044,SHOP003,USR-003,credit_transaction,CRD-000236,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 22500, ""status"": ""RECORDED""}",UI,2026-05-08 10:18:32
+AUD-000045,SHOP003,USR-003,credit_transaction,CRD-000261,CREATE,,"{""type"": ""ADJUSTMENT"", ""amount_paise"": 22500, ""status"": ""RECORDED""}",VOICE,2026-05-09 13:48:53
+AUD-000046,SHOP001,USR-001,sale,SAL-00024,STATUS_CHANGE,"{""status"": ""COMPLETED""}","{""status"": ""RETURNED""}",UI,2026-05-10 12:48:21
+AUD-000047,SHOP001,USR-001,credit_transaction,CRD-000270,CREATE,,"{""type"": ""ADJUSTMENT"", ""amount_paise"": 3700, ""status"": ""RECORDED""}",VOICE,2026-05-10 17:41:21
+AUD-000048,SHOP002,USR-002,credit_transaction,CRD-000247,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 17000, ""status"": ""RECORDED""}",UI,2026-05-15 16:40:15
+AUD-000049,SHOP002,USR-002,inventory_movement,VOU-00160,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 20, ""product_id"": ""PRD-002-003""}",VOICE,2026-05-17 10:48:03
+AUD-000050,SHOP006,USR-006,credit_transaction,CRD-000255,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 27500, ""status"": ""RECORDED""}",VOICE,2026-05-24 12:17:27
+AUD-000051,SHOP005,USR-005,sale,SAL-00372,STATUS_CHANGE,"{""status"": ""COMPLETED""}","{""status"": ""CANCELLED""}",UI,2026-05-24 18:01:35
+AUD-000052,SHOP005,USR-005,credit_transaction,CRD-000252,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 28500, ""status"": ""RECORDED""}",UI,2026-05-31 20:01:54
+AUD-000053,SHOP003,USR-003,credit_transaction,CRD-000244,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 24000, ""status"": ""RECORDED""}",UI,2026-06-01 14:48:57
+AUD-000054,SHOP006,USR-006,inventory_movement,VOU-00062,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 14, ""product_id"": ""PRD-006-008""}",VOICE,2026-06-06 15:44:46
+AUD-000055,SHOP006,USR-006,inventory_movement,ADJ-0027,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -2, ""product_id"": ""PRD-006-003""}",UI,2026-06-17 13:29:15
+AUD-000056,SHOP006,USR-006,inventory_movement,ADJ-0028,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": 5, ""product_id"": ""PRD-006-002""}",UI,2026-06-22 10:03:41
+AUD-000057,SHOP006,USR-006,sale,SAL-00506,STATUS_CHANGE,"{""status"": ""COMPLETED""}","{""status"": ""CANCELLED""}",UI,2026-06-23 09:48:51
+AUD-000058,SHOP005,USR-005,extracted_draft,DRF-0003,CREATE,,"{""type"": ""PAYMENT_RECEIVED"", ""status"": ""CONFIRMED""}",AUDIO,2026-06-24 09:45:34
+AUD-000059,SHOP005,USR-005,extracted_draft,DRF-0003,CONFIRM,"{""status"": ""PENDING_REVIEW""}","{""status"": ""CONFIRMED"", ""credit_txn_id"": ""CRD-000239""}",UI,2026-06-24 11:17:02
+AUD-000060,SHOP005,USR-005,credit_transaction,CRD-000239,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 79000, ""status"": ""RECORDED""}",VOICE,2026-06-24 15:56:40
+AUD-000061,SHOP003,USR-003,inventory_movement,ADJ-0014,CREATE,,"{""type"": ""WASTAGE"", ""qty"": -1, ""product_id"": ""PRD-003-003""}",UI,2026-06-25 20:56:46
+AUD-000062,SHOP001,USR-001,credit_transaction,CRD-000264,CREATE,,"{""type"": ""ADJUSTMENT"", ""amount_paise"": 3900, ""status"": ""RECORDED""}",VOICE,2026-06-27 11:38:38
+AUD-000063,SHOP002,USR-002,inventory_movement,ADJ-0008,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": 4, ""product_id"": ""PRD-002-011""}",UI,2026-07-06 19:29:09
+AUD-000064,SHOP003,USR-003,inventory_movement,ADJ-0015,CREATE,,"{""type"": ""WASTAGE"", ""qty"": -1, ""product_id"": ""PRD-003-005""}",UI,2026-07-07 17:58:06
+AUD-000065,SHOP004,USR-004,inventory_movement,VOU-00128,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 16, ""product_id"": ""PRD-004-011""}",VOICE,2026-07-09 16:57:33
+AUD-000066,SHOP005,USR-005,inventory_movement,ADJ-0023,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": 2, ""product_id"": ""PRD-005-002""}",UI,2026-07-10 13:42:31
+AUD-000067,SHOP002,USR-002,sale,SAL-00165,STATUS_CHANGE,"{""status"": ""COMPLETED""}","{""status"": ""RETURNED""}",UI,2026-07-15 14:38:16
+AUD-000068,SHOP005,USR-005,inventory_movement,ADJ-0024,CREATE,,"{""type"": ""WASTAGE"", ""qty"": -1, ""product_id"": ""PRD-005-004""}",UI,2026-07-17 20:59:56
+AUD-000069,SHOP005,USR-005,inventory_movement,ADJ-0025,CREATE,,"{""type"": ""WASTAGE"", ""qty"": -2, ""product_id"": ""PRD-005-010""}",UI,2026-07-26 12:50:30
+AUD-000070,SHOP003,USR-003,inventory_movement,ADJ-0011,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -4, ""product_id"": ""PRD-003-007""}",UI,2026-07-31 17:16:35
+AUD-000071,SHOP001,USR-001,credit_transaction,CRD-000262,CREATE,,"{""type"": ""ADJUSTMENT"", ""amount_paise"": 2500, ""status"": ""RECORDED""}",VOICE,2026-07-31 18:09:15
+AUD-000072,SHOP001,USR-001,inventory_movement,VOU-00077,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 12, ""product_id"": ""PRD-001-011""}",VOICE,2026-07-31 19:20:53
+AUD-000073,SHOP004,USR-004,inventory_movement,VOU-00142,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 5, ""product_id"": ""PRD-004-006""}",VOICE,2026-08-17 18:35:14
+AUD-000074,SHOP001,USR-001,credit_transaction,CRD-000271,CREATE,,"{""type"": ""ADJUSTMENT"", ""amount_paise"": 1000, ""status"": ""RECORDED""}",VOICE,2026-08-18 10:27:23
+AUD-000075,SHOP003,USR-003,inventory_movement,ADJ-0012,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -1, ""product_id"": ""PRD-003-001""}",UI,2026-08-22 19:56:34
+AUD-000076,SHOP006,USR-006,sale,SAL-00502,STATUS_CHANGE,"{""status"": ""COMPLETED""}","{""status"": ""CANCELLED""}",UI,2026-08-24 14:17:09
+AUD-000077,SHOP005,USR-005,sale,SAL-00345,STATUS_CHANGE,"{""status"": ""COMPLETED""}","{""status"": ""RETURNED""}",UI,2026-09-03 09:46:29
+AUD-000078,SHOP006,USR-006,sale,SAL-00465,STATUS_CHANGE,"{""status"": ""COMPLETED""}","{""status"": ""CANCELLED""}",UI,2026-09-06 12:28:37
+AUD-000079,SHOP002,USR-002,credit_transaction,CRD-000251,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 11500, ""status"": ""RECORDED""}",VOICE,2026-09-06 15:03:13
+AUD-000080,SHOP006,USR-006,credit_transaction,CRD-000256,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 5000, ""status"": ""RECORDED""}",VOICE,2026-09-06 19:43:51
+AUD-000081,SHOP003,USR-003,credit_transaction,CRD-000248,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 26500, ""status"": ""RECORDED""}",UI,2026-09-08 13:15:17
+AUD-000082,SHOP002,USR-002,inventory_movement,ADJ-0010,CREATE,,"{""type"": ""WASTAGE"", ""qty"": -3, ""product_id"": ""PRD-002-005""}",UI,2026-09-08 15:57:37
+AUD-000083,SHOP004,USR-004,inventory_movement,ADJ-0020,CREATE,,"{""type"": ""WASTAGE"", ""qty"": -3, ""product_id"": ""PRD-004-009""}",UI,2026-09-10 20:12:45
+AUD-000084,SHOP003,USR-003,inventory_movement,ADJ-0013,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": 3, ""product_id"": ""PRD-003-005""}",UI,2026-09-13 10:18:27
+AUD-000085,SHOP005,USR-005,credit_transaction,CRD-000245,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 98000, ""status"": ""RECORDED""}",VOICE,2026-09-14 17:28:57
+AUD-000086,SHOP003,USR-003,inventory_movement,VOU-00173,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 5, ""product_id"": ""PRD-003-003""}",VOICE,2026-09-14 18:20:31
+AUD-000087,SHOP001,USR-001,credit_transaction,CRD-000246,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 2500, ""status"": ""RECORDED""}",VOICE,2026-09-15 13:48:15
+AUD-000088,SHOP005,USR-005,credit_transaction,CRD-000263,CREATE,,"{""type"": ""ADJUSTMENT"", ""amount_paise"": 1800, ""status"": ""RECORDED""}",UI,2026-09-16 10:36:13
+AUD-000089,SHOP002,USR-002,extracted_draft,DRF-0012,CREATE,,"{""type"": ""PAYMENT_RECEIVED"", ""status"": ""REJECTED""}",AUDIO,2026-09-18 16:07:29
+AUD-000090,SHOP006,USR-006,credit_transaction,CRD-000243,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 35000, ""status"": ""RECORDED""}",VOICE,2026-09-19 11:51:29
+AUD-000091,SHOP001,USR-001,credit_transaction,CRD-000269,CREATE,,"{""type"": ""ADJUSTMENT"", ""amount_paise"": 4800, ""status"": ""RECORDED""}",UI,2026-09-23 09:22:34
+AUD-000092,SHOP001,USR-001,credit_transaction,CRD-000234,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 7000, ""status"": ""RECORDED""}",UI,2026-09-25 18:41:20
+AUD-000093,SHOP001,USR-001,credit_transaction,CRD-000259,CREATE,,"{""type"": ""ADJUSTMENT"", ""amount_paise"": 7000, ""status"": ""RECORDED""}",VOICE,2026-09-26 19:27:08
+AUD-000094,SHOP001,USR-001,inventory_movement,ADJ-0005,CREATE,,"{""type"": ""WASTAGE"", ""qty"": -2, ""product_id"": ""PRD-001-011""}",UI,2026-09-30 11:23:22
+AUD-000095,SHOP006,USR-006,inventory_movement,ADJ-0029,CREATE,,"{""type"": ""WASTAGE"", ""qty"": -1, ""product_id"": ""PRD-006-009""}",UI,2026-10-01 10:59:48
+AUD-000096,SHOP002,USR-002,inventory_movement,VOU-00136,CREATE,,"{""type"": ""MANUAL_IN"", ""qty"": 18, ""product_id"": ""PRD-002-011""}",VOICE,2026-10-03 18:04:24
+AUD-000097,SHOP003,USR-003,credit_transaction,CRD-000241,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 4500, ""status"": ""RECORDED""}",VOICE,2026-10-04 15:14:11
+AUD-000098,SHOP004,USR-004,sale,SAL-00292,STATUS_CHANGE,"{""status"": ""COMPLETED""}","{""status"": ""CANCELLED""}",UI,2026-10-07 20:34:26
+AUD-000099,SHOP001,USR-001,inventory_movement,ADJ-0004,CREATE,,"{""type"": ""WASTAGE"", ""qty"": -1, ""product_id"": ""PRD-001-004""}",UI,2026-10-08 15:17:29
+AUD-000100,SHOP003,USR-003,credit_transaction,CRD-000250,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 22500, ""status"": ""RECORDED""}",UI,2026-10-09 12:04:26
+AUD-000101,SHOP004,USR-004,inventory_movement,ADJ-0019,CREATE,,"{""type"": ""WASTAGE"", ""qty"": -3, ""product_id"": ""PRD-004-009""}",UI,2026-10-10 15:13:59
+AUD-000102,SHOP001,USR-001,inventory_movement,ADJ-0002,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -3, ""product_id"": ""PRD-001-010""}",UI,2026-10-13 18:12:45
+AUD-000103,SHOP003,USR-003,credit_transaction,CRD-000238,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 16500, ""status"": ""RECORDED""}",VOICE,2026-10-14 09:02:15
+AUD-000104,SHOP003,USR-003,extracted_draft,DRF-0002,CREATE,,"{""type"": ""PAYMENT_RECEIVED"", ""status"": ""CONFIRMED""}",AUDIO,2026-10-14 12:47:30
+AUD-000105,SHOP003,USR-003,extracted_draft,DRF-0002,CONFIRM,"{""status"": ""PENDING_REVIEW""}","{""status"": ""CONFIRMED"", ""credit_txn_id"": ""CRD-000238""}",UI,2026-10-14 13:46:37
+AUD-000106,SHOP002,USR-002,extracted_draft,DRF-0006,CREATE,,"{""type"": ""PAYMENT_COMMITMENT"", ""status"": ""PENDING_REVIEW""}",AUDIO,2026-10-18 10:35:48
+AUD-000107,SHOP001,USR-001,credit_transaction,CRD-000266,CREATE,,"{""type"": ""ADJUSTMENT"", ""amount_paise"": 2900, ""status"": ""RECORDED""}",UI,2026-10-18 15:25:45
+AUD-000108,SHOP006,USR-006,extracted_draft,DRF-0010,CREATE,,"{""type"": ""PAYMENT_RECEIVED"", ""status"": ""NEEDS_CLARIFICATION""}",AUDIO,2026-10-20 10:43:14
+AUD-000109,SHOP006,USR-006,credit_transaction,CRD-000254,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 40000, ""status"": ""RECORDED""}",VOICE,2026-10-20 17:47:47
+AUD-000110,SHOP003,USR-003,extracted_draft,DRF-0005,CREATE,,"{""type"": ""PAYMENT_COMMITMENT"", ""status"": ""PENDING_REVIEW""}",AUDIO,2026-10-20 18:40:43
+AUD-000111,SHOP003,USR-003,credit_transaction,CRD-000278,CREATE,,"{""type"": ""CREDIT_ISSUED"", ""amount_paise"": 25000, ""status"": ""PENDING_CONFIRMATION""}",VOICE,2026-10-20 20:26:31
+AUD-000112,SHOP001,USR-001,extracted_draft,DRF-0007,CREATE,,"{""type"": ""PAYMENT_COMMITMENT"", ""status"": ""PENDING_REVIEW""}",AUDIO,2026-10-21 15:28:58
+AUD-000113,SHOP006,USR-006,credit_transaction,CRD-000279,CREATE,,"{""type"": ""CREDIT_ISSUED"", ""amount_paise"": 50000, ""status"": ""PENDING_CONFIRMATION""}",UI,2026-10-21 16:41:45
+AUD-000114,SHOP004,USR-004,extracted_draft,DRF-0009,CREATE,,"{""type"": ""CREDIT_GIVEN"", ""status"": ""PENDING_REVIEW""}",AUDIO,2026-10-22 09:26:28
+AUD-000115,SHOP002,USR-002,credit_transaction,CRD-000274,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 2000, ""status"": ""PENDING_CONFIRMATION""}",VOICE,2026-10-22 12:48:29
+AUD-000116,SHOP004,USR-004,credit_transaction,CRD-000273,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 10000, ""status"": ""PENDING_CONFIRMATION""}",VOICE,2026-10-22 12:53:59
+AUD-000117,SHOP002,USR-002,credit_transaction,CRD-000276,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 8500, ""status"": ""PENDING_CONFIRMATION""}",VOICE,2026-10-22 16:13:22
+AUD-000118,SHOP004,USR-004,extracted_draft,DRF-0011,CREATE,,"{""type"": ""PAYMENT_RECEIVED"", ""status"": ""NEEDS_CLARIFICATION""}",AUDIO,2026-10-22 17:14:41
+AUD-000119,SHOP005,USR-005,credit_transaction,CRD-000277,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 5000, ""status"": ""PENDING_CONFIRMATION""}",VOICE,2026-10-22 18:44:56
+AUD-000120,SHOP001,USR-001,credit_transaction,CRD-000280,CREATE,,"{""type"": ""CREDIT_ISSUED"", ""amount_paise"": 45000, ""status"": ""PENDING_CONFIRMATION""}",VOICE,2026-10-23 10:18:14
+AUD-000121,SHOP006,USR-006,credit_transaction,CRD-000249,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 10500, ""status"": ""RECORDED""}",VOICE,2026-10-24 11:09:14
+AUD-000122,SHOP005,USR-005,extracted_draft,DRF-0008,CREATE,,"{""type"": ""CREDIT_GIVEN"", ""status"": ""PENDING_REVIEW""}",AUDIO,2026-10-24 12:40:13
+AUD-000123,SHOP004,USR-004,credit_transaction,CRD-000275,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 10000, ""status"": ""PENDING_CONFIRMATION""}",UI,2026-10-24 15:21:01
+AUD-000124,SHOP006,USR-006,credit_transaction,CRD-000272,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 5000, ""status"": ""PENDING_CONFIRMATION""}",UI,2026-10-24 16:29:27
+AUD-000125,SHOP006,USR-006,credit_transaction,CRD-000281,CREATE,,"{""type"": ""CREDIT_ISSUED"", ""amount_paise"": 40000, ""status"": ""PENDING_CONFIRMATION""}",VOICE,2026-10-25 13:42:37
+AUD-000126,SHOP003,USR-003,credit_transaction,CRD-000236,REVERSE,,"{""reversed_by"": ""CRD-000261""}",UI,2026-10-26 15:16:53
+AUD-000127,SHOP001,USR-001,credit_transaction,CRD-000234,REVERSE,,"{""reversed_by"": ""CRD-000259""}",UI,2026-10-26 16:11:03
+AUD-000128,SHOP006,USR-006,credit_transaction,CRD-000235,REVERSE,,"{""reversed_by"": ""CRD-000260""}",UI,2026-10-26 16:20:21
+AUD-000129,SHOP005,USR-005,credit_transaction,CRD-000253,CREATE,,"{""type"": ""REPAYMENT"", ""amount_paise"": 43500, ""status"": ""RECORDED""}",VOICE,2026-11-30 16:00:22
+AUD-000130,SHOP001,USR-001,inventory_movement,ADJ-1001,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -301.0, ""product_id"": ""PRD-001-005""}",UI,2026-10-18 17:54:00
+AUD-000131,SHOP001,USR-001,inventory_movement,ADJ-1002,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -183.0, ""product_id"": ""PRD-001-010""}",UI,2026-10-18 16:28:00
+AUD-000132,SHOP001,USR-001,inventory_movement,ADJ-1003,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -234.0, ""product_id"": ""PRD-001-011""}",UI,2026-10-18 17:54:00
+AUD-000133,SHOP001,USR-001,inventory_movement,ADJ-1004,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -161.0, ""product_id"": ""PRD-001-002""}",UI,2026-10-18 18:12:00
+AUD-000134,SHOP002,USR-002,inventory_movement,ADJ-1005,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -352.0, ""product_id"": ""PRD-002-001""}",UI,2026-10-18 17:30:00
+AUD-000135,SHOP002,USR-002,inventory_movement,ADJ-1006,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -108.0, ""product_id"": ""PRD-002-004""}",UI,2026-10-18 19:39:00
+AUD-000136,SHOP002,USR-002,inventory_movement,ADJ-1007,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -239.0, ""product_id"": ""PRD-002-003""}",UI,2026-10-18 11:06:00
+AUD-000137,SHOP002,USR-002,inventory_movement,ADJ-1008,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -139.0, ""product_id"": ""PRD-002-007""}",UI,2026-10-18 16:19:00
+AUD-000138,SHOP003,USR-003,inventory_movement,ADJ-1009,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -271.0, ""product_id"": ""PRD-003-007""}",UI,2026-10-18 10:34:00
+AUD-000139,SHOP003,USR-003,inventory_movement,ADJ-1010,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -326.0, ""product_id"": ""PRD-003-006""}",UI,2026-10-18 19:02:00
+AUD-000140,SHOP003,USR-003,inventory_movement,ADJ-1011,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -237.0, ""product_id"": ""PRD-003-001""}",UI,2026-10-18 18:25:00
+AUD-000141,SHOP003,USR-003,inventory_movement,ADJ-1012,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -153.0, ""product_id"": ""PRD-003-010""}",UI,2026-10-18 16:41:00
+AUD-000142,SHOP004,USR-004,inventory_movement,ADJ-1013,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -189.0, ""product_id"": ""PRD-004-002""}",UI,2026-10-18 18:00:00
+AUD-000143,SHOP004,USR-004,inventory_movement,ADJ-1014,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -160.0, ""product_id"": ""PRD-004-003""}",UI,2026-10-18 17:04:00
+AUD-000144,SHOP004,USR-004,inventory_movement,ADJ-1015,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -174.0, ""product_id"": ""PRD-004-001""}",UI,2026-10-18 09:02:00
+AUD-000145,SHOP004,USR-004,inventory_movement,ADJ-1016,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -163.0, ""product_id"": ""PRD-004-006""}",UI,2026-10-18 12:56:00
+AUD-000146,SHOP005,USR-005,inventory_movement,ADJ-1017,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -239.0, ""product_id"": ""PRD-005-009""}",UI,2026-10-18 18:01:00
+AUD-000147,SHOP005,USR-005,inventory_movement,ADJ-1018,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -135.0, ""product_id"": ""PRD-005-010""}",UI,2026-10-18 16:20:00
+AUD-000148,SHOP005,USR-005,inventory_movement,ADJ-1019,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -282.0, ""product_id"": ""PRD-005-004""}",UI,2026-10-18 16:37:00
+AUD-000149,SHOP005,USR-005,inventory_movement,ADJ-1020,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -60.0, ""product_id"": ""PRD-005-005""}",UI,2026-10-18 12:33:00
+AUD-000150,SHOP006,USR-006,inventory_movement,ADJ-1021,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -262.0, ""product_id"": ""PRD-006-001""}",UI,2026-10-18 19:18:00
+AUD-000151,SHOP006,USR-006,inventory_movement,ADJ-1022,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -305.0, ""product_id"": ""PRD-006-010""}",UI,2026-10-18 16:00:00
+AUD-000152,SHOP006,USR-006,inventory_movement,ADJ-1023,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -82.0, ""product_id"": ""PRD-006-011""}",UI,2026-10-18 19:05:00
+AUD-000153,SHOP006,USR-006,inventory_movement,ADJ-1024,CREATE,,"{""type"": ""ADJUSTMENT"", ""qty"": -164.0, ""product_id"": ""PRD-006-002""}",UI,2026-10-18 16:41:00

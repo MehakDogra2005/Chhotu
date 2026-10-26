@@ -1,0 +1,7 @@
+shop_id,shop_name,business_type,city,currency,is_active,opening_cash_paise,opening_cash_date
+SHOP001,Sharma General Store,General Retail,Delhi,INR,True,3140000,2026-01-01
+SHOP002,Bright Stationery House,Stationery,Delhi,INR,True,2250000,2026-01-01
+SHOP003,Fresh Basket Mart,Grocery,Gurugram,INR,True,4810000,2026-01-01
+SHOP004,Balaji Oil Traders,Edible Oil Retail,Noida,INR,True,4500000,2026-01-01
+SHOP005,Daily Needs Corner,Convenience Store,Ghaziabad,INR,True,4280000,2026-01-01
+SHOP006,Om Household Mart,Household & General Retail,Faridabad,INR,True,3420000,2026-01-01

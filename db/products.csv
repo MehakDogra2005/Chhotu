@@ -1,0 +1,73 @@
+product_id,shop_id,product_name,category,subcategory,brand,variant,unit,unit_purchase_price_paise,unit_selling_price_paise,opening_stock,reorder_level,supplier_id,is_active
+PRD-001-001,SHOP001,Bottled Water,Beverages,Beverages,Everyday,Standard,bottle,1000,1500,132,14,SUP-001-03,True
+PRD-001-002,SHOP001,Toothpaste,Personal Care,Personal Care,Value,Standard,piece,4800,6000,41,15,SUP-001-04,True
+PRD-001-003,SHOP001,Dishwash Bar,Cleaning,Cleaning,Local,Standard,piece,1800,2500,53,10,SUP-001-04,True
+PRD-001-004,SHOP001,Chips,Snacks,Snacks,Value,Standard,pack,800,1000,42,24,SUP-001-04,True
+PRD-001-005,SHOP001,LED Bulb,Electrical,Electrical,Premium,Standard,piece,6500,8500,138,9,SUP-001-02,True
+PRD-001-006,SHOP001,AA Battery,Electrical,Electrical,Local,Standard,pair,2800,4000,115,19,SUP-001-02,True
+PRD-001-007,SHOP001,Tissue Box,Household,Household,Unbranded,Standard,box,4200,5500,67,19,SUP-001-03,True
+PRD-001-008,SHOP001,Soap,Personal Care,Personal Care,Unbranded,Standard,piece,2800,3500,76,29,SUP-001-03,True
+PRD-001-009,SHOP001,Detergent,Cleaning,Cleaning,Unbranded,Standard,pack,4500,5800,50,23,SUP-001-02,True
+PRD-001-010,SHOP001,Chocolate,Snacks,Snacks,Value,Standard,piece,1800,2500,115,22,SUP-001-02,True
+PRD-001-011,SHOP001,Garbage Bags,Household,Household,Everyday,Standard,pack,3500,4800,142,13,SUP-001-03,True
+PRD-001-012,SHOP001,Soft Drink,Beverages,Beverages,Unbranded,Standard,bottle,3200,4000,65,26,SUP-001-01,True
+PRD-002-001,SHOP002,Notebook,Paper Products,Paper Products,Everyday,Standard,piece,2800,4000,124,10,SUP-002-03,True
+PRD-002-002,SHOP002,Ball Pen,Writing,Writing,Unbranded,Standard,piece,500,1000,128,25,SUP-002-01,True
+PRD-002-003,SHOP002,Pencil,Writing,Writing,Everyday,Standard,piece,300,500,153,25,SUP-002-04,True
+PRD-002-004,SHOP002,Eraser,Writing,Writing,Value,Standard,piece,200,400,131,16,SUP-002-01,True
+PRD-002-005,SHOP002,Geometry Box,School Supplies,School Supplies,Premium,Standard,piece,6500,9000,88,8,SUP-002-02,True
+PRD-002-006,SHOP002,A4 Paper Ream,Paper Products,Paper Products,Value,Standard,ream,22000,28000,66,29,SUP-002-01,True
+PRD-002-007,SHOP002,Marker,Writing,Writing,Everyday,Standard,piece,1800,2500,123,22,SUP-002-04,True
+PRD-002-008,SHOP002,Glue Stick,Craft Supplies,Craft Supplies,Local,Standard,piece,1200,1800,93,30,SUP-002-03,True
+PRD-002-009,SHOP002,File Folder,Office Supplies,Office Supplies,Value,Standard,piece,1000,1600,116,30,SUP-002-02,True
+PRD-002-010,SHOP002,Stapler,Office Supplies,Office Supplies,Unbranded,Standard,piece,4500,6500,108,17,SUP-002-03,True
+PRD-002-011,SHOP002,Crayons,Art Supplies,Art Supplies,Local,Standard,box,3500,5000,68,9,SUP-002-04,True
+PRD-002-012,SHOP002,Chart Paper,Paper Products,Paper Products,Value,Standard,sheet,500,800,139,8,SUP-002-04,True
+PRD-003-001,SHOP003,Rice,Staples,Staples,Local,Standard,kg,5800,7200,102,20,SUP-003-03,True
+PRD-003-002,SHOP003,Wheat Flour,Staples,Staples,Everyday,Standard,kg,3400,4200,137,28,SUP-003-02,True
+PRD-003-003,SHOP003,Sugar,Staples,Staples,Everyday,Standard,kg,3900,4800,80,21,SUP-003-04,True
+PRD-003-004,SHOP003,Toor Dal,Pulses,Pulses,Local,Standard,kg,11200,13500,45,18,SUP-003-04,True
+PRD-003-005,SHOP003,Tea,Beverages,Beverages,Value,Standard,pack,9500,12000,145,13,SUP-003-04,True
+PRD-003-006,SHOP003,Biscuits,Snacks,Snacks,Premium,Standard,pack,800,1000,71,18,SUP-003-01,True
+PRD-003-007,SHOP003,Instant Noodles,Snacks,Snacks,Premium,Standard,pack,1200,1500,97,13,SUP-003-04,True
+PRD-003-008,SHOP003,Milk,Dairy,Dairy,Premium,Standard,litre,5400,6200,113,23,SUP-003-01,True
+PRD-003-009,SHOP003,Cooking Oil,Oils,Oils,Unbranded,Standard,litre,12500,14800,155,27,SUP-003-04,True
+PRD-003-010,SHOP003,Salt,Staples,Staples,Unbranded,Standard,kg,1600,2000,63,22,SUP-003-02,True
+PRD-003-011,SHOP003,Soap,Personal Care,Personal Care,Value,Standard,piece,2800,3500,48,22,SUP-003-01,True
+PRD-003-012,SHOP003,Detergent,Household,Household,Value,Standard,pack,4500,5800,121,20,SUP-003-03,True
+PRD-004-001,SHOP004,Mustard Oil,Edible Oils,Edible Oils,Local,Standard,litre,13500,16000,149,23,SUP-004-01,True
+PRD-004-002,SHOP004,Sunflower Oil,Edible Oils,Edible Oils,Value,Standard,litre,11800,14200,81,17,SUP-004-01,True
+PRD-004-003,SHOP004,Groundnut Oil,Edible Oils,Edible Oils,Everyday,Standard,litre,16000,19000,66,17,SUP-004-01,True
+PRD-004-004,SHOP004,Rice Bran Oil,Edible Oils,Edible Oils,Everyday,Standard,litre,10500,12800,60,12,SUP-004-01,True
+PRD-004-005,SHOP004,Olive Oil,Specialty Oils,Specialty Oils,Unbranded,Standard,litre,42000,51000,147,21,SUP-004-02,True
+PRD-004-006,SHOP004,Ghee,Dairy & Fats,Dairy & Fats,Everyday,Standard,kg,52000,61000,106,29,SUP-004-02,True
+PRD-004-007,SHOP004,Coconut Oil,Oils,Oils,Local,Standard,litre,18000,22000,74,29,SUP-004-01,True
+PRD-004-008,SHOP004,Sesame Oil,Edible Oils,Edible Oils,Unbranded,Standard,litre,21000,25000,131,12,SUP-004-01,True
+PRD-004-009,SHOP004,Refined Oil Tin,Edible Oils,Edible Oils,Unbranded,Standard,tin,145000,168000,95,19,SUP-004-01,True
+PRD-004-010,SHOP004,Empty Bottle 500ml,Packaging,Packaging,Everyday,Standard,piece,600,1000,126,24,SUP-004-04,True
+PRD-004-011,SHOP004,Empty Bottle 1L,Packaging,Packaging,Premium,Standard,piece,900,1400,138,11,SUP-004-02,True
+PRD-004-012,SHOP004,Oil Pouch 1L,Packaging,Packaging,Everyday,Standard,piece,400,700,87,28,SUP-004-04,True
+PRD-005-001,SHOP005,Bread,Bakery,Bakery,Everyday,Standard,pack,2800,3500,127,13,SUP-005-02,True
+PRD-005-002,SHOP005,Eggs,Dairy & Eggs,Dairy & Eggs,Value,Standard,dozen,6800,8400,133,18,SUP-005-04,True
+PRD-005-003,SHOP005,Curd,Dairy,Dairy,Premium,Standard,pack,2800,3500,87,25,SUP-005-02,True
+PRD-005-004,SHOP005,Frozen Peas,Frozen Foods,Frozen Foods,Unbranded,Standard,pack,4800,6000,94,9,SUP-005-04,True
+PRD-005-005,SHOP005,Coffee,Beverages,Beverages,Premium,Standard,pack,9500,12000,115,11,SUP-005-01,True
+PRD-005-006,SHOP005,Cornflakes,Breakfast,Breakfast,Local,Standard,box,14500,17500,56,11,SUP-005-02,True
+PRD-005-007,SHOP005,Handwash,Personal Care,Personal Care,Local,Standard,bottle,7200,9000,151,21,SUP-005-03,True
+PRD-005-008,SHOP005,Sanitary Pads,Personal Care,Personal Care,Everyday,Standard,pack,5800,7500,85,13,SUP-005-01,True
+PRD-005-009,SHOP005,Aluminium Foil,Kitchen,Kitchen,Premium,Standard,roll,4800,6000,82,17,SUP-005-04,True
+PRD-005-010,SHOP005,Cling Film,Kitchen,Kitchen,Unbranded,Standard,roll,6500,8000,66,26,SUP-005-04,True
+PRD-005-011,SHOP005,Lighter,Household,Household,Unbranded,Standard,piece,1800,2500,135,27,SUP-005-03,True
+PRD-005-012,SHOP005,Matchbox,Household,Household,Unbranded,Standard,piece,100,200,44,28,SUP-005-02,True
+PRD-006-001,SHOP006,Bucket,Household,Household,Unbranded,Standard,piece,9500,13000,131,9,SUP-006-01,True
+PRD-006-002,SHOP006,Mug,Household,Household,Unbranded,Standard,piece,1800,2800,125,13,SUP-006-01,True
+PRD-006-003,SHOP006,Steel Plate,Kitchenware,Kitchenware,Premium,Standard,piece,5500,8000,104,27,SUP-006-04,True
+PRD-006-004,SHOP006,Storage Container,Kitchenware,Kitchenware,Local,Standard,piece,4500,7000,113,20,SUP-006-02,True
+PRD-006-005,SHOP006,Scrub Pad,Cleaning,Cleaning,Premium,Standard,piece,800,1200,117,26,SUP-006-01,True
+PRD-006-006,SHOP006,Mop,Cleaning,Cleaning,Premium,Standard,piece,12500,17000,136,24,SUP-006-02,True
+PRD-006-007,SHOP006,Broom,Cleaning,Cleaning,Value,Standard,piece,5500,8000,86,10,SUP-006-02,True
+PRD-006-008,SHOP006,Lunch Box,Kitchenware,Kitchenware,Premium,Standard,piece,11000,15000,147,30,SUP-006-03,True
+PRD-006-009,SHOP006,Water Bottle,Kitchenware,Kitchenware,Unbranded,Standard,piece,7000,10000,135,17,SUP-006-03,True
+PRD-006-010,SHOP006,Extension Board,Electrical,Electrical,Everyday,Standard,piece,18000,24000,93,15,SUP-006-01,True
+PRD-006-011,SHOP006,Screwdriver Set,Tools,Tools,Local,Standard,set,14500,19500,49,18,SUP-006-04,True
+PRD-006-012,SHOP006,Plastic Rope,Household,Household,Unbranded,Standard,metre,400,700,88,30,SUP-006-04,True

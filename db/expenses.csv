@@ -1,0 +1,301 @@
+expense_id,shop_id,expense_date,expense_category,amount_paise,currency,payment_method,description,recorded_by
+EXP-00001,SHOP001,2026-09-20,Maintenance,352589,INR,Bank Transfer,Maintenance expense,OWNER
+EXP-00002,SHOP005,2026-03-08,Other,339021,INR,Bank Transfer,Other expense,OWNER
+EXP-00003,SHOP002,2026-06-11,Transport,88752,INR,Cash,Transport expense,OWNER
+EXP-00004,SHOP001,2026-02-02,Staff Wages,645865,INR,Cash,Staff Wages expense,OWNER
+EXP-00005,SHOP003,2026-01-15,Maintenance,438194,INR,Bank Transfer,Maintenance expense,OWNER
+EXP-00006,SHOP002,2026-07-01,Staff Wages,1032463,INR,Bank Transfer,Staff Wages expense,OWNER
+EXP-00007,SHOP005,2026-06-25,Transport,306495,INR,UPI,Transport expense,OWNER
+EXP-00008,SHOP006,2026-01-02,Rent,1112404,INR,Cash,Rent expense,OWNER
+EXP-00009,SHOP003,2026-05-01,Maintenance,63478,INR,Bank Transfer,Maintenance expense,OWNER
+EXP-00010,SHOP002,2026-01-23,Internet,383519,INR,Cash,Internet expense,OWNER
+EXP-00011,SHOP006,2026-02-17,Transport,319984,INR,Cash,Transport expense,OWNER
+EXP-00012,SHOP002,2026-07-07,Packaging,368706,INR,Cash,Packaging expense,OWNER
+EXP-00013,SHOP002,2026-03-05,Electricity,305070,INR,Cash,Electricity expense,OWNER
+EXP-00014,SHOP003,2026-02-22,Packaging,351641,INR,Bank Transfer,Packaging expense,OWNER
+EXP-00015,SHOP001,2026-02-20,Transport,210321,INR,Bank Transfer,Transport expense,OWNER
+EXP-00016,SHOP004,2026-07-11,Transport,82295,INR,Cash,Transport expense,OWNER
+EXP-00017,SHOP003,2026-09-17,Transport,253950,INR,UPI,Transport expense,OWNER
+EXP-00018,SHOP001,2026-09-21,Packaging,230815,INR,Bank Transfer,Packaging expense,OWNER
+EXP-00019,SHOP002,2026-06-17,Packaging,304775,INR,Cash,Packaging expense,OWNER
+EXP-00020,SHOP001,2026-05-10,Transport,235031,INR,Bank Transfer,Transport expense,OWNER
+EXP-00021,SHOP005,2026-10-11,Electricity,43067,INR,UPI,Electricity expense,OWNER
+EXP-00022,SHOP002,2026-04-25,Transport,46300,INR,UPI,Transport expense,OWNER
+EXP-00023,SHOP001,2026-04-26,Internet,157315,INR,Bank Transfer,Internet expense,OWNER
+EXP-00024,SHOP003,2026-06-03,Staff Wages,1831463,INR,Cash,Staff Wages expense,OWNER
+EXP-00025,SHOP002,2026-05-25,Electricity,130484,INR,Cash,Electricity expense,OWNER
+EXP-00026,SHOP001,2026-05-05,Packaging,206390,INR,Bank Transfer,Packaging expense,OWNER
+EXP-00027,SHOP005,2026-09-01,Internet,359476,INR,Cash,Internet expense,OWNER
+EXP-00028,SHOP006,2026-05-02,Transport,449813,INR,UPI,Transport expense,OWNER
+EXP-00029,SHOP005,2026-09-08,Maintenance,216593,INR,Bank Transfer,Maintenance expense,OWNER
+EXP-00030,SHOP005,2026-04-08,Packaging,395051,INR,Bank Transfer,Packaging expense,OWNER
+EXP-00031,SHOP006,2026-09-01,Transport,352384,INR,Bank Transfer,Transport expense,OWNER
+EXP-00032,SHOP003,2026-09-20,Rent,1419862,INR,Bank Transfer,Rent expense,OWNER
+EXP-00033,SHOP005,2026-06-18,Packaging,308508,INR,UPI,Packaging expense,OWNER
+EXP-00034,SHOP001,2026-06-06,Internet,31242,INR,Bank Transfer,Internet expense,OWNER
+EXP-00035,SHOP004,2026-06-28,Other,359238,INR,Cash,Other expense,OWNER
+EXP-00036,SHOP002,2026-08-18,Maintenance,247914,INR,Bank Transfer,Maintenance expense,OWNER
+EXP-00037,SHOP001,2026-07-09,Staff Wages,1579625,INR,UPI,Staff Wages expense,OWNER
+EXP-00038,SHOP002,2026-02-20,Transport,428378,INR,Bank Transfer,Transport expense,OWNER
+EXP-00039,SHOP003,2026-04-28,Staff Wages,107403,INR,Bank Transfer,Staff Wages expense,OWNER
+EXP-00040,SHOP005,2026-03-19,Transport,52168,INR,UPI,Transport expense,OWNER
+EXP-00041,SHOP006,2026-08-17,Maintenance,312145,INR,UPI,Maintenance expense,OWNER
+EXP-00042,SHOP002,2026-04-12,Electricity,363537,INR,Bank Transfer,Electricity expense,OWNER
+EXP-00043,SHOP002,2026-03-11,Packaging,186689,INR,Cash,Packaging expense,OWNER
+EXP-00044,SHOP002,2026-10-10,Internet,254634,INR,Bank Transfer,Internet expense,OWNER
+EXP-00045,SHOP003,2026-06-26,Transport,65269,INR,Bank Transfer,Transport expense,OWNER
+EXP-00046,SHOP005,2026-06-08,Electricity,255934,INR,Cash,Electricity expense,OWNER
+EXP-00047,SHOP003,2026-02-15,Staff Wages,2154467,INR,UPI,Staff Wages expense,OWNER
+EXP-00048,SHOP001,2026-06-21,Internet,146739,INR,Bank Transfer,Internet expense,OWNER
+EXP-00049,SHOP001,2026-08-16,Transport,16492,INR,Bank Transfer,Transport expense,OWNER
+EXP-00050,SHOP006,2026-08-01,Transport,192426,INR,UPI,Transport expense,OWNER
+EXP-00051,SHOP001,2026-06-27,Rent,106540,INR,Bank Transfer,Rent expense,OWNER
+EXP-00052,SHOP002,2026-07-04,Staff Wages,1760523,INR,Bank Transfer,Staff Wages expense,OWNER
+EXP-00053,SHOP005,2026-04-13,Other,145405,INR,Cash,Other expense,OWNER
+EXP-00054,SHOP005,2026-06-09,Maintenance,133435,INR,UPI,Maintenance expense,OWNER
+EXP-00055,SHOP006,2026-01-29,Other,228183,INR,Bank Transfer,Other expense,OWNER
+EXP-00056,SHOP003,2026-02-12,Rent,1150376,INR,UPI,Rent expense,OWNER
+EXP-00057,SHOP005,2026-05-23,Maintenance,279248,INR,UPI,Maintenance expense,OWNER
+EXP-00058,SHOP001,2026-09-11,Electricity,254385,INR,Bank Transfer,Electricity expense,OWNER
+EXP-00059,SHOP002,2026-06-19,Other,160296,INR,Bank Transfer,Other expense,OWNER
+EXP-00060,SHOP001,2026-07-24,Electricity,411649,INR,Cash,Electricity expense,OWNER
+EXP-00061,SHOP004,2026-05-16,Staff Wages,213188,INR,Cash,Staff Wages expense,OWNER
+EXP-00062,SHOP006,2026-09-20,Electricity,80304,INR,Bank Transfer,Electricity expense,OWNER
+EXP-00063,SHOP004,2026-03-25,Transport,187397,INR,UPI,Transport expense,OWNER
+EXP-00064,SHOP005,2026-04-16,Internet,378930,INR,Bank Transfer,Internet expense,OWNER
+EXP-00065,SHOP003,2026-02-26,Staff Wages,1345204,INR,UPI,Staff Wages expense,OWNER
+EXP-00066,SHOP005,2026-01-15,Electricity,118352,INR,Cash,Electricity expense,OWNER
+EXP-00067,SHOP005,2026-03-02,Rent,970430,INR,Bank Transfer,Rent expense,OWNER
+EXP-00068,SHOP005,2026-01-20,Packaging,448766,INR,UPI,Packaging expense,OWNER
+EXP-00069,SHOP003,2026-09-14,Maintenance,332261,INR,Cash,Maintenance expense,OWNER
+EXP-00070,SHOP006,2026-06-22,Transport,40761,INR,UPI,Transport expense,OWNER
+EXP-00071,SHOP004,2026-09-28,Internet,297085,INR,UPI,Internet expense,OWNER
+EXP-00072,SHOP004,2026-04-06,Electricity,57508,INR,Bank Transfer,Electricity expense,OWNER
+EXP-00073,SHOP004,2026-09-28,Staff Wages,2190421,INR,Cash,Staff Wages expense,OWNER
+EXP-00074,SHOP006,2026-10-14,Other,253179,INR,Bank Transfer,Other expense,OWNER
+EXP-00075,SHOP005,2026-06-15,Electricity,184967,INR,Bank Transfer,Electricity expense,OWNER
+EXP-00076,SHOP001,2026-01-15,Rent,1164861,INR,Cash,Rent expense,OWNER
+EXP-00077,SHOP002,2026-02-13,Rent,2267112,INR,UPI,Rent expense,OWNER
+EXP-00078,SHOP001,2026-03-14,Staff Wages,234953,INR,UPI,Staff Wages expense,OWNER
+EXP-00079,SHOP006,2026-08-18,Rent,1838560,INR,Cash,Rent expense,OWNER
+EXP-00080,SHOP002,2026-04-20,Transport,193145,INR,Bank Transfer,Transport expense,OWNER
+EXP-00081,SHOP002,2026-05-22,Rent,239692,INR,Cash,Rent expense,OWNER
+EXP-00082,SHOP001,2026-09-02,Rent,1163614,INR,Bank Transfer,Rent expense,OWNER
+EXP-00083,SHOP005,2026-01-04,Staff Wages,2399409,INR,Bank Transfer,Staff Wages expense,OWNER
+EXP-00084,SHOP004,2026-03-28,Packaging,403916,INR,UPI,Packaging expense,OWNER
+EXP-00085,SHOP001,2026-01-10,Staff Wages,1196455,INR,UPI,Staff Wages expense,OWNER
+EXP-00086,SHOP004,2026-08-25,Internet,411589,INR,UPI,Internet expense,OWNER
+EXP-00087,SHOP002,2026-02-17,Packaging,414183,INR,Bank Transfer,Packaging expense,OWNER
+EXP-00088,SHOP004,2026-10-13,Transport,168576,INR,Bank Transfer,Transport expense,OWNER
+EXP-00089,SHOP001,2026-02-07,Maintenance,25256,INR,Bank Transfer,Maintenance expense,OWNER
+EXP-00090,SHOP003,2026-07-04,Packaging,65695,INR,Cash,Packaging expense,OWNER
+EXP-00091,SHOP002,2026-05-06,Internet,115698,INR,Bank Transfer,Internet expense,OWNER
+EXP-00092,SHOP003,2026-03-17,Rent,1500118,INR,Cash,Rent expense,OWNER
+EXP-00093,SHOP006,2026-09-19,Electricity,186589,INR,Cash,Electricity expense,OWNER
+EXP-00094,SHOP002,2026-02-07,Transport,32129,INR,Bank Transfer,Transport expense,OWNER
+EXP-00095,SHOP005,2026-06-12,Internet,129298,INR,Cash,Internet expense,OWNER
+EXP-00096,SHOP004,2026-02-25,Rent,1882582,INR,Bank Transfer,Rent expense,OWNER
+EXP-00097,SHOP005,2026-04-02,Rent,245666,INR,Cash,Rent expense,OWNER
+EXP-00098,SHOP002,2026-05-30,Rent,1120678,INR,Cash,Rent expense,OWNER
+EXP-00099,SHOP004,2026-10-15,Packaging,274967,INR,Cash,Packaging expense,OWNER
+EXP-00100,SHOP002,2026-09-28,Internet,81487,INR,Cash,Internet expense,OWNER
+EXP-00101,SHOP001,2026-07-13,Maintenance,16341,INR,Cash,Maintenance expense,OWNER
+EXP-00102,SHOP002,2026-05-07,Staff Wages,224776,INR,Bank Transfer,Staff Wages expense,OWNER
+EXP-00103,SHOP002,2026-01-12,Packaging,443089,INR,Bank Transfer,Packaging expense,OWNER
+EXP-00104,SHOP004,2026-03-03,Maintenance,274030,INR,Bank Transfer,Maintenance expense,OWNER
+EXP-00105,SHOP006,2026-03-06,Other,98448,INR,UPI,Other expense,OWNER
+EXP-00106,SHOP006,2026-08-09,Electricity,370458,INR,UPI,Electricity expense,OWNER
+EXP-00107,SHOP005,2026-04-03,Packaging,449537,INR,Cash,Packaging expense,OWNER
+EXP-00108,SHOP001,2026-04-08,Electricity,307598,INR,UPI,Electricity expense,OWNER
+EXP-00109,SHOP004,2026-06-12,Rent,2439386,INR,Bank Transfer,Rent expense,OWNER
+EXP-00110,SHOP001,2026-10-03,Rent,83214,INR,Cash,Rent expense,OWNER
+EXP-00111,SHOP003,2026-07-13,Electricity,355922,INR,UPI,Electricity expense,OWNER
+EXP-00112,SHOP003,2026-07-21,Other,363617,INR,UPI,Other expense,OWNER
+EXP-00113,SHOP004,2026-03-24,Rent,584844,INR,UPI,Rent expense,OWNER
+EXP-00114,SHOP001,2026-05-20,Internet,90388,INR,Cash,Internet expense,OWNER
+EXP-00115,SHOP005,2026-07-26,Internet,32637,INR,Cash,Internet expense,OWNER
+EXP-00116,SHOP006,2026-08-31,Packaging,311664,INR,Bank Transfer,Packaging expense,OWNER
+EXP-00117,SHOP003,2026-05-08,Transport,260262,INR,Bank Transfer,Transport expense,OWNER
+EXP-00118,SHOP001,2026-04-06,Maintenance,12913,INR,UPI,Maintenance expense,OWNER
+EXP-00119,SHOP002,2026-09-29,Rent,311917,INR,Bank Transfer,Rent expense,OWNER
+EXP-00120,SHOP005,2026-02-19,Maintenance,36178,INR,Cash,Maintenance expense,OWNER
+EXP-00121,SHOP001,2026-09-25,Rent,1950676,INR,UPI,Rent expense,OWNER
+EXP-00122,SHOP002,2026-10-11,Electricity,47685,INR,Bank Transfer,Electricity expense,OWNER
+EXP-00123,SHOP003,2026-01-24,Packaging,122750,INR,Cash,Packaging expense,OWNER
+EXP-00124,SHOP005,2026-05-03,Staff Wages,134766,INR,Bank Transfer,Staff Wages expense,OWNER
+EXP-00125,SHOP003,2026-02-21,Rent,22066,INR,UPI,Rent expense,OWNER
+EXP-00126,SHOP001,2026-08-24,Internet,280761,INR,Bank Transfer,Internet expense,OWNER
+EXP-00127,SHOP001,2026-10-16,Internet,379638,INR,Bank Transfer,Internet expense,OWNER
+EXP-00128,SHOP002,2026-02-10,Rent,915531,INR,Bank Transfer,Rent expense,OWNER
+EXP-00129,SHOP001,2026-01-15,Maintenance,288655,INR,Cash,Maintenance expense,OWNER
+EXP-00130,SHOP002,2026-10-15,Transport,163124,INR,Bank Transfer,Transport expense,OWNER
+EXP-00131,SHOP002,2026-09-16,Electricity,317026,INR,Cash,Electricity expense,OWNER
+EXP-00132,SHOP006,2026-09-08,Packaging,50818,INR,Bank Transfer,Packaging expense,OWNER
+EXP-00133,SHOP005,2026-09-03,Rent,426601,INR,UPI,Rent expense,OWNER
+EXP-00134,SHOP004,2026-06-04,Staff Wages,647612,INR,UPI,Staff Wages expense,OWNER
+EXP-00135,SHOP002,2026-04-29,Transport,134034,INR,UPI,Transport expense,OWNER
+EXP-00136,SHOP003,2026-02-01,Other,327852,INR,UPI,Other expense,OWNER
+EXP-00137,SHOP003,2026-07-14,Internet,39659,INR,Cash,Internet expense,OWNER
+EXP-00138,SHOP001,2026-02-13,Maintenance,87618,INR,UPI,Maintenance expense,OWNER
+EXP-00139,SHOP002,2026-01-14,Packaging,110143,INR,Cash,Packaging expense,OWNER
+EXP-00140,SHOP001,2026-02-13,Electricity,347988,INR,UPI,Electricity expense,OWNER
+EXP-00141,SHOP001,2026-03-25,Electricity,345995,INR,Cash,Electricity expense,OWNER
+EXP-00142,SHOP001,2026-10-09,Other,17487,INR,UPI,Other expense,OWNER
+EXP-00143,SHOP004,2026-04-16,Packaging,294477,INR,UPI,Packaging expense,OWNER
+EXP-00144,SHOP002,2026-02-28,Other,423189,INR,UPI,Other expense,OWNER
+EXP-00145,SHOP002,2026-04-07,Staff Wages,1384536,INR,UPI,Staff Wages expense,OWNER
+EXP-00146,SHOP001,2026-05-06,Other,170500,INR,Bank Transfer,Other expense,OWNER
+EXP-00147,SHOP001,2026-10-03,Staff Wages,1651756,INR,Cash,Staff Wages expense,OWNER
+EXP-00148,SHOP004,2026-04-14,Electricity,330623,INR,UPI,Electricity expense,OWNER
+EXP-00149,SHOP001,2026-03-04,Electricity,113254,INR,Bank Transfer,Electricity expense,OWNER
+EXP-00150,SHOP002,2026-04-17,Internet,285252,INR,UPI,Internet expense,OWNER
+EXP-00151,SHOP006,2026-07-12,Staff Wages,1189664,INR,Bank Transfer,Staff Wages expense,OWNER
+EXP-00152,SHOP002,2026-03-28,Rent,2138605,INR,UPI,Rent expense,OWNER
+EXP-00153,SHOP004,2026-04-13,Rent,2311062,INR,UPI,Rent expense,OWNER
+EXP-00154,SHOP006,2026-04-27,Maintenance,114762,INR,UPI,Maintenance expense,OWNER
+EXP-00155,SHOP006,2026-08-09,Rent,1970206,INR,UPI,Rent expense,OWNER
+EXP-00156,SHOP004,2026-02-16,Internet,258701,INR,Cash,Internet expense,OWNER
+EXP-00157,SHOP002,2026-10-13,Internet,49469,INR,Cash,Internet expense,OWNER
+EXP-00158,SHOP006,2026-03-13,Electricity,22915,INR,UPI,Electricity expense,OWNER
+EXP-00159,SHOP005,2026-09-08,Other,198440,INR,UPI,Other expense,OWNER
+EXP-00160,SHOP005,2026-06-30,Packaging,207163,INR,Bank Transfer,Packaging expense,OWNER
+EXP-00161,SHOP006,2026-08-16,Packaging,385027,INR,Cash,Packaging expense,OWNER
+EXP-00162,SHOP001,2026-07-23,Rent,2373987,INR,UPI,Rent expense,OWNER
+EXP-00163,SHOP003,2026-05-05,Maintenance,51115,INR,UPI,Maintenance expense,OWNER
+EXP-00164,SHOP004,2026-06-25,Packaging,246185,INR,Cash,Packaging expense,OWNER
+EXP-00165,SHOP005,2026-10-08,Staff Wages,1400927,INR,Cash,Staff Wages expense,OWNER
+EXP-00166,SHOP005,2026-09-25,Other,444067,INR,UPI,Other expense,OWNER
+EXP-00167,SHOP004,2026-08-02,Staff Wages,756863,INR,Cash,Staff Wages expense,OWNER
+EXP-00168,SHOP001,2026-02-05,Rent,2171237,INR,Cash,Rent expense,OWNER
+EXP-00169,SHOP005,2026-07-02,Electricity,383137,INR,Bank Transfer,Electricity expense,OWNER
+EXP-00170,SHOP005,2026-02-07,Staff Wages,949348,INR,Cash,Staff Wages expense,OWNER
+EXP-00171,SHOP002,2026-01-12,Transport,75558,INR,Cash,Transport expense,OWNER
+EXP-00172,SHOP003,2026-05-31,Maintenance,3698,INR,Bank Transfer,Maintenance expense,OWNER
+EXP-00173,SHOP006,2026-04-14,Packaging,412422,INR,UPI,Packaging expense,OWNER
+EXP-00174,SHOP006,2026-06-05,Packaging,255869,INR,UPI,Packaging expense,OWNER
+EXP-00175,SHOP006,2026-09-14,Maintenance,359463,INR,Bank Transfer,Maintenance expense,OWNER
+EXP-00176,SHOP002,2026-02-02,Staff Wages,272677,INR,Cash,Staff Wages expense,OWNER
+EXP-00177,SHOP005,2026-01-10,Maintenance,446061,INR,UPI,Maintenance expense,OWNER
+EXP-00178,SHOP004,2026-06-09,Internet,396128,INR,UPI,Internet expense,OWNER
+EXP-00179,SHOP004,2026-08-18,Other,239077,INR,UPI,Other expense,OWNER
+EXP-00180,SHOP005,2026-02-01,Electricity,367254,INR,Bank Transfer,Electricity expense,OWNER
+EXP-00181,SHOP005,2026-09-16,Other,400623,INR,Cash,Other expense,OWNER
+EXP-00182,SHOP002,2026-09-09,Electricity,74622,INR,Cash,Electricity expense,OWNER
+EXP-00183,SHOP005,2026-02-13,Transport,140157,INR,Bank Transfer,Transport expense,OWNER
+EXP-00184,SHOP006,2026-09-04,Rent,750097,INR,UPI,Rent expense,OWNER
+EXP-00185,SHOP006,2026-01-15,Other,95564,INR,UPI,Other expense,OWNER
+EXP-00186,SHOP002,2026-10-18,Maintenance,201075,INR,Bank Transfer,Maintenance expense,OWNER
+EXP-00187,SHOP004,2026-10-06,Internet,221872,INR,UPI,Internet expense,OWNER
+EXP-00188,SHOP005,2026-01-24,Packaging,204774,INR,Bank Transfer,Packaging expense,OWNER
+EXP-00189,SHOP004,2026-02-04,Internet,372996,INR,UPI,Internet expense,OWNER
+EXP-00190,SHOP005,2026-05-02,Packaging,47956,INR,Cash,Packaging expense,OWNER
+EXP-00191,SHOP004,2026-01-10,Rent,761126,INR,Bank Transfer,Rent expense,OWNER
+EXP-00192,SHOP002,2026-05-01,Staff Wages,1044063,INR,UPI,Staff Wages expense,OWNER
+EXP-00193,SHOP001,2026-07-03,Rent,2236238,INR,Bank Transfer,Rent expense,OWNER
+EXP-00194,SHOP001,2026-06-11,Transport,1039,INR,UPI,Transport expense,OWNER
+EXP-00195,SHOP005,2026-01-22,Transport,140326,INR,Bank Transfer,Transport expense,OWNER
+EXP-00196,SHOP006,2026-02-21,Staff Wages,854000,INR,UPI,Staff Wages expense,OWNER
+EXP-00197,SHOP002,2026-01-17,Packaging,185202,INR,Bank Transfer,Packaging expense,OWNER
+EXP-00198,SHOP002,2026-02-19,Transport,169002,INR,UPI,Transport expense,OWNER
+EXP-00199,SHOP004,2026-09-18,Maintenance,46469,INR,UPI,Maintenance expense,OWNER
+EXP-00200,SHOP003,2026-01-26,Transport,44173,INR,Cash,Transport expense,OWNER
+EXP-00201,SHOP002,2026-03-05,Electricity,108999,INR,UPI,Electricity expense,OWNER
+EXP-00202,SHOP005,2026-05-16,Rent,585633,INR,UPI,Rent expense,OWNER
+EXP-00203,SHOP002,2026-08-23,Other,323604,INR,Cash,Other expense,OWNER
+EXP-00204,SHOP003,2026-09-20,Internet,115307,INR,Cash,Internet expense,OWNER
+EXP-00205,SHOP003,2026-10-18,Rent,1393542,INR,Cash,Rent expense,OWNER
+EXP-00206,SHOP001,2026-03-27,Electricity,1958,INR,Bank Transfer,Electricity expense,OWNER
+EXP-00207,SHOP006,2026-02-08,Staff Wages,847261,INR,Bank Transfer,Staff Wages expense,OWNER
+EXP-00208,SHOP004,2026-01-04,Transport,102419,INR,UPI,Transport expense,OWNER
+EXP-00209,SHOP003,2026-06-01,Packaging,307795,INR,Bank Transfer,Packaging expense,OWNER
+EXP-00210,SHOP004,2026-10-04,Electricity,80139,INR,Bank Transfer,Electricity expense,OWNER
+EXP-00211,SHOP003,2026-09-17,Packaging,407301,INR,Bank Transfer,Packaging expense,OWNER
+EXP-00212,SHOP001,2026-01-31,Maintenance,281272,INR,Bank Transfer,Maintenance expense,OWNER
+EXP-00213,SHOP005,2026-08-25,Transport,159890,INR,Bank Transfer,Transport expense,OWNER
+EXP-00214,SHOP005,2026-07-20,Maintenance,159334,INR,UPI,Maintenance expense,OWNER
+EXP-00215,SHOP004,2026-03-04,Maintenance,226464,INR,Cash,Maintenance expense,OWNER
+EXP-00216,SHOP006,2026-04-15,Maintenance,56651,INR,Bank Transfer,Maintenance expense,OWNER
+EXP-00217,SHOP003,2026-08-05,Rent,1965941,INR,UPI,Rent expense,OWNER
+EXP-00218,SHOP003,2026-01-09,Packaging,3025,INR,Bank Transfer,Packaging expense,OWNER
+EXP-00219,SHOP006,2026-03-24,Other,114702,INR,UPI,Other expense,OWNER
+EXP-00220,SHOP003,2026-07-26,Rent,1420787,INR,Cash,Rent expense,OWNER
+EXP-00221,SHOP002,2026-04-02,Rent,1566640,INR,UPI,Rent expense,OWNER
+EXP-00222,SHOP004,2026-01-02,Electricity,136380,INR,Cash,Electricity expense,OWNER
+EXP-00223,SHOP002,2026-10-03,Electricity,145416,INR,Bank Transfer,Electricity expense,OWNER
+EXP-00224,SHOP004,2026-05-19,Other,105468,INR,UPI,Other expense,OWNER
+EXP-00225,SHOP006,2026-08-24,Maintenance,356944,INR,Cash,Maintenance expense,OWNER
+EXP-00226,SHOP004,2026-02-26,Internet,47147,INR,Cash,Internet expense,OWNER
+EXP-00227,SHOP004,2026-10-12,Maintenance,331195,INR,Cash,Maintenance expense,OWNER
+EXP-00228,SHOP002,2026-07-17,Transport,224237,INR,Bank Transfer,Transport expense,OWNER
+EXP-00229,SHOP003,2026-01-17,Staff Wages,102985,INR,Cash,Staff Wages expense,OWNER
+EXP-00230,SHOP004,2026-07-24,Other,34924,INR,Bank Transfer,Other expense,OWNER
+EXP-00231,SHOP001,2026-07-27,Internet,325126,INR,UPI,Internet expense,OWNER
+EXP-00232,SHOP003,2026-05-31,Electricity,106236,INR,UPI,Electricity expense,OWNER
+EXP-00233,SHOP006,2026-06-18,Maintenance,423551,INR,Bank Transfer,Maintenance expense,OWNER
+EXP-00234,SHOP004,2026-08-20,Transport,407672,INR,Cash,Transport expense,OWNER
+EXP-00235,SHOP003,2026-04-08,Maintenance,129413,INR,Bank Transfer,Maintenance expense,OWNER
+EXP-00236,SHOP003,2026-01-18,Transport,132273,INR,Bank Transfer,Transport expense,OWNER
+EXP-00237,SHOP006,2026-09-06,Internet,188803,INR,Cash,Internet expense,OWNER
+EXP-00238,SHOP005,2026-01-01,Electricity,331113,INR,UPI,Electricity expense,OWNER
+EXP-00239,SHOP003,2026-05-06,Packaging,137625,INR,UPI,Packaging expense,OWNER
+EXP-00240,SHOP006,2026-04-27,Other,1349,INR,Bank Transfer,Other expense,OWNER
+EXP-00241,SHOP004,2026-04-11,Transport,212731,INR,Bank Transfer,Transport expense,OWNER
+EXP-00242,SHOP006,2026-08-18,Packaging,313323,INR,Bank Transfer,Packaging expense,OWNER
+EXP-00243,SHOP003,2026-10-17,Staff Wages,1361343,INR,Cash,Staff Wages expense,OWNER
+EXP-00244,SHOP003,2026-06-12,Electricity,254697,INR,Bank Transfer,Electricity expense,OWNER
+EXP-00245,SHOP002,2026-09-02,Other,265415,INR,UPI,Other expense,OWNER
+EXP-00246,SHOP002,2026-07-24,Staff Wages,1238854,INR,UPI,Staff Wages expense,OWNER
+EXP-00247,SHOP001,2026-08-07,Internet,247773,INR,Bank Transfer,Internet expense,OWNER
+EXP-00248,SHOP005,2026-01-25,Maintenance,31228,INR,Cash,Maintenance expense,OWNER
+EXP-00249,SHOP006,2026-02-12,Rent,1286657,INR,Cash,Rent expense,OWNER
+EXP-00250,SHOP004,2026-02-25,Electricity,130172,INR,Cash,Electricity expense,OWNER
+EXP-00251,SHOP004,2026-06-03,Maintenance,122508,INR,UPI,Maintenance expense,OWNER
+EXP-00252,SHOP003,2026-08-12,Electricity,90205,INR,Bank Transfer,Electricity expense,OWNER
+EXP-00253,SHOP006,2026-07-15,Internet,14945,INR,UPI,Internet expense,OWNER
+EXP-00254,SHOP002,2026-05-19,Transport,296340,INR,Bank Transfer,Transport expense,OWNER
+EXP-00255,SHOP001,2026-05-04,Internet,302710,INR,Bank Transfer,Internet expense,OWNER
+EXP-00256,SHOP002,2026-09-01,Internet,141161,INR,UPI,Internet expense,OWNER
+EXP-00257,SHOP003,2026-08-16,Transport,103297,INR,Bank Transfer,Transport expense,OWNER
+EXP-00258,SHOP004,2026-07-09,Internet,157106,INR,Cash,Internet expense,OWNER
+EXP-00259,SHOP005,2026-03-13,Other,20550,INR,Bank Transfer,Other expense,OWNER
+EXP-00260,SHOP002,2026-03-02,Packaging,67780,INR,UPI,Packaging expense,OWNER
+EXP-00261,SHOP005,2026-01-23,Staff Wages,675644,INR,Cash,Staff Wages expense,OWNER
+EXP-00262,SHOP001,2026-10-18,Packaging,229270,INR,UPI,Packaging expense,OWNER
+EXP-00263,SHOP003,2026-06-16,Transport,154187,INR,Bank Transfer,Transport expense,OWNER
+EXP-00264,SHOP001,2026-02-07,Internet,30352,INR,Cash,Internet expense,OWNER
+EXP-00265,SHOP003,2026-08-23,Electricity,78332,INR,UPI,Electricity expense,OWNER
+EXP-00266,SHOP003,2026-09-08,Rent,1155091,INR,Cash,Rent expense,OWNER
+EXP-00267,SHOP005,2026-10-04,Maintenance,240898,INR,UPI,Maintenance expense,OWNER
+EXP-00268,SHOP005,2026-09-11,Electricity,340914,INR,UPI,Electricity expense,OWNER
+EXP-00269,SHOP001,2026-07-01,Other,392108,INR,UPI,Other expense,OWNER
+EXP-00270,SHOP006,2026-09-24,Other,334721,INR,Cash,Other expense,OWNER
+EXP-00271,SHOP002,2026-06-14,Packaging,168138,INR,Cash,Packaging expense,OWNER
+EXP-00272,SHOP005,2026-01-10,Rent,235491,INR,UPI,Rent expense,OWNER
+EXP-00273,SHOP004,2026-01-20,Staff Wages,2119983,INR,Cash,Staff Wages expense,OWNER
+EXP-00274,SHOP005,2026-07-02,Internet,67503,INR,Cash,Internet expense,OWNER
+EXP-00275,SHOP004,2026-07-05,Electricity,148817,INR,UPI,Electricity expense,OWNER
+EXP-00276,SHOP002,2026-03-19,Internet,322233,INR,Cash,Internet expense,OWNER
+EXP-00277,SHOP006,2026-10-12,Other,184222,INR,Bank Transfer,Other expense,OWNER
+EXP-00278,SHOP004,2026-02-16,Electricity,119012,INR,UPI,Electricity expense,OWNER
+EXP-00279,SHOP001,2026-09-19,Transport,161098,INR,Cash,Transport expense,OWNER
+EXP-00280,SHOP005,2026-07-19,Maintenance,162105,INR,UPI,Maintenance expense,OWNER
+EXP-00281,SHOP005,2026-10-08,Electricity,137734,INR,UPI,Electricity expense,OWNER
+EXP-00282,SHOP005,2026-09-28,Staff Wages,807345,INR,Cash,Staff Wages expense,OWNER
+EXP-00283,SHOP003,2026-07-03,Rent,2421802,INR,Cash,Rent expense,OWNER
+EXP-00284,SHOP004,2026-05-09,Packaging,6600,INR,UPI,Packaging expense,OWNER
+EXP-00285,SHOP002,2026-03-03,Transport,32179,INR,Cash,Transport expense,OWNER
+EXP-00286,SHOP004,2026-01-27,Internet,442360,INR,Bank Transfer,Internet expense,OWNER
+EXP-00287,SHOP001,2026-07-01,Maintenance,263562,INR,Cash,Maintenance expense,OWNER
+EXP-00288,SHOP004,2026-09-29,Staff Wages,246220,INR,Bank Transfer,Staff Wages expense,OWNER
+EXP-00289,SHOP005,2026-03-01,Electricity,339797,INR,Bank Transfer,Electricity expense,OWNER
+EXP-00290,SHOP001,2026-08-15,Internet,443287,INR,Bank Transfer,Internet expense,OWNER
+EXP-00291,SHOP006,2026-09-28,Other,118352,INR,Bank Transfer,Other expense,OWNER
+EXP-00292,SHOP002,2026-07-12,Internet,448996,INR,Bank Transfer,Internet expense,OWNER
+EXP-00293,SHOP004,2026-01-22,Electricity,361994,INR,Cash,Electricity expense,OWNER
+EXP-00294,SHOP004,2026-01-11,Internet,71861,INR,UPI,Internet expense,OWNER
+EXP-00295,SHOP006,2026-07-16,Internet,343080,INR,Bank Transfer,Internet expense,OWNER
+EXP-00296,SHOP005,2026-08-30,Staff Wages,1591016,INR,Cash,Staff Wages expense,OWNER
+EXP-00297,SHOP003,2026-06-19,Other,290201,INR,Cash,Other expense,OWNER
+EXP-00298,SHOP006,2026-05-08,Maintenance,419338,INR,Cash,Maintenance expense,OWNER
+EXP-00299,SHOP005,2026-10-10,Electricity,153022,INR,Bank Transfer,Electricity expense,OWNER
+EXP-00300,SHOP002,2026-03-09,Other,54610,INR,Bank Transfer,Other expense,OWNER

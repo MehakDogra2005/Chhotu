@@ -1,0 +1,31 @@
+reminder_id,shop_id,customer_id,amount_due_paise,channel,message_text,status,created_at,sent_at
+RMD-0001,SHOP004,CUS-004-020,75752,SMS,"Namaste Anaya Jain, aapke Rs 757 baaki hain. Kripya jaldi bhugtan karein. - Balaji Oil Traders",DRAFT,2026-10-10 15:21:20,
+RMD-0002,SHOP005,CUS-005-002,63046,WHATSAPP,"Namaste Isha Jain, aapke Rs 630 baaki hain. Kripya jaldi bhugtan karein. - Daily Needs Corner",DRAFT,2026-10-04 11:21:26,
+RMD-0003,SHOP004,CUS-004-018,153000,SMS,"Namaste Rahul Jain, aapke Rs 1530 baaki hain. Kripya jaldi bhugtan karein. - Balaji Oil Traders",DRAFT,2026-10-03 13:42:25,
+RMD-0004,SHOP004,CUS-004-003,67362,WHATSAPP,"Namaste Aarav Kumar, aapke Rs 673 baaki hain. Kripya jaldi bhugtan karein. - Balaji Oil Traders",DRAFT,2026-09-29 16:05:20,
+RMD-0005,SHOP001,CUS-001-016,5205,SMS,"Namaste Arjun Kumar, aapke Rs 52 baaki hain. Kripya jaldi bhugtan karein. - Sharma General Store",DRAFT,2026-10-17 10:49:25,
+RMD-0006,SHOP005,CUS-005-012,84900,WHATSAPP,"Namaste Meera Singh, aapke Rs 849 baaki hain. Kripya jaldi bhugtan karein. - Daily Needs Corner",DRAFT,2026-09-28 19:55:34,
+RMD-0007,SHOP001,CUS-001-007,78653,SMS,"Namaste Arjun Verma, aapke Rs 490 baaki hain. Kripya jaldi bhugtan karein. - Sharma General Store",DRAFT,2026-10-11 09:12:33,
+RMD-0008,SHOP004,CUS-004-002,190423,SMS,"Namaste Nisha Mehta, aapke Rs 1904 baaki hain. Kripya jaldi bhugtan karein. - Balaji Oil Traders",DRAFT,2026-10-14 19:28:48,
+RMD-0009,SHOP003,CUS-003-007,27689,WHATSAPP,"Namaste Kabir Sharma, aapke Rs 276 baaki hain. Kripya jaldi bhugtan karein. - Fresh Basket Mart",DRAFT,2026-10-24 13:35:08,
+RMD-0010,SHOP005,CUS-005-013,178330,SMS,"Namaste Priya Jain, aapke Rs 1783 baaki hain. Kripya jaldi bhugtan karein. - Daily Needs Corner",DRAFT,2026-09-26 16:56:44,
+RMD-0011,SHOP002,CUS-002-020,35000,WHATSAPP,"Namaste Kabir Kumar, aapke Rs 350 baaki hain. Kripya jaldi bhugtan karein. - Bright Stationery House",SENT,2026-10-10 09:40:38,2026-10-10 12:45:10
+RMD-0012,SHOP001,CUS-001-004,31543,WHATSAPP,"Namaste Kabir Kumar, aapke Rs 315 baaki hain. Kripya jaldi bhugtan karein. - Sharma General Store",SENT,2026-10-16 17:26:05,2026-10-16 12:53:58
+RMD-0013,SHOP001,CUS-001-017,14908,SMS,"Namaste Kabir Verma, aapke Rs 149 baaki hain. Kripya jaldi bhugtan karein. - Sharma General Store",SENT,2026-10-22 10:41:53,2026-10-22 11:31:59
+RMD-0014,SHOP002,CUS-002-016,490,SMS,"Namaste Anaya Gupta, aapke Rs 4 baaki hain. Kripya jaldi bhugtan karein. - Bright Stationery House",SENT,2026-10-03 17:45:17,2026-10-03 15:53:30
+RMD-0015,SHOP005,CUS-005-024,10500,WHATSAPP,"Namaste Aarav Mehta, aapke Rs 105 baaki hain. Kripya jaldi bhugtan karein. - Daily Needs Corner",SENT,2026-10-10 16:35:09,2026-10-10 15:12:58
+RMD-0016,SHOP005,CUS-005-008,29400,WHATSAPP,"Namaste Arjun Kumar, aapke Rs 294 baaki hain. Kripya jaldi bhugtan karein. - Daily Needs Corner",SENT,2026-10-06 10:17:49,2026-10-06 15:21:59
+RMD-0017,SHOP005,CUS-005-011,11974,SMS,"Namaste Isha Mehta, aapke Rs 119 baaki hain. Kripya jaldi bhugtan karein. - Daily Needs Corner",SENT,2026-09-30 09:18:46,2026-09-30 13:53:37
+RMD-0018,SHOP001,CUS-001-003,17060,SMS,"Namaste Rahul Gupta, aapke Rs 170 baaki hain. Kripya jaldi bhugtan karein. - Sharma General Store",SENT,2026-10-07 11:28:34,2026-10-07 16:22:21
+RMD-0019,SHOP002,CUS-002-023,2345,SMS,"Namaste Priya Verma, aapke Rs 23 baaki hain. Kripya jaldi bhugtan karein. - Bright Stationery House",SENT,2026-10-08 16:59:20,2026-10-08 12:44:15
+RMD-0020,SHOP005,CUS-005-023,57150,SMS,"Namaste Priya Mehta, aapke Rs 571 baaki hain. Kripya jaldi bhugtan karein. - Daily Needs Corner",SENT,2026-10-07 12:54:49,2026-10-07 15:02:20
+RMD-0021,SHOP006,CUS-006-016,37500,SMS,"Namaste Arjun Verma, aapke Rs 375 baaki hain. Kripya jaldi bhugtan karein. - Om Household Mart",SENT,2026-10-02 20:58:51,2026-10-02 15:24:42
+RMD-0022,SHOP002,CUS-002-007,2617,WHATSAPP,"Namaste Rohan Kumar, aapke Rs 26 baaki hain. Kripya jaldi bhugtan karein. - Bright Stationery House",SENT,2026-09-30 16:02:08,2026-09-30 17:37:21
+RMD-0023,SHOP004,CUS-004-014,248227,WHATSAPP,"Namaste Anaya Singh, aapke Rs 2482 baaki hain. Kripya jaldi bhugtan karein. - Balaji Oil Traders",SENT,2026-09-28 16:06:33,2026-09-28 16:00:46
+RMD-0024,SHOP004,CUS-004-023,10138,SMS,"Namaste Aarav Mehta, aapke Rs 101 baaki hain. Kripya jaldi bhugtan karein. - Balaji Oil Traders",SENT,2026-10-21 19:09:04,2026-10-21 16:50:16
+RMD-0025,SHOP006,CUS-006-019,94260,SMS,"Namaste Nisha Singh, aapke Rs 942 baaki hain. Kripya jaldi bhugtan karein. - Om Household Mart",SENT,2026-10-15 19:05:54,2026-10-15 14:54:43
+RMD-0026,SHOP002,CUS-002-024,57580,SMS,"Namaste Isha Gupta, aapke Rs 575 baaki hain. Kripya jaldi bhugtan karein. - Bright Stationery House",SENT,2026-09-28 14:40:45,2026-09-28 16:55:34
+RMD-0027,SHOP002,CUS-002-008,950,WHATSAPP,"Namaste Rahul Singh, aapke Rs 9 baaki hain. Kripya jaldi bhugtan karein. - Bright Stationery House",SENT,2026-10-24 12:40:43,2026-10-24 13:14:47
+RMD-0028,SHOP006,CUS-006-015,2951,SMS,"Namaste Aarav Kumar, aapke Rs 29 baaki hain. Kripya jaldi bhugtan karein. - Om Household Mart",SENT,2026-10-23 10:48:40,2026-10-23 20:55:06
+RMD-0029,SHOP004,CUS-004-017,55957,WHATSAPP,"Namaste Rahul Jain, aapke Rs 559 baaki hain. Kripya jaldi bhugtan karein. - Balaji Oil Traders",SENT,2026-10-11 20:19:57,2026-10-11 09:02:20
+RMD-0030,SHOP006,CUS-006-002,41715,WHATSAPP,"Namaste Rohan Verma, aapke Rs 417 baaki hain. Kripya jaldi bhugtan karein. - Om Household Mart",SENT,2026-09-30 13:22:23,2026-09-30 15:09:15
