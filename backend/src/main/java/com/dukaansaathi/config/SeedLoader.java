@@ -23,7 +23,8 @@ public class SeedLoader implements ApplicationRunner {
     // Parent tables first, so foreign keys are satisfied.
     private static final List<String> TABLES = List.of(
             "shops", "users", "user_shops", "suppliers", "customers", "products", "purchases", "purchase_items", "sales",
-            "sale_items", "credit_transactions", "inventory_movements", "voice_utterances", "audio_recordings", "product_aliases", "audit_log");
+            "sale_items", "credit_transactions", "inventory_movements", "voice_utterances", "audio_recordings", "product_aliases", "audit_log", "expenses",
+            "payment_reminders");
 
     private final JdbcTemplate jdbc;
     private final Path seedDir;

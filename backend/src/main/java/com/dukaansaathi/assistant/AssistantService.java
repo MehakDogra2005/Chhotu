@@ -2,7 +2,11 @@ package com.dukaansaathi.assistant;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.regex.Pattern;
 
 import org.springframework.http.HttpStatus;
@@ -10,12 +14,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.dukaansaathi.advisor.AdvisorRepository;
+import com.dukaansaathi.advisor.AdvisorRepository.ProductSales;
 import com.dukaansaathi.assistant.CommandParser.Parsed;
 import com.dukaansaathi.auth.ShopContext;
 import com.dukaansaathi.config.AppClock;
 import com.dukaansaathi.customers.CustomerRepository;
 import com.dukaansaathi.customers.CustomerRepository.Balance;
+import com.dukaansaathi.customers.CustomerRepository.Entry;
+import com.dukaansaathi.customers.CustomerRepository.Person;
 import com.dukaansaathi.customers.CustomerService;
+import com.dukaansaathi.customers.UdhaarBook;
+import com.dukaansaathi.customers.UdhaarBook.Account;
 import com.dukaansaathi.dashboard.DashboardRepository;
 import com.dukaansaathi.dashboard.DashboardRepository.SalesTotals;
 import com.dukaansaathi.inventory.InventoryRepository;
@@ -51,6 +61,9 @@ public class AssistantService {
 
     private static final int MAX_TEXT = 300;
     private static final int MAX_OPTIONS = 6;
+    private static final int LIST_SIZE = 8;
+    private static final String NL = "\n";
+    private static final DateTimeFormatter DAY = DateTimeFormatter.ofPattern("d MMM");
     private static final Pattern HINGLISH = Pattern.compile("\\b(ka|ki|ke|hai|karo|batao|ne|ko|diye|diya|kitna|kitni|bacha|aaj|hafte|mahine)\\b");
     private static final String HELP = "I did not understand that. You can ask, for example: \"Chocolate ka stock kitna hai?\", "
             + "\"Aaj ki sale batao\", \"Ramesh ka udhaar kitna hai?\", or tell me: \"10 Chocolate add karo\", \"Ramesh ne 500 de diye\".";
@@ -62,12 +75,13 @@ public class AssistantService {
     private final CustomerRepository customers;
     private final CustomerService customerService;
     private final DashboardRepository dashboard;
+    private final AdvisorRepository advisor;
     private final AppClock clock;
     private final ObjectMapper json;
 
     public AssistantService(AssistantRepository repo, CommandParser parser, InventoryRepository inventory,
                             InventoryService inventoryService, CustomerRepository customers, CustomerService customerService,
-                            DashboardRepository dashboard, AppClock clock, ObjectMapper json) {
+                            DashboardRepository dashboard, AdvisorRepository advisor, AppClock clock, ObjectMapper json) {
         this.repo = repo;
         this.parser = parser;
         this.inventory = inventory;
@@ -75,6 +89,7 @@ public class AssistantService {
         this.customers = customers;
         this.customerService = customerService;
         this.dashboard = dashboard;
+        this.advisor = advisor;
         this.clock = clock;
         this.json = json;
     }
@@ -101,6 +116,11 @@ public class AssistantService {
             case LOW_STOCK -> lowStock(shop);
             case RESTOCK_LIST -> restockList(shop);
             case INSIGHTS -> insights(shop);
+            case TOP_SELLER -> topSeller(shop, p);
+            case BEST_MARGIN -> bestMargin(shop, p);
+            case REMINDERS -> reminders(shop);
+            case OLD_UDHAAR -> oldUdhaar(shop, p);
+            case PAYMENT_REGISTER -> register(shop, p);
             case UNKNOWN -> Outcome.say(HELP);
         };
 
@@ -217,6 +237,89 @@ public class AssistantService {
         dashboard.topDebtors(shop, 1).stream().findFirst().ifPresent((d) ->
                 out.append("\n• Biggest udhaar: ").append(d.name()).append(" owes ").append(CustomerService.rupees(d.pendingPaise())).append("."));
         return Outcome.say(out.toString());
+    }
+
+    private Outcome topSeller(String shop, Parsed p) {
+        List<ProductSales> sold = advisor.productSales(shop, from(p.period()), clock.today());
+        if (sold.isEmpty()) return Outcome.say("Nothing was sold in " + when(p.period()) + ".");
+        ProductSales top = sold.get(0);
+        String next = sold.stream().skip(1).limit(2).map((s) -> s.name() + " (" + fmt(s.quantity()) + ")").reduce((a, b) -> a + ", " + b).orElse("");
+        return Outcome.say("Your top seller in " + when(p.period()) + " is " + top.name() + ": " + fmt(top.quantity()) + " " + top.unit()
+                + " sold for " + CustomerService.rupees(top.salesPaise()) + "." + (next.isEmpty() ? "" : " Next: " + next + "."));
+    }
+
+    private Outcome bestMargin(String shop, Parsed p) {
+        return advisor.productSales(shop, from(p.period()), clock.today()).stream().filter((s) -> s.salesPaise() > 0)
+                .max(Comparator.comparingDouble((ProductSales s) -> (s.salesPaise() - s.costPaise()) / (double) s.salesPaise()))
+                .map((s) -> Outcome.say("Your best margin in " + when(p.period()) + " is on " + s.name() + ": "
+                        + Math.round((s.salesPaise() - s.costPaise()) * 100.0 / s.salesPaise()) + "% (" + CustomerService.rupees(s.salesPaise() - s.costPaise())
+                        + " profit on " + CustomerService.rupees(s.salesPaise()) + " of sales)."))
+                .orElse(Outcome.say("Nothing was sold in " + when(p.period()) + ", so there is no margin to compare."));
+    }
+
+    /** Customers whose udhaar is past its due date, biggest overdue amount first. */
+    private Outcome reminders(String shop) {
+        LocalDate today = clock.today();
+        List<Account> overdue = accounts(shop).stream().filter((a) -> a.pendingPaise() > 0 && a.overduePaise() > 0)
+                .sorted(Comparator.comparingLong(Account::overduePaise).reversed()).toList();
+        if (overdue.isEmpty()) return Outcome.say("Nobody's payment is overdue right now, so no reminders are needed.");
+        String list = overdue.stream().limit(LIST_SIZE).map((a) -> "• " + a.name() + ": " + CustomerService.rupees(a.overduePaise()) + " overdue for "
+                + a.daysOverdue(today) + " days (owes " + CustomerService.rupees(a.pendingPaise()) + " in all)").collect(Collectors.joining(NL));
+        return Outcome.say(overdue.size() + (overdue.size() == 1 ? " customer needs" : " customers need") + " a payment reminder:" + NL + list
+                + more(overdue.size()) + NL + "On the Customer Handling page, Send Reminder prepares the WhatsApp messages.");
+    }
+
+    /** Customers who still owe udhaar given more than p.quantity() days ago. */
+    private Outcome oldUdhaar(String shop, Parsed p) {
+        int days = (int) Math.round(p.quantity());
+        LocalDate since = clock.today().minusDays(days);
+        List<Account> old = accounts(shop).stream().filter((a) -> a.pendingPaise() > 0 && a.oldestUnpaid() != null && a.oldestUnpaid().isBefore(since))
+                .sorted(Comparator.comparing(Account::oldestUnpaid)).toList();
+        String age = days % 30 == 0 ? (days / 30) + (days == 30 ? " month" : " months") : days + " days";
+        if (old.isEmpty()) return Outcome.say("No customer has unpaid udhaar older than " + age + ".");
+        String list = old.stream().limit(LIST_SIZE).map((a) -> "• " + a.name() + ": " + CustomerService.rupees(a.pendingPaise())
+                + ", unpaid since " + a.oldestUnpaid().format(DAY)).collect(Collectors.joining(NL));
+        return Outcome.say(old.size() + (old.size() == 1 ? " customer has" : " customers have") + " udhaar older than " + age + ":" + NL + list + more(old.size()));
+    }
+
+    /** Every payment and udhaar entry of today, the last 7 days or the last 30 days. */
+    private Outcome register(String shop, Parsed p) {
+        LocalDate from = from(p.period()), to = clock.today();
+        Map<String, String> names = customers.people(shop).stream().collect(Collectors.toMap(Person::customerId, Person::name));
+        List<Entry> entries = customers.ledger(shop, null).stream().filter((e) -> !e.date().isBefore(from) && !e.date().isAfter(to)).toList();
+        if (entries.isEmpty()) return Outcome.say("No payments or udhaar were recorded for " + when(p.period()) + ".");
+        long received = 0, given = 0;
+        for (Entry e : entries) {
+            switch (UdhaarBook.kind(e)) {
+                case PAYMENT -> received += e.amountPaise();
+                case PAYMENT_REVERSED -> received -= e.amountPaise();
+                case CREDIT -> given += e.amountPaise();
+                default -> { }
+            }
+        }
+        String list = reversed(entries).stream().limit(LIST_SIZE).map((e) -> "• " + (p.period().equals("today") ? "" : e.date().format(DAY) + ": ")
+                + names.get(e.customerId()) + switch (UdhaarBook.kind(e)) {
+                    case PAYMENT -> " paid " + CustomerService.rupees(e.amountPaise());
+                    case CREDIT -> " took " + CustomerService.rupees(e.amountPaise()) + " udhaar";
+                    case WAIVED -> ": " + CustomerService.rupees(e.amountPaise()) + " waived";
+                    case PAYMENT_REVERSED -> ": payment of " + CustomerService.rupees(e.amountPaise()) + " undone (entered by mistake)";
+                }).collect(Collectors.joining(NL));
+        return Outcome.say("Payment register for " + when(p.period()) + ":" + NL + list + more(entries.size())
+                + NL + "Received " + CustomerService.rupees(received) + ", udhaar given " + CustomerService.rupees(given) + ".");
+    }
+
+    private List<Account> accounts(String shop) {
+        return UdhaarBook.accounts(customers.people(shop), customers.ledger(shop, null), null, clock.today());
+    }
+
+    private static <T> List<T> reversed(List<T> list) {
+        List<T> copy = new java.util.ArrayList<>(list);
+        java.util.Collections.reverse(copy);
+        return copy;
+    }
+
+    private static String more(int total) {
+        return total > LIST_SIZE ? NL + "...and " + (total - LIST_SIZE) + " more." : "";
     }
 
     // ------------------------------------------------------------------ proposals (changes that need a confirm)

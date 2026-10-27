@@ -32,7 +32,11 @@ Tap any mic on the Home page, or one of the example sentences, and Saathi opens.
 | "10 Chocolate add karo" | proposes adding stock, then you confirm |
 | "Ramesh ne 500 de diye" | proposes recording the payment, then you confirm |
 | "Ramesh ko 300 ka udhaar diya" | proposes giving credit, then you confirm |
-| "Restocking list bana do", "kaun sa samaan khatam hone wala hai?", "business insights" | lists and summaries |
+| "Restocking list bana do", "agle hafte ke liye kya stock mangwana chahiye?", "kaun sa samaan khatam hone wala hai?", "business insights" | lists and summaries |
+| "Kaun sa product sabse zyada bika?" / "Kis product pe sabse zyada margin hai?" | top seller / best margin (last 30 days unless you say "aaj" or "hafte") |
+| "Kis-kis ko payment reminder bhejna hai?" | customers with overdue udhaar, biggest amount first |
+| "Kaunse customers ka udhaar 1 mahine se zyada purana hai?" | unpaid udhaar older than that ("15 din", "2 hafte", "2 mahine" work too) |
+| "Aaj ka payment register dikhao" / "is hafte ka payment register" | every payment and udhaar entry of today / the last 7 / 30 days, with totals |
 
 If two customers share a name, Saathi asks which one (showing phone and pending amount). Every change is saved in the credit ledger / stock movements and in `audit_log`, and every sentence is kept in `voice_utterances` (see Conversations). Answers always come from the database, never from guessing.
 
@@ -46,6 +50,28 @@ How it works: `assistant/CommandParser.java` finds the intent with keywords; `As
 - **Tick rows:** "Restocking list for these" makes a list for just the ticked items.
 - **View Stock Report** (also the Inventory Value card): stock value by category, and a spreadsheet (CSV) of every item.
 - The number cards, the Low Stock Alert and the tabs filter the table; the search and tab live in the address (`/inventory?filter=low&search=bulb`).
+
+## What the Business Advisor page can do
+
+Pick a period (last 7 days, this month, last month, last 3 months, this year); every number is compared with the period just before.
+
+- **Total Sales, Total Purchase Cost, Estimated Profit, Profit Margin:** purchase cost is what the items you *sold* cost you, so profit = sales − purchase cost (before shop expenses).
+- **Sales vs Profit Trend** (by day, by week for 3 months, by month for the year) and **Sales by Category**. Hover or tap for the numbers.
+- **Top Selling Products** and **Lowest Profit Margin Products** ("View all" opens the full list).
+- **Purchase vs Sales Summary:** stock bought (deliveries received) against sales, and **Net Profit** = profit − shop expenses. "View details" lists the period's purchase orders.
+- **Expense Breakdown:** where the money went: the cost of the goods sold plus each kind of expense (from the `expenses` table, loaded from `db/expenses.csv`).
+- **Key Insights:** written by `advisor/AdvisorService.java` from the numbers (biggest rise and drop, weakest margin, margin change, best category, expenses vs profit).
+- **Quick Actions:** a spoken profit report, a margin comparison, **Suggest Price Changes** (products under 15% margin and the price that reaches it; "Set ₹X" saves it like Edit item, into `audit_log`), and **Generate Purchase Plan** (opens the Inventory restocking list).
+
+## What the Customer Handling page can do
+
+Pick a period like on the Business Advisor page; Outstanding and Payments Received are compared with the period before.
+
+- **Total Outstanding, Customers on Udhaar** (with how many are new), **Payments Received, Payments Overdue.** A customer's udhaar is *overdue* when part of it is still unpaid after its due date. Payments clear the oldest udhaar first (`customers/UdhaarBook.java` works this out from the ledger).
+- **Customer list** with tabs (All / Pending Payments / Recently Paid = paid in the chosen period) and search by name or phone. **Record Payment**, and the ⋮ menu: **View history** (every entry with the balance after it), **Give udhaar** (with what they took), **Send payment reminder**. **Add Customer** checks the phone number and can take udhaar they already owe.
+- **Customer-wise Outstanding** (red = has overdue udhaar, amber = not due yet), **Recent Transactions** (with what was bought on the bill), **Reminders & Insights** (written by `customers/CustomerPageService.java`).
+- **Send Reminder** prepares the message for each overdue customer; WhatsApp or SMS opens on the device to send it, and the page notes it in `payment_reminders` so it shows "reminded 2 days ago". The sample phone numbers are masked, so WhatsApp asks you to pick the contact.
+- **Ask Saathi about customers** (questions use real names from the shop) and **Add Udhaar/Payment by Voice or Upload.** Uploaded voice notes and call recordings are kept in `backend/data/recordings/` (90 days, up to 20 MB, the same file cannot be uploaded twice, a call recording needs a consent tick). There is no speech-to-text service yet: open a recording, listen, type what was said, and **Send to Saathi**, which proposes the change and waits for your Yes.
 
 ## Use it on a phone, and install it as an app
 
@@ -78,6 +104,13 @@ A login code (6 digits) works for **60 seconds**; the page shows a countdown, an
 
 **Email:** the code is emailed once you add your mail settings (next section). Until then it is shown in the backend window, and the page tells you so. If an email already has an account, logging in with it opens that account; a new account is only made for a new email (capital letters do not matter).
 
+**For faster testing with a fixed code:** start the backend with:
+```
+set DUKAAN_FIXED_CODE=111111
+mvnw.cmd spring-boot:run
+```
+Then every OTP request will return `111111` instead of a random code.
+
 | Phone | Owner | Shop |
 |---|---|---|
 | 9999900001 | Rajesh Sharma | Sharma General Store |
@@ -106,7 +139,10 @@ backend/src/main/java/com/dukaansaathi/
   auth/        login + sign-up (controller -> service -> repository)
   profile/     /api/me: who is logged in (used by the top bar on every page)
   dashboard/   the Home page data (controller -> service -> repository)
+  advisor/     the Business Advisor page: profit & loss for a period, product margins, price suggestions, insights
   inventory/   the Inventory page, and adding / editing / archiving products, stock history and the stock report
+  customers/   the Customer Handling page, udhaar (payments, credit, history, reminders) and UdhaarBook (who owes what, what is overdue)
+  recordings/  uploading voice notes and call recordings, playing them back, and the text typed for them
   restock/     what to order, purchase orders, and receiving a delivery (which adds the stock)
   settings/    the Settings page: shop profile + preferences (saved in shops, users and shop_settings)
   config/      loads the sample CSVs on first start
@@ -123,7 +159,10 @@ frontend/src/
                  ItemFormDialogs / StockDialogs / RestockDialog / ReportDialog / RowActionsDialog (one per button)
     settings/    Settings page: Settings.jsx (the form), SettingsCards.jsx (one card per section)
     help/        Help page: Help.jsx, and helpContent.js where all the text is written
-    advisor/ customers/   placeholders, to be built
+    advisor/     Business Advisor page: BusinessAdvisor.jsx (the page), Charts.jsx (trend + ring charts), ProductTables.jsx,
+                 SideCards.jsx (Ask Saathi, Key Insights, Quick Actions), AdvisorDialogs.jsx
+    customers/   Customer Handling page: Customers.jsx (the page), CustomerTable.jsx, BottomCards.jsx (outstanding bars,
+                 recent transactions, reminders & insights), SideCards.jsx (Ask Saathi, voice / upload), CustomerDialogs.jsx
 db/              sample data + the full PostgreSQL schema
 ```
 
@@ -135,4 +174,4 @@ To move from the local H2 file to PostgreSQL: swap the `h2` dependency in `backe
 
 ## Not built yet
 
-The other pages (Business Advisor, Customer Handling), adding / editing products, recording sales, Hindi in Devanagari letters and the language selector (multilingual), hands-free "always listening" mode, the Gnani speech service, and SMS/email for OTPs. Everything on the Home and Inventory pages works except the language selector.
+Recording sales and expenses, Hindi in Devanagari letters and the language selector (multilingual), hands-free "always listening" mode, the Gnani speech service (speech-to-text for uploaded recordings), sending reminders automatically from the server, and SMS/email for OTPs. Everything on the Home, Inventory, Business Advisor and Customer Handling pages works except the language selector.

@@ -214,7 +214,35 @@ CREATE TABLE IF NOT EXISTS audit_log (
   created_at TIMESTAMP NOT NULL
 );
 
+-- Shop running costs (rent, wages, electricity...). Used by the Business Advisor for net profit.
+CREATE TABLE IF NOT EXISTS expenses (
+  expense_id VARCHAR(40) PRIMARY KEY,
+  shop_id VARCHAR(40) NOT NULL REFERENCES shops(shop_id),
+  expense_date DATE NOT NULL,
+  expense_category VARCHAR(50) NOT NULL,
+  amount_paise BIGINT NOT NULL,
+  currency VARCHAR(3) DEFAULT 'INR' NOT NULL,
+  payment_method VARCHAR(30) NOT NULL,
+  description VARCHAR(500),
+  recorded_by VARCHAR(40)
+);
+
+-- Payment reminders the shopkeeper sent (or drafted) to a customer who owes money.
+CREATE TABLE IF NOT EXISTS payment_reminders (
+  reminder_id VARCHAR(40) PRIMARY KEY,
+  shop_id VARCHAR(40) NOT NULL REFERENCES shops(shop_id),
+  customer_id VARCHAR(40) NOT NULL REFERENCES customers(customer_id),
+  amount_due_paise BIGINT NOT NULL,
+  channel VARCHAR(20) NOT NULL,            -- WHATSAPP or SMS
+  message_text VARCHAR(1000) NOT NULL,
+  status VARCHAR(20) NOT NULL,             -- DRAFT, SENT, FAILED
+  created_at TIMESTAMP NOT NULL,
+  sent_at TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_reminders_customer ON payment_reminders(shop_id, customer_id);
 CREATE INDEX IF NOT EXISTS idx_sales_shop_date ON sales(shop_id, sale_date);
+CREATE INDEX IF NOT EXISTS idx_expenses_shop_date ON expenses(shop_id, expense_date);
 CREATE INDEX IF NOT EXISTS idx_sale_items_sale ON sale_items(sale_id);
 CREATE INDEX IF NOT EXISTS idx_credit_customer ON credit_transactions(shop_id, customer_id);
 CREATE INDEX IF NOT EXISTS idx_movements_product ON inventory_movements(shop_id, product_id);

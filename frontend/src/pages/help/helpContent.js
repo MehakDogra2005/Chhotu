@@ -10,7 +10,8 @@ export const STEPS = [
 export const VOICE_GROUPS = [
   ['Stock', ['Maggi ka stock kitna hai?', '10 packet Amul Milk add karo', 'Kaun sa samaan khatam hone wala hai?', 'Restocking list bana do']],
   ['Sales and profit', ['Aaj ki total sale batao', 'Is mahine profit kam kyun hua?', 'Mere kharche kahan badh rahe hain?']],
-  ['Udhaar', ['Ramesh ka udhaar kitna hai?', 'Ramesh ne ₹500 de diye', 'Ramesh ko ₹300 ka samaan udhaar diya']],
+  ['Udhaar', ['Ramesh ka udhaar kitna hai?', 'Ramesh ne ₹500 de diye', 'Ramesh ko ₹300 ka samaan udhaar diya',
+    'Kis-kis ko payment reminder bhejna hai?', 'Aaj ka payment register dikhao', 'Kaunse customers ka udhaar 1 mahine se zyada purana hai?']],
 ]
 
 export const FAQ = [
@@ -20,6 +21,10 @@ export const FAQ = [
     'A product is Low Stock when what is left is at or below its reorder level. It is Out of Stock when none is left. Both appear in the Action Needed and Low Stock Alert lists.'],
   ['How is pending udhaar calculated?',
     'For each customer: credit you gave, minus payments they made, plus or minus any corrections. Only entries you have confirmed are counted, so nothing is added by a guess.'],
+  ['When is a payment overdue, and how do I send a reminder?',
+    'Each udhaar has a due date (30 days after it was given, unless set otherwise). Payments clear the oldest udhaar first, so whatever is still unpaid after its due date is overdue. On Customer Handling, tap Send Reminder: the message is ready for each customer, and WhatsApp or SMS opens on your phone to send it. The page remembers when you last reminded someone.'],
+  ['Can I upload a voice note or call recording?',
+    'Yes, on Customer Handling. The recording is kept for 90 days. A call recording needs your confirmation that the customer knew the call was recorded. Automatic speech-to-text is not set up yet, so open the recording, listen, and type what was said; Send to Saathi then shows the change and waits for your Yes.'],
   ['What is gross profit?',
     'Sales minus what the goods cost you. It is before your shop expenses such as rent and wages, so it is higher than your final profit.'],
   ['Why does Today show ₹0?',

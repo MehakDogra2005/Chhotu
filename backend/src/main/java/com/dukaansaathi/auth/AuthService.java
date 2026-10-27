@@ -45,14 +45,17 @@ public class AuthService {
     private final GoogleVerifier google;
     private final EmailSender email;
     private final int validSeconds;
+    private final String fixedCode;
 
     public AuthService(UserRepository users, SessionStore sessions, GoogleVerifier google, EmailSender email,
-                       @Value("${dukaan.code-valid-seconds:60}") int validSeconds) {
+                       @Value("${dukaan.code-valid-seconds:60}") int validSeconds,
+                       @Value("${dukaan.fixed-code:}") String fixedCode) {
         this.users = users;
         this.sessions = sessions;
         this.google = google;
         this.email = email;
         this.validSeconds = validSeconds;
+        this.fixedCode = fixedCode;
     }
 
     // ---- phone
@@ -124,7 +127,7 @@ public class AuthService {
             if (wait > 0) throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Please wait " + wait + " seconds before asking for another code");
         }
 
-        String code = String.format("%06d", random.nextInt(1_000_000));
+        String code = fixedCode.isBlank() ? String.format("%06d", random.nextInt(1_000_000)) : fixedCode;
         codes.put(key, new PendingCode(code));
 
         String delivery = "log";

@@ -21,9 +21,10 @@ import com.dukaansaathi.inventory.InventoryRepository.ProductStock;
  */
 @Component
 public class CommandParser {
-    public enum Intent { SALES, PROFIT, STOCK_LOOKUP, STOCK_ADD, BALANCE, PAYMENT, CREDIT, LOW_STOCK, RESTOCK_LIST, INSIGHTS, UNKNOWN }
+    public enum Intent { SALES, PROFIT, STOCK_LOOKUP, STOCK_ADD, BALANCE, PAYMENT, CREDIT, LOW_STOCK, RESTOCK_LIST, INSIGHTS,
+        TOP_SELLER, BEST_MARGIN, REMINDERS, OLD_UDHAAR, PAYMENT_REGISTER, UNKNOWN }
 
-    /** products and people are the ones the sentence mentions; period is today, week or month. */
+    /** products and people are the ones the sentence mentions; period is today, week or month. For OLD_UDHAAR quantity is a number of days. */
     public record Parsed(Intent intent, List<ProductStock> products, List<Balance> people, Double quantity, Long amountPaise, String period) {}
 
     private static final Pattern NUMBER = Pattern.compile("\\d+(\\.\\d+)?");
@@ -40,11 +41,25 @@ public class CommandParser {
         boolean person = !foundPeople.isEmpty();
         boolean udhaarWord = has(t, "udhaar", "udhar", "credit", "samaan", "saman");
         boolean paidWord = has(t, "diye", "diya", "paid", "payment", "chuka", "chukaya", "jama", "received", "mile", "wapas", "bhare");
+        boolean most = has(t, "sabse", "most", "best", "top", "highest");
 
         if (has(t, "insight", "insights", "salah", "suggestion", "suggest") || t.contains("business kaisa")) {
             intent = Intent.INSIGHTS;
-        } else if (has(t, "restock", "restocking", "reorder") || t.contains("list bana")) {
-            intent = Intent.RESTOCK_LIST;
+        } else if (has(t, "reminder", "reminders", "remind", "tagada", "yaad")) {
+            intent = Intent.REMINDERS;      // "Kis-kis ko payment reminder bhejna hai?"
+        } else if (!person && has(t, "purana", "purani", "purane", "old", "older")) {
+            intent = Intent.OLD_UDHAAR;     // "Kaunse customers ka udhaar 1 mahine se zyada purana hai?"
+            number = number == null ? 1.0 : number;
+            number = has(t, "din", "day", "days") ? number : has(t, "hafte", "hafta", "week", "weeks") ? number * 7 : number * 30;
+        } else if (!person && has(t, "register", "khata", "ledger", "entries", "hisaab", "hisab")) {
+            intent = Intent.PAYMENT_REGISTER; // "Aaj ka payment register dikhao"
+        } else if (has(t, "restock", "restocking", "reorder") || t.contains("list bana")
+                || (number == null && has(t, "mangwana", "mangwau", "mangwaun", "mangwana chahiye"))) {
+            intent = Intent.RESTOCK_LIST;  // "Agle hafte ke liye kya stock mangwana chahiye?"
+        } else if (most && has(t, "margin", "munafa", "profit", "fayda")) {
+            intent = Intent.BEST_MARGIN;   // "Kis product pe sabse zyada margin hai?"
+        } else if (most && has(t, "bika", "biki", "bikta", "selling", "seller", "sold", "bikne")) {
+            intent = Intent.TOP_SELLER;    // "Kaun sa product sabse zyada bika?"
         } else if (has(t, "khatam", "shortage") || t.contains("low stock") || t.contains("kam stock") || t.contains("out of stock")) {
             intent = Intent.LOW_STOCK;
         } else if (person && number != null && udhaarWord && (padded(t).contains(" ko ") || has(t, "give", "gave", "likh", "likho"))
@@ -64,6 +79,8 @@ public class CommandParser {
         } else if (!foundProducts.isEmpty() && !has(t, "bik", "sold", "bech")) {
             intent = Intent.STOCK_LOOKUP;
         }
+        // "Sabse zyada kya bika?" means lately, not only today
+        if ((intent == Intent.TOP_SELLER || intent == Intent.BEST_MARGIN) && period.equals("today") && !has(t, "aaj", "today")) period = "month";
         return new Parsed(intent, foundProducts, foundPeople, number, paise, period);
     }
 

@@ -57,14 +57,18 @@ export function ViewAll({ to }) {
   return <Link to={to} className="flex items-center gap-1 text-[13px] font-semibold text-brand">View all <ArrowRight size={14} /></Link>
 }
 
-/** "↑ 12% vs last month". Shows nothing useful when there is no earlier period to compare with. */
-export function Change({ pct, label = '' }) {
+/**
+ * "↑ 12% vs last month". Shows nothing useful when there is no earlier period to compare with.
+ * good says which way is good news: 'up' (sales), 'down' (expenses) or 'none' (just a number, no colour).
+ */
+export function Change({ pct, label = '', unit = '%', good = 'up' }) {
   if (pct === null || pct === undefined) return <div className="text-[13px] text-muted">No earlier data</div>
   const up = pct >= 0
   const Arrow = up ? ArrowUp : ArrowDown
+  const tone = good === 'none' ? 'text-muted' : up === (good === 'up') ? 'text-brand' : 'text-red-600'
   return (
-    <div className={`flex items-center gap-1 text-[12px] ${up ? 'text-brand' : 'text-red-600'}`}>
-      <Arrow size={13} /> {Math.abs(pct)}% {label}
+    <div className={`flex items-center gap-1 text-[12px] ${tone}`}>
+      <Arrow size={13} /> {Math.abs(pct)}{unit} {label}
     </div>
   )
 }

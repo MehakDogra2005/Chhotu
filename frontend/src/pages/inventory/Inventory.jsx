@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Box, ChartNoAxesCombined, Truck, TriangleAlert } from 'lucide-react'
 import { del, post } from '../../api'
@@ -31,8 +31,12 @@ export default function Inventory() {
   }
 
   // Which dialog is open: { kind: 'add' | 'edit' | 'actions' | 'stock' | 'history' | 'archive' | 'receive' | 'restock' | 'report', item, ids }
-  const [dialog, setDialog] = useState(null)
+  // /inventory?restock=1 (the Business Advisor's "Generate Purchase Plan") opens with the restocking list
+  const [dialog, setDialog] = useState(() => (params.has('restock') ? { kind: 'restock' } : null))
   const [selected, setSelected] = useState([]) // ids of the rows that are ticked
+  useEffect(() => {
+    if (params.has('restock')) change({}) // drop it from the address, so a reload does not open the list again
+  }, [])
   const open = (kind, extra) => setDialog({ kind, ...extra })
   const close = () => setDialog(null)
 
