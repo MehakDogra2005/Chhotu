@@ -22,7 +22,7 @@ The first start creates `backend/data/` and loads the sample CSVs from `db/` int
 
 ## The voice assistant (Saathi)
 
-Tap any mic on the Home page, or one of the example sentences, and Saathi opens. **The microphone listens only between your taps**: tap the mic to start, tap it again (or just stop talking, or close the window) to stop. It is never on by itself. Say it (Chrome and Android Chrome have speech built in) or type it. It answers questions and, for changes, shows what it will do and waits for your Yes.
+Tap any mic on the Home page, or one of the example sentences, and Saathi opens. **By default the microphone listens only between your taps**: tap the mic to start, tap it again (or just stop talking, or close the window) to stop. It is never on by itself. **Keep listening** (the switch in the Saathi window) is the only way it stays on: a bar at the bottom shows "Listening, always on" with a Stop button, it stays on while you move between pages, and it is off again after you press Stop. The choice is remembered on that browser only. Say it or type it. Listening and Saathi's spoken replies use **Gnani speech** when a key is set (see "Voice: Gnani speech" below), and otherwise the browser's own speech (Chrome and Android Chrome). It answers questions and, for changes, shows what it will do and waits for your Yes.
 
 | You say | What happens |
 |---|---|
@@ -34,13 +34,26 @@ Tap any mic on the Home page, or one of the example sentences, and Saathi opens.
 | "Ramesh ko 300 ka udhaar diya" | proposes giving credit, then you confirm |
 | "Restocking list bana do", "agle hafte ke liye kya stock mangwana chahiye?", "kaun sa samaan khatam hone wala hai?", "business insights" | lists and summaries |
 | "Kaun sa product sabse zyada bika?" / "Kis product pe sabse zyada margin hai?" | top seller / best margin (last 30 days unless you say "aaj" or "hafte") |
+| "Inventory kholo", "Udhaar page par le chalo", "Go to settings" | opens that page (Home, Inventory, Business Advisor, Customer Handling, Settings, Help, Conversations) |
 | "Kis-kis ko payment reminder bhejna hai?" | customers with overdue udhaar, biggest amount first |
 | "Kaunse customers ka udhaar 1 mahine se zyada purana hai?" | unpaid udhaar older than that ("15 din", "2 hafte", "2 mahine" work too) |
 | "Aaj ka payment register dikhao" / "is hafte ka payment register" | every payment and udhaar entry of today / the last 7 / 30 days, with totals |
 
 If two customers share a name, Saathi asks which one (showing phone and pending amount). Every change is saved in the credit ledger / stock movements and in `audit_log`, and every sentence is kept in `voice_utterances` (see Conversations). Answers always come from the database, never from guessing.
 
-How it works: `assistant/CommandParser.java` finds the intent with keywords; `AssistantService.java` runs only checked actions. A proposed change is stored on the server and can be confirmed once, so it cannot be changed or repeated from the browser. The parser is deliberately simple; to understand more sentences add keywords there, or replace it with an LLM or the Gnani speech service later (nothing else needs to change).
+How it works: `assistant/CommandParser.java` finds the intent with keywords; `AssistantService.java` runs only checked actions. A proposed change is stored on the server and can be confirmed once, so it cannot be changed or repeated from the browser. The parser is deliberately simple; to understand more sentences add keywords there, or replace it with an LLM later (nothing else needs to change: speech in and out is separate, see below).
+
+## Voice: Gnani speech
+
+With a Gnani Vachana API key, the microphone and Saathi's voice use Gnani, which is much better with Hindi and Hinglish than the browser's speech. Without a key everything still works with the browser's own speech.
+
+1. Put the key in **`backend/config/local.properties`** (private, never shared): `gnani.api-key=vach_...`, then restart the backend. (Or set the `GNANI_API_KEY` environment variable.) The key stays on the server: the browser only talks to this app's `/api/voice`.
+2. **Listening** (`POST /api/voice/transcribe`): the browser records one sentence at a time (it detects when you start and stop talking, `components/mic.js`) as a small WAV file; Gnani Prisma turns it into Hinglish text in English letters ("ramesh ne 500 rupay de diye"), which Saathi reads like typed text. The shop's customer and product names plus Saathi's command words are sent as a word-boost list, so names and words like "kholo" and "udhaar" are recognised better.
+3. **Speaking** (`POST /api/voice/speak`): Saathi's reply is turned into speech by Gnani Timbre. Amounts and numbers are written out in words first (`voice/SpeechText.java`: "₹1,173" becomes "one thousand one hundred seventy three rupees"), because the voice drops the ₹ sign and reads "38" digit by digit.
+4. **Uploaded recordings** up to a minute long are turned into text automatically (`recordings/RecordingService.java`); you check the text and send it to Saathi.
+5. Settings in `application.properties`: `gnani.stt-language`, `gnani.tts-voice`, `gnani.tts-model`, `gnani.tts-language`. Each shop can make at most 40 listen and 60 speak requests a minute, so one shop cannot use up the paid service.
+
+What leaves the server: the audio of each sentence you speak or upload, and the text of Saathi's replies. If that is not acceptable for a shop, leave the key unset.
 
 ## What the Inventory page can do
 
@@ -174,4 +187,4 @@ To move from the local H2 file to PostgreSQL: swap the `h2` dependency in `backe
 
 ## Not built yet
 
-Recording sales and expenses, Hindi in Devanagari letters and the language selector (multilingual), hands-free "always listening" mode, the Gnani speech service (speech-to-text for uploaded recordings), sending reminders automatically from the server, and SMS/email for OTPs. Everything on the Home, Inventory, Business Advisor and Customer Handling pages works except the language selector.
+Recording sales and expenses, Hindi in Devanagari letters and the language selector (multilingual), an LLM for sentences the keyword parser does not understand, Gnani's live streaming (the app records one sentence at a time instead), sending reminders automatically from the server, and SMS/email for OTPs. Everything on the Home, Inventory, Business Advisor and Customer Handling pages works except the language selector.

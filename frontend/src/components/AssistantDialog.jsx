@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { Mic, Send, Sparkles } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Ear, Mic, Send, Sparkles } from 'lucide-react'
 import { post } from '../api'
 import { useAuth } from '../AuthContext'
 import { refreshData } from '../useFetch'
 import Modal from './Modal'
-import { speak, useListening } from './speech'
+import { speak, stopSpeaking, useListening } from './speech'
 
 const GREETING = 'Boliye, aapke liye kya karna hai? Say it, or type it. For example: "Chocolate ka stock kitna hai?"'
 
@@ -13,12 +14,16 @@ const GREETING = 'Boliye, aapke liye kya karna hai? Say it, or type it. For exam
  * `start` says how it was opened: { text } sends that sentence now, { listen: true } starts the microphone,
  * and { hint } replaces the first line.
  */
-export default function AssistantDialog({ start, speakReplies, onClose }) {
+export default function AssistantDialog({ start, speakReplies, keepListening, onKeepListening, onClose }) {
   const { token } = useAuth()
-  const [chat, setChat] = useState([{ from: 'saathi', text: start.hint || GREETING }])
+  const navigate = useNavigate()
+  const [chat, setChat] = useState(() => (start.reply
+    ? [{ from: 'me', text: start.reply.heard }, { from: 'saathi', text: start.reply.message, options: start.reply.options, utteranceId: start.reply.utteranceId }]
+    : [{ from: 'saathi', text: start.hint || GREETING }]))
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
   const bottom = useRef(null)
+  const navigating = useRef(false) // the window is closing because Saathi opened a page: its reply must still be heard
 
   const add = (message) => setChat((c) => [...c, message])
   const reply = (text) => { add({ from: 'saathi', text }); if (speakReplies) speak(text) }
@@ -34,6 +39,11 @@ export default function AssistantDialog({ start, speakReplies, onClose }) {
       const r = await post('/api/assistant/interpret', { text, via }, token)
       add({ from: 'saathi', text: r.message, options: r.options, utteranceId: r.utteranceId })
       if (speakReplies) speak(r.message)
+      if (r.navigate) {
+        navigating.current = true
+        navigate(r.navigate)
+        if (!keepListening) onClose()
+      }
     } catch (err) {
       reply(err.message)
     } finally {
@@ -49,7 +59,8 @@ export default function AssistantDialog({ start, speakReplies, onClose }) {
       reply(done.message)
       refreshData()
     } catch (err) {
-      settle(message.utteranceId)
+      // Only when it was already done or cancelled is the proposal gone; after a network error the buttons stay so it can be retried
+      if (err.status === 404 || err.status === 409) settle(message.utteranceId)
       reply(err.message)
     } finally {
       setBusy(false)
@@ -62,7 +73,7 @@ export default function AssistantDialog({ start, speakReplies, onClose }) {
     reply('Okay, cancelled. Nothing was changed.')
   }
 
-  const mic = useListening((words) => send(words, 'voice'))
+  const mic = useListening((words) => send(words, mic.engine))
 
   // When the window opens: send the sentence it was opened with, or start listening.
   useEffect(() => {
@@ -73,7 +84,7 @@ export default function AssistantDialog({ start, speakReplies, onClose }) {
   useEffect(() => { bottom.current?.scrollIntoView({ behavior: 'smooth' }) }, [chat])
 
   // Closing the window also stops Saathi talking.
-  useEffect(() => () => window.speechSynthesis?.cancel(), [])
+  useEffect(() => () => { if (!navigating.current) stopSpeaking() }, [])
 
   return (
     <Modal title="Saathi" icon={<span className="grid h-9 w-9 place-items-center rounded-full bg-brand text-white"><Sparkles size={18} /></span>} onClose={onClose}>
@@ -100,7 +111,12 @@ export default function AssistantDialog({ start, speakReplies, onClose }) {
         <div ref={bottom} />
       </div>
 
-      {mic.listening && <p className="px-5 pb-2 text-[13px] font-semibold text-red-500">● Listening... tap the red mic when you are done</p>}
+      <button onClick={() => onKeepListening(!keepListening)} className="mx-5 mt-3 flex items-center gap-2 self-start rounded-full border border-edge px-3 py-1.5 text-[12.5px] font-semibold hover:bg-stone-50">
+        <Ear size={14} className={keepListening ? 'text-brand' : 'text-muted'} />
+        Keep listening: {keepListening ? 'on' : 'off'}
+      </button>
+      {mic.listening && <p className="px-5 pb-2 text-[13px] font-semibold text-red-500">● Listening... speak, then pause (or tap the red mic when you are done)</p>}
+      {mic.working && <p className="px-5 pb-2 text-[13px] text-muted">Understanding what you said...</p>}
       {mic.problem && <p className="px-5 pb-2 text-[13px] text-red-600">{mic.problem}</p>}
       <form onSubmit={(e) => { e.preventDefault(); send(input) }} className="flex items-center gap-2 border-t border-edge p-3">
         {mic.supported && (
@@ -110,7 +126,7 @@ export default function AssistantDialog({ start, speakReplies, onClose }) {
           </button>
         )}
         <input value={input} onChange={(e) => setInput(e.target.value)} autoFocus={!start.listen}
-          placeholder={mic.listening ? 'Listening...' : 'Type here, for example: Ramesh ne 500 de diye'}
+          placeholder={mic.listening ? 'Listening...' : mic.working ? 'Understanding...' : 'Type here, for example: Ramesh ne 500 de diye'}
           className="h-12 min-w-0 flex-1 rounded-full border border-line bg-white px-4 text-[14px] outline-none focus:border-brand" />
         <button disabled={busy || !input.trim()} aria-label="Send" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand text-white disabled:opacity-50"><Send size={20} /></button>
       </form>

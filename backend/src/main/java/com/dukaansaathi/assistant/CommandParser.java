@@ -22,10 +22,13 @@ import com.dukaansaathi.inventory.InventoryRepository.ProductStock;
 @Component
 public class CommandParser {
     public enum Intent { SALES, PROFIT, STOCK_LOOKUP, STOCK_ADD, BALANCE, PAYMENT, CREDIT, LOW_STOCK, RESTOCK_LIST, INSIGHTS,
-        TOP_SELLER, BEST_MARGIN, REMINDERS, OLD_UDHAAR, PAYMENT_REGISTER, UNKNOWN }
+        TOP_SELLER, BEST_MARGIN, REMINDERS, OLD_UDHAAR, PAYMENT_REGISTER, NAVIGATE, UNKNOWN }
 
-    /** products and people are the ones the sentence mentions; period is today, week or month. For OLD_UDHAAR quantity is a number of days. */
-    public record Parsed(Intent intent, List<ProductStock> products, List<Balance> people, Double quantity, Long amountPaise, String period) {}
+    /** A page of the app: path is its address, name is what Saathi says. */
+    public record Page(String path, String name) {}
+
+    /** products and people are the ones the sentence mentions; period is today, week or month. For OLD_UDHAAR quantity is a number of days. page is set for NAVIGATE. */
+    public record Parsed(Intent intent, List<ProductStock> products, List<Balance> people, Double quantity, Long amountPaise, String period, Page page) {}
 
     private static final Pattern NUMBER = Pattern.compile("\\d+(\\.\\d+)?");
 
@@ -37,13 +40,21 @@ public class CommandParser {
         List<Balance> foundPeople = findPeople(t, customers);
         String period = has(t, "hafte", "hafta", "week", "saptah") ? "week" : has(t, "mahine", "mahina", "month") ? "month" : "today";
 
+        Page page = pageFor(t);
         Intent intent = Intent.UNKNOWN;
         boolean person = !foundPeople.isEmpty();
         boolean udhaarWord = has(t, "udhaar", "udhar", "credit", "samaan", "saman");
         boolean paidWord = has(t, "diye", "diya", "paid", "payment", "chuka", "chukaya", "jama", "received", "mile", "wapas", "bhare");
         boolean most = has(t, "sabse", "most", "best", "top", "highest");
 
-        if (has(t, "insight", "insights", "salah", "suggestion", "suggest") || t.contains("business kaisa")) {
+        // "Chalo aaj ka profit batao" is a question, not a request to open a page: a weak word like "chalo" only counts
+        // when the sentence asks for no answer
+        boolean openStrong = has(t, "kholo", "kholiye", "khol do", "open", "go to", "navigate", "le chalo", "le chal", "par le", "pe le", "page par", "page pe");
+        boolean openWeak = has(t, "chalo", "jao", "par chalo", "pe chalo", "par jao", "pe jao");
+        boolean asks = has(t, "batao", "bata", "batana", "kitna", "kitni", "kya", "kaun", "kab", "kaise", "hai", "dikhao", "show", "tell");
+        if (page != null && !person && number == null && (openStrong || (openWeak && !asks))) {
+            intent = Intent.NAVIGATE;      // "Inventory kholo", "Udhaar page par le chalo", "Home chalo"
+        } else if (has(t, "insight", "insights", "salah", "suggestion", "suggest") || t.contains("business kaisa")) {
             intent = Intent.INSIGHTS;
         } else if (has(t, "reminder", "reminders", "remind", "tagada", "yaad")) {
             intent = Intent.REMINDERS;      // "Kis-kis ko payment reminder bhejna hai?"
@@ -58,7 +69,7 @@ public class CommandParser {
             intent = Intent.RESTOCK_LIST;  // "Agle hafte ke liye kya stock mangwana chahiye?"
         } else if (most && has(t, "margin", "munafa", "profit", "fayda")) {
             intent = Intent.BEST_MARGIN;   // "Kis product pe sabse zyada margin hai?"
-        } else if (most && has(t, "bika", "biki", "bikta", "selling", "seller", "sold", "bikne")) {
+        } else if (most && has(t, "bika", "biki", "bikta", "selling", "seller", "sold", "bikne", "beka", "bikaa", "bikka")) {
             intent = Intent.TOP_SELLER;    // "Kaun sa product sabse zyada bika?"
         } else if (has(t, "khatam", "shortage") || t.contains("low stock") || t.contains("kam stock") || t.contains("out of stock")) {
             intent = Intent.LOW_STOCK;
@@ -74,14 +85,14 @@ public class CommandParser {
         } else if (has(t, "sale", "sales", "bikri", "becha", "revenue", "kamai", "income")) {
             intent = Intent.SALES;
         } else if (!foundProducts.isEmpty() && number != null
-                && has(t, "add", "aaye", "aaya", "aa", "jod", "jodo", "badhao", "increase", "received", "mangwa", "kharida", "laya", "mein")) {
+                && has(t, "add", "ad", "aaye", "aaya", "aa", "jod", "jodo", "badhao", "increase", "received", "mangwa", "kharida", "laya", "mein")) {
             intent = Intent.STOCK_ADD;
         } else if (!foundProducts.isEmpty() && !has(t, "bik", "sold", "bech")) {
             intent = Intent.STOCK_LOOKUP;
         }
         // "Sabse zyada kya bika?" means lately, not only today
         if ((intent == Intent.TOP_SELLER || intent == Intent.BEST_MARGIN) && period.equals("today") && !has(t, "aaj", "today")) period = "month";
-        return new Parsed(intent, foundProducts, foundPeople, number, paise, period);
+        return new Parsed(intent, foundProducts, foundPeople, number, paise, period, page);
     }
 
     // ---- who and what the sentence is about
@@ -118,11 +129,24 @@ public class CommandParser {
         return exact.isEmpty() ? byFirstName : exact;
     }
 
+    static Page pageFor(String t) {
+        if (has(t, "inventory", "stock", "samaan", "saman", "items", "maal")) return new Page("/inventory", "Inventory");
+        if (has(t, "advisor", "profit", "munafa", "business")) return new Page("/advisor", "Business Advisor");
+        if (has(t, "customer", "customers", "udhaar", "udhar", "grahak", "khata")) return new Page("/customers", "Customer Handling");
+        if (has(t, "settings", "setting")) return new Page("/settings", "Settings");
+        if (has(t, "help", "madad")) return new Page("/help", "Help");
+        if (has(t, "conversations", "conversation", "baatein")) return new Page("/conversations", "Conversations");
+        if (has(t, "home", "ghar", "dashboard")) return new Page("/", "Home");
+        return null;
+    }
+
     // ---- small helpers
 
     /** Lower case, letters and numbers only: "₹1,200!" becomes "1200". */
     static String normalize(String text) {
-        return text.toLowerCase().replaceAll("(?<=\\d),(?=\\d)", "").replaceAll("[^\\p{L}\\p{N}.]+", " ").replaceAll("\\s+", " ").trim();
+        // A full stop from the speech service ("diye.") must not stick to the word; dots stay only inside numbers (1.5)
+        return text.toLowerCase().replaceAll("(?<=\\d),(?=\\d)", "").replaceAll("[^\\p{L}\\p{N}.]+", " ")
+                .replaceAll("(?<!\\d)\\.|\\.(?!\\d)", " ").replaceAll("\\s+", " ").trim();
     }
 
     private static Double firstNumber(String t) {

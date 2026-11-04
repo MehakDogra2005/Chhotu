@@ -49,9 +49,10 @@ public class RecordingRepository {
                 """, id, shopId, type, fileName, contentHash, durationSeconds, consent, userId, uploadedAt, keepUntil);
     }
 
-    public void saveTranscript(String shopId, String recordingId, String transcript) {
-        jdbc.update("UPDATE audio_recordings SET transcript = ?, transcript_provider = 'Typed by shopkeeper', status = 'NEEDS_REVIEW' WHERE shop_id = ? AND recording_id = ?",
-                transcript, shopId, recordingId);
+    /** provider is who wrote the text: "Gnani Prisma" or "Typed by shopkeeper". */
+    public void saveTranscript(String shopId, String recordingId, String transcript, String provider) {
+        jdbc.update("UPDATE audio_recordings SET transcript = ?, transcript_provider = ?, status = 'NEEDS_REVIEW' WHERE shop_id = ? AND recording_id = ?",
+                transcript, provider, shopId, recordingId);
     }
 
     private static Recording toRecording(java.sql.ResultSet rs) throws java.sql.SQLException {

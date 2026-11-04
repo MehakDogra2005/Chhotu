@@ -47,13 +47,18 @@ public class AssistantService {
     public record Action(String type, String productId, String customerId, Double quantity, Long amountPaise, String label) {}
 
     /** What the browser receives. options is empty for a plain answer; otherwise each option is one action to confirm. */
-    public record Reply(String utteranceId, String message, List<String> options) {}
+    /** navigate is the address of the page to open, or null. */
+    public record Reply(String utteranceId, String message, List<String> options, String navigate) {}
 
     public record Done(String message) {}
 
     private record Stored(String intent, List<Action> actions) {}
 
-    private record Outcome(String message, List<Action> actions) {
+    private record Outcome(String message, List<Action> actions, String navigate) {
+        Outcome(String message, List<Action> actions) {
+            this(message, actions, null);
+        }
+
         static Outcome say(String message) {
             return new Outcome(message, List.of());
         }
@@ -96,7 +101,7 @@ public class AssistantService {
 
     // ------------------------------------------------------------------ understanding
 
-    /** via is "voice" (spoken into the microphone) or "typed". */
+    /** via is "gnani" (spoken, heard by the Gnani speech service), "voice" (spoken, heard by the browser) or "typed". */
     @Transactional
     public Reply interpret(ShopContext who, String text, String via) {
         if (text == null || text.isBlank()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Say or type something first");
@@ -121,15 +126,16 @@ public class AssistantService {
             case REMINDERS -> reminders(shop);
             case OLD_UDHAAR -> oldUdhaar(shop, p);
             case PAYMENT_REGISTER -> register(shop, p);
+            case NAVIGATE -> new Outcome("Opening " + p.page().name() + ".", List.of(), p.page().path());
             case UNKNOWN -> Outcome.say(HELP);
         };
 
         boolean needsConfirm = !outcome.actions().isEmpty();
         String id = repo.save(shop, text.trim(), HINGLISH.matcher(text.toLowerCase()).find() ? "hinglish" : "en",
-                "voice".equals(via) ? "Browser" : "Typed", stored(p.intent().name(), outcome.actions()),
+                "gnani".equals(via) ? "Gnani Prisma" : "voice".equals(via) ? "Browser" : "Typed", stored(p.intent().name(), outcome.actions()),
                 p.products().size() == 1 ? p.products().get(0).productId() : null,
                 p.products().isEmpty() ? "INTENT_ONLY" : "CATALOGUE_MATCH", needsConfirm ? "PENDING" : "NOT_REQUIRED", clock.today().atTime(LocalTime.now()));
-        return new Reply(id, outcome.message(), outcome.actions().stream().map(Action::label).toList());
+        return new Reply(id, outcome.message(), outcome.actions().stream().map(Action::label).toList(), outcome.navigate());
     }
 
     // ------------------------------------------------------------------ doing

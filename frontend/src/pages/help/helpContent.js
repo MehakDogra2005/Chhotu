@@ -24,7 +24,7 @@ export const FAQ = [
   ['When is a payment overdue, and how do I send a reminder?',
     'Each udhaar has a due date (30 days after it was given, unless set otherwise). Payments clear the oldest udhaar first, so whatever is still unpaid after its due date is overdue. On Customer Handling, tap Send Reminder: the message is ready for each customer, and WhatsApp or SMS opens on your phone to send it. The page remembers when you last reminded someone.'],
   ['Can I upload a voice note or call recording?',
-    'Yes, on Customer Handling. The recording is kept for 90 days. A call recording needs your confirmation that the customer knew the call was recorded. Automatic speech-to-text is not set up yet, so open the recording, listen, and type what was said; Send to Saathi then shows the change and waits for your Yes.'],
+    'Yes, on Customer Handling. The recording is kept for 90 days. A call recording needs your confirmation that the customer knew the call was recorded. A recording up to a minute long is turned into text automatically; open it, listen, correct the text if needed, and Send to Saathi, which shows the change and waits for your Yes. Longer recordings need the text typed.'],
   ['What is gross profit?',
     'Sales minus what the goods cost you. It is before your shop expenses such as rent and wages, so it is higher than your final profit.'],
   ['Why does Today show ₹0?',

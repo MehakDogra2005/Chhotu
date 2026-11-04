@@ -183,7 +183,7 @@ export function AddByVoice({ recordings, onOpen }) {
               Uploaded <b>{status.done.fileName}</b>. <button onClick={() => onOpen(status.done)} className="font-semibold text-brand underline">Open it</button> to add what was said.
             </p>
           )}
-          <p className="text-[11.5px] text-muted">Automatic speech-to-text is not set up yet: open a recording, listen, and type or say what it says. Nothing changes until you confirm it with Saathi.</p>
+          <p className="text-[11.5px] text-muted">A short recording is turned into text automatically. Open it, check the text and fix anything wrong, then Send to Saathi. Nothing changes until you confirm it.</p>
         </div>
       )}
 

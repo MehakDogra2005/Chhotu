@@ -20,3 +20,7 @@ dukaan.demo-email=your.address@gmail.com
 
 # ---- 3. Continue with Google (optional) ---------------------------------------------------------
 # google.client-id=xxxxxxxx.apps.googleusercontent.com
+
+# ---- 4. Speech: Gnani speech-to-text and text-to-speech (optional) ------------------------------
+# With a key, the microphone and Saathi's spoken replies use Gnani; without one the browser's own speech is used.
+# gnani.api-key=vach_your-key-here

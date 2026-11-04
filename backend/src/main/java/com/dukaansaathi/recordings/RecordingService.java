@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,11 +25,14 @@ import com.dukaansaathi.audit.AuditRepository;
 import com.dukaansaathi.auth.ShopContext;
 import com.dukaansaathi.config.AppClock;
 import com.dukaansaathi.recordings.RecordingRepository.Recording;
+import com.dukaansaathi.voice.GnaniClient;
+import com.dukaansaathi.voice.UsageLimit;
+import com.dukaansaathi.voice.VoiceVocabulary;
 
 /**
- * Uploading voice notes and call recordings. The audio is kept on this server for KEEP_DAYS. There is no speech-to-text
- * service yet, so the shopkeeper types (or says to Saathi) what the recording says; nothing in a recording changes
- * the udhaar until it goes through Saathi and is confirmed.
+ * Uploading voice notes and call recordings. The audio is kept on this server for KEEP_DAYS. When the Gnani speech
+ * service is set up, a short recording is turned into text on upload; otherwise (or when that fails) the shopkeeper types
+ * what it says. Nothing in a recording changes the udhaar until it goes through Saathi and is confirmed.
  */
 @Service
 public class RecordingService {
@@ -37,7 +42,10 @@ public class RecordingService {
 
     public record Audio(byte[] bytes, String contentType) {}
 
+    private static final Logger log = LoggerFactory.getLogger(RecordingService.class);
     private static final int KEEP_DAYS = 90;
+    private static final int MAX_AUTO_BYTES = 3 * 1024 * 1024; // about a minute of audio; the length the browser reports is not trusted
+    private static final int AUTO_PER_MINUTE = 10;
     private static final int MAX_TRANSCRIPT = 1000;
     private static final Set<String> TYPES = Set.of("VOICE_NOTE", "CALL_RECORDING");
     private static final Map<String, String> AUDIO_TYPES = Map.of("m4a", "audio/mp4", "mp3", "audio/mpeg", "wav", "audio/wav",
@@ -46,13 +54,19 @@ public class RecordingService {
     private final RecordingRepository repo;
     private final AuditRepository audit;
     private final AppClock clock;
+    private final GnaniClient gnani;
+    private final VoiceVocabulary vocabulary;
+    private final UsageLimit limit;
     private final Path folder;
 
-    public RecordingService(RecordingRepository repo, AuditRepository audit, AppClock clock,
-                            @Value("${dukaan.recordings-dir:./data/recordings}") String folder) {
+    public RecordingService(RecordingRepository repo, AuditRepository audit, AppClock clock, GnaniClient gnani,
+                            VoiceVocabulary vocabulary, UsageLimit limit, @Value("${dukaan.recordings-dir:./data/recordings}") String folder) {
         this.repo = repo;
         this.audit = audit;
         this.clock = clock;
+        this.gnani = gnani;
+        this.vocabulary = vocabulary;
+        this.limit = limit;
         this.folder = Path.of(folder).toAbsolutePath();
     }
 
@@ -90,6 +104,7 @@ public class RecordingService {
         Integer seconds = durationSeconds == null || durationSeconds < 0 ? null : durationSeconds;
         repo.add(id, who.shopId(), type, name, hash, seconds, consent, who.userId(), clock.today().atTime(LocalTime.now()), clock.today().plusDays(KEEP_DAYS));
         audit.record(who.shopId(), who.userId(), "audio_recording", id, "CREATE", null, Map.of("type", type, "file", name), "UI");
+        transcribeNow(who, id, bytes, name);
         return toItem(get(who, id));
     }
 
@@ -98,8 +113,20 @@ public class RecordingService {
         get(who, recordingId);
         if (text == null || text.isBlank()) throw bad("Type what was said in the recording");
         if (text.length() > MAX_TRANSCRIPT) throw bad("Keep it under " + MAX_TRANSCRIPT + " letters");
-        repo.saveTranscript(who.shopId(), recordingId, text.trim());
+        repo.saveTranscript(who.shopId(), recordingId, text.trim(), "Typed by shopkeeper");
         return toItem(get(who, recordingId));
+    }
+
+    /** Reads a short recording with the speech service. If that fails the upload still stands and the text can be typed. */
+    private void transcribeNow(ShopContext who, String id, byte[] audio, String fileName) {
+        if (!gnani.configured() || audio.length > MAX_AUTO_BYTES) return;
+        try {
+            limit.check(who.shopId(), "auto", AUTO_PER_MINUTE); // uploads must not be a way round the limits on the paid service
+            String text = gnani.transcribe(audio, fileName, vocabulary.forShop(who.shopId()));
+            if (!text.isBlank()) repo.saveTranscript(who.shopId(), id, text.length() > MAX_TRANSCRIPT ? text.substring(0, MAX_TRANSCRIPT) : text, "Gnani Prisma");
+        } catch (RuntimeException e) {
+            log.warn("Could not read recording {} automatically: {}", id, e.getMessage());
+        }
     }
 
     public Audio audio(ShopContext who, String recordingId) {
