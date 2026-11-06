@@ -17,7 +17,7 @@ import com.dukaansaathi.auth.AuthService;
 @RestController
 @RequestMapping("/api/assistant")
 public class AssistantController {
-    record Say(String text, String via) {}
+    record Say(String text, String via, Context context) {}
     record Confirm(String utteranceId, int choice) {}
     record Cancel(String utteranceId) {}
 
@@ -32,7 +32,7 @@ public class AssistantController {
     /** The shopkeeper said or typed something. The reply is an answer, or a change waiting to be confirmed. */
     @PostMapping("/interpret")
     public AssistantService.Reply interpret(@RequestHeader(value = "Authorization", defaultValue = "") String authHeader, @RequestBody Say body) {
-        return assistant.interpret(auth.requireShop(authHeader), body.text(), body.via());
+        return assistant.interpret(auth.requireShop(authHeader), body.text(), body.via(), body.context());
     }
 
     /** The shopkeeper confirmed one option of an earlier reply. */

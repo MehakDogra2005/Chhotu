@@ -24,7 +24,7 @@ public class SeedLoader implements ApplicationRunner {
     private static final List<String> TABLES = List.of(
             "shops", "users", "user_shops", "suppliers", "customers", "products", "purchases", "purchase_items", "sales",
             "sale_items", "credit_transactions", "inventory_movements", "voice_utterances", "audio_recordings", "product_aliases", "audit_log", "expenses",
-            "payment_reminders");
+            "payment_reminders", "orders", "order_items");
 
     private final JdbcTemplate jdbc;
     private final Path seedDir;

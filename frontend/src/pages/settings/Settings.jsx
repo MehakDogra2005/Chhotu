@@ -7,6 +7,7 @@ import useFetch from '../../useFetch'
 import PageHeader from '../../components/PageHeader'
 import { Card } from '../../components/ui'
 import { AccountCard, InstallApp, NeedHelp, Notifications, ShopProfile, VoicePreferences } from './SettingsCards'
+import VoiceSelection from './VoiceSelection'
 
 export default function Settings() {
   const { reloadMe } = useOutletContext() // refreshes the name and shop in the top bar after saving
@@ -47,6 +48,7 @@ export default function Settings() {
       <div className="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-[1fr_330px]">
         <div className="space-y-4">
           <ShopProfile form={form} change={change} />
+          <VoiceSelection />
           <VoicePreferences form={form} change={change} />
           <Notifications form={form} change={change} />
 

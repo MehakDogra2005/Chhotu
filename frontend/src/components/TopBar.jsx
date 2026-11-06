@@ -21,13 +21,18 @@ export default function TopBar({ me }) {
         </div>
       </div>
 
+      {/* On a phone the same button is just the mic, in the same place in the top bar */}
+      <button onClick={() => ask({ greet: true })} aria-label="Talk to Saathi" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand text-white shadow-md active:scale-95 lg:hidden">
+        <Mic size={22} />
+      </button>
+
       <div className="hidden text-center lg:block">
-        <button onClick={() => ask({ listen: true })} className="flex items-center gap-3 rounded-full border border-[#cfe9d8] bg-panel py-1.5 pl-1.5 pr-5 text-[14px] font-semibold hover:border-brand">
+        <button onClick={() => ask({ greet: true })} aria-label="Talk to Saathi" className="flex items-center gap-3 rounded-full border border-[#cfe9d8] bg-panel py-1.5 pl-1.5 pr-5 text-[14px] font-semibold hover:border-brand">
           <span className="grid h-10 w-10 place-items-center rounded-full bg-brand text-white"><Mic size={20} /></span>
           Tap to speak
           <AudioLines size={20} className="text-brand" />
         </button>
-        <div className="mt-1 text-[12px] text-muted">Tap the mic, speak, then tap it again to stop</div>
+        <div className="mt-1 text-[12px] text-muted">Saathi greets you, then listens. Tap again to stop</div>
       </div>
 
       <div className="flex items-center gap-3 sm:gap-5">

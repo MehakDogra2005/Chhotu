@@ -10,7 +10,11 @@ import { Mic, Square } from 'lucide-react'
 const AssistantContext = createContext(null)
 const KEY = 'saathi-keep-listening'
 
-/** Anything on any page can call ask() to open Saathi: ask({ text }), ask({ listen: true }), ask({ hint }), ask({ reply }). */
+/**
+ * Anything on any page can call ask() to open Saathi: ask({ greet: true }) (the mic button: greets, explains, then listens),
+ * ask({ text }), ask({ listen: true, hint }), ask({ reply }). A plain ask({ listen: true }) is the same as greet.
+ * `draft` is the order Saathi is taking by voice right now, for the Orders screen to show.
+ */
 export const useAssistant = () => useContext(AssistantContext)
 
 function readKeepListening() {
@@ -21,7 +25,7 @@ function readKeepListening() {
   }
 }
 
-export function AssistantProvider({ speakReplies, children }) {
+export function AssistantProvider({ speakReplies, userName, children }) {
   const { token } = useAuth()
   const navigate = useNavigate()
   const [start, setStart] = useState(null) // null = closed
@@ -34,12 +38,17 @@ export function AssistantProvider({ speakReplies, children }) {
   const queueRef = useRef([]) // sentences heard while another was being answered
   const heardRef = useRef(null)
   const [last, setLast] = useState(null) // { heard, reply } of the last sentence while listening
+  const [draft, setDraft] = useState(null) // { customerName, lines } of the order being taken by voice
   useEffect(() => {
     loadVoiceEngine(token).then((gnani) => setEngine(gnani ? 'gnani' : 'browser'))
     return stopSpeaking
   }, [token])
 
-  const ask = useCallback((options = {}) => setStart({ ...options, id: Date.now() }), [])
+  const ask = useCallback((options = {}) => {
+    const greet = options.greet || (options.listen && !options.hint)
+    setStart({ ...options, greet, id: Date.now() })
+  }, [])
+  const close = useCallback(() => { setStart(null); setDraft(null) }, [])
 
   const setKeepListening = (on) => {
     keepRef.current = on
@@ -100,14 +109,14 @@ export function AssistantProvider({ speakReplies, children }) {
   })
 
   return (
-    <AssistantContext.Provider value={{ ask, keepListening, setKeepListening }}>
+    <AssistantContext.Provider value={{ ask, keepListening, setKeepListening, draft }}>
       {children}
       {/* a new id makes a fresh conversation each time it is opened, and keeps this one while it stays open */}
       {start && (
-        <AssistantDialog key={start.id} start={start} speakReplies={speakReplies} keepListening={keepListening}
-          onKeepListening={setKeepListening} onClose={() => setStart(null)} />
+        <AssistantDialog key={start.id} start={start} ready={engine !== null} speakReplies={speakReplies} userName={userName}
+          keepListening={keepListening} onKeepListening={setKeepListening} onDraft={setDraft} onClose={close} />
       )}
-      {keepListening && (
+      {keepListening && !start && (
         <div className="fixed bottom-24 left-1/2 z-40 w-[min(92vw,460px)] -translate-x-1/2 rounded-2xl border border-brand bg-white px-4 py-3 text-[13px] shadow-lg md:bottom-5">
           <div className="flex items-center gap-3">
             <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-white ${listening.listening ? 'animate-pulse bg-red-500' : 'bg-muted'}`}><Mic size={18} /></span>

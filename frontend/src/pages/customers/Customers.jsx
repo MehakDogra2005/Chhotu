@@ -1,11 +1,13 @@
-import { useState } from 'react'
-import { Clock, HandCoins, Users, Wallet } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useLocation, useSearchParams } from 'react-router-dom'
+import { Clock, HandCoins, ShoppingBag, Users, Wallet } from 'lucide-react'
 import useFetch from '../../useFetch'
 import PageHeader from '../../components/PageHeader'
 import PeriodSelect, { PERIODS } from '../../components/PeriodSelect'
 import { Change, StatCard, rupees } from '../../components/ui'
 import RecordPaymentDialog from '../home/RecordPaymentDialog'
 import CustomerTable from './CustomerTable'
+import OrdersSection from './OrdersSection'
 import { OutstandingChart, RecentTransactions, RemindersInsights } from './BottomCards'
 import { AddByVoice, AskSaathi } from './SideCards'
 import { AddCustomerDialog, CustomerDetailDialog, CustomerMenu, GiveCreditDialog, RecordingDialog, RemindersDialog, TransactionsDialog } from './CustomerDialogs'
@@ -19,6 +21,21 @@ export default function Customers() {
   // { kind, id } — the customer is looked up again in fresh data, so a dialog shows new numbers after a change
   const [dialog, setDialog] = useState(null)
   const { data, error } = useFetch(`/api/customers?period=${period}`)
+
+  // Saathi can open this page on a customer (?search=Ramesh&open=CUS-1) or on the order-taking part (?view=orders&customer=CUS-1)
+  const [params, setParams] = useSearchParams()
+  const { key } = useLocation()
+  const view = params.get('view') === 'orders' ? 'orders' : 'udhaar'
+  const wanted = params.get('search') || ''
+  const openId = params.get('open')
+  useEffect(() => {
+    setSearch(wanted)
+    setTab('all')
+  }, [wanted, key])
+  useEffect(() => {
+    if (openId && data?.customers.some((c) => c.customerId === openId)) setDialog({ kind: 'view', id: openId })
+  }, [openId, key, !!data])
+  const showView = (next) => setParams(next === 'orders' ? { view: 'orders' } : {}, { replace: true })
 
   if (error) return <p className="p-10 text-center text-red-600">{error}</p>
   if (!data) return <p className="p-10 text-center text-muted">Loading your customers...</p>
@@ -39,8 +56,22 @@ export default function Customers() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <PageHeader icon={<Users size={48} strokeWidth={2.4} className="text-brand" />}
           title="Customer Handling (Udhaar Management)" subtitle="Manage customer credit, record payments, and get reminders." />
-        <PeriodSelect value={period} onChange={setPeriod} range={data.period} />
+        {view === 'udhaar' && <PeriodSelect value={period} onChange={setPeriod} range={data.period} />}
       </div>
+
+      <div className="mt-4 inline-flex rounded-xl border border-edge bg-white p-1 text-[14px] font-semibold" role="tablist" aria-label="Customer Handling sections">
+        {[['udhaar', 'Udhaar', Users], ['orders', 'Orders', ShoppingBag]].map(([key, text, Icon]) => (
+          <button key={key} role="tab" aria-selected={view === key} onClick={() => showView(key)}
+            className={`flex items-center gap-2 rounded-lg px-4 py-2 ${view === key ? 'bg-brand text-white' : 'hover:bg-stone-100'}`}>
+            <Icon size={16} /> {text}
+          </button>
+        ))}
+      </div>
+
+      {view === 'orders' ? (
+        <div className="mt-4"><OrdersSection customers={data.customers} preselect={params.get('customer')} /></div>
+      ) : (
+      <>
 
       <div className="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-[1fr_330px]">
         <div className="min-w-0 space-y-4">
@@ -73,6 +104,8 @@ export default function Customers() {
         <RecentTransactions transactions={data.transactions} today={data.today} onViewAll={() => open('transactions')} />
         <RemindersInsights insights={data.insights} onRemind={() => open('remind-all')} />
       </div>
+      </>
+      )}
 
       {dialog?.kind === 'add' && <AddCustomerDialog onClose={close} />}
       {dialog?.kind === 'transactions' && <TransactionsDialog transactions={data.transactions} today={data.today} onClose={close} />}

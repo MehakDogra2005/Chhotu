@@ -4,7 +4,7 @@ export const STEPS = [
   ['Log in', 'Use your mobile number, your email or Google. A new shop is set up in about a minute.'],
   ['See your shop at a glance', 'Home shows your sales, pending udhaar, low stock and recent conversations.'],
   ['Keep your stock in check', 'Inventory shows what is low, what is out of stock and what is already on order.'],
-  ['Talk to Saathi', 'Tap the mic and say what you need (tap it again to stop), or type it. Saathi answers, and asks you before it changes anything.'],
+  ['Talk to Saathi', 'Tap the mic in the top bar. Saathi greets you, tells you what it can help with, and then listens. Say what you need, or type it. Say "haan" or "nahi" when it asks before changing anything.'],
 ]
 
 export const VOICE_GROUPS = [
@@ -37,8 +37,10 @@ export const FAQ = [
     'Open Inventory and tap Generate Restocking List. Saathi suggests how much to order for each low item. You can change the numbers, share the list on WhatsApp with your supplier, and tap Place order to save it. The items then show as On Order. When the delivery arrives, tap the three dots on the item and choose Mark order received: your stock goes up by itself.'],
   ['How do I add a new item or fix a wrong price?',
     'On Inventory, tap Add Item and fill in the form. To change an existing item, tap the three dots at the end of its row and choose Edit item. Use Add stock when more arrives, and Archive item to hide something you no longer sell (its history is kept).'],
+  ['Can I change the voice Saathi speaks with?',
+    'Yes. Open Settings, then Voice Selection. Tap Play Sample to hear each voice, then tap the voice you like. It is saved at once, and Saathi uses it for every spoken reply in Inventory, Business Advisor and Customer Handling until you change it.'],
   ['Is the microphone always on?',
-    'No. Saathi listens only after you tap the mic, and stops when you finish speaking or tap the mic again. Closing the Saathi window switches the microphone off.'],
+    'No. Saathi listens only after you tap the mic and it has finished its greeting. Press Stop or Pause in the Saathi panel, or close it (End), and the microphone is off straight away.'],
   ['Does the voice assistant work?',
     'Yes. Tap the mic (Chrome works best) and speak, or type the same sentence in the box. Saathi understands English and Hindi written in English letters, like "Ramesh ne 500 de diye". Before it adds stock or records a payment, it shows you exactly what it will do and waits for your Yes. Hindi in Devanagari letters and other languages will come later.'],
 ]

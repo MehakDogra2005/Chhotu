@@ -5,6 +5,8 @@ import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,20 +37,16 @@ public class GnaniClient {
     private final RestClient http;
     private final String apiKey;
     private final String sttLanguage;
-    private final String voice;
-    private final String model;
     private final String ttsLanguage;
+    // Gnani can limit an account to one text-to-speech request at a time (a second one is answered 429), so ours wait in line
+    private final Semaphore speaking = new Semaphore(1, true);
 
     public GnaniClient(@Value("${gnani.api-key:}") String apiKey,
                        @Value("${gnani.base-url:https://api.vachana.ai}") String baseUrl,
                        @Value("${gnani.stt-language:en-IN}") String sttLanguage,
-                       @Value("${gnani.tts-voice:Nalini}") String voice,
-                       @Value("${gnani.tts-model:timbre-v2.5}") String model,
                        @Value("${gnani.tts-language:hi-en}") String ttsLanguage) {
         this.apiKey = apiKey.trim();
         this.sttLanguage = sttLanguage;
-        this.voice = voice;
-        this.model = model;
         this.ttsLanguage = ttsLanguage;
         JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build());
         factory.setReadTimeout(Duration.ofSeconds(25));
@@ -84,25 +82,48 @@ public class GnaniClient {
         }
     }
 
-    /** The text spoken as a WAV file. Pass the text through SpeechText.forSpeech first. */
-    public byte[] speak(String text) {
+    /**
+     * The text spoken as a WAV file, in the given voice. voice must be one of VoiceCatalog's Timbre v3.0 names (Gnani rejects a
+     * voice that belongs to another model). Pass the text through SpeechText.forSpeech first.
+     */
+    public byte[] speak(String text, String voice) {
         requireKey();
+        log.info("Gnani text-to-speech: model={} voice={}", VoiceCatalog.MODEL, voice);
         Map<String, Object> request = new LinkedHashMap<>();
         request.put("text", text);
         request.put("voice", voice);
-        request.put("model", model);
+        request.put("model", VoiceCatalog.MODEL);
         request.put("language", ttsLanguage);
         request.put("speed", 1.0);
         request.put("audio_config", Map.of("sample_rate", 24000, "num_channels", 1, "sample_width", 2, "encoding", "linear_pcm", "container", "wav"));
+        boolean turn = false;
         try {
-            return http.post().uri("/api/v1/tts/inference").header("X-API-Key-ID", apiKey)
-                    .contentType(MediaType.APPLICATION_JSON).accept(MediaType.parseMediaType("audio/wav"), MediaType.APPLICATION_OCTET_STREAM)
-                    .body(request).retrieve().body(byte[].class);
+            turn = speaking.tryAcquire(30, TimeUnit.SECONDS);
+            if (!turn) throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "The voice service is busy. Try again in a moment");
+            try {
+                return synthesize(request);
+            } catch (RestClientResponseException e) {
+                if (e.getStatusCode().value() != 429) throw e;
+                // Still answered 429 (RATE_LIMITED), for example by another app using the same account: wait a moment and ask once more
+                Thread.sleep(1200);
+                return synthesize(request);
+            }
         } catch (RestClientResponseException e) {
             throw failed("text-to-speech", e);
         } catch (ResourceAccessException e) {
             throw unreachable("text-to-speech", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT, "The voice service did not answer in time");
+        } finally {
+            if (turn) speaking.release();
         }
+    }
+
+    private byte[] synthesize(Map<String, Object> request) {
+        return http.post().uri("/api/v1/tts/inference").header("X-API-Key-ID", apiKey)
+                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.parseMediaType("audio/wav"), MediaType.APPLICATION_OCTET_STREAM)
+                .body(request).retrieve().body(byte[].class);
     }
 
     private void requireKey() {

@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS users (
 );
 -- For databases created before phone became optional
 ALTER TABLE users ALTER COLUMN phone DROP NOT NULL;
+-- The voice Saathi speaks with for this person (a Gnani Timbre v3.0 voice name); empty until they choose one
+ALTER TABLE users ADD COLUMN IF NOT EXISTS tts_voice VARCHAR(30);
 
 CREATE TABLE IF NOT EXISTS user_shops (
   user_id VARCHAR(40) NOT NULL REFERENCES users(user_id),
@@ -281,3 +283,27 @@ SELECT c.customer_id, c.shop_id, c.customer_name,
 FROM customers c
 LEFT JOIN credit_transactions t ON t.customer_id = c.customer_id AND t.status = 'RECORDED'
 GROUP BY c.customer_id, c.shop_id, c.customer_name;
+
+-- Customer orders: what a customer wants to buy. Saving an order does not change stock;
+-- stock only goes down when the goods are sold (sales / sale_items).
+CREATE TABLE IF NOT EXISTS orders (
+  order_id VARCHAR(40) PRIMARY KEY,
+  shop_id VARCHAR(40) NOT NULL REFERENCES shops(shop_id),
+  customer_id VARCHAR(40) REFERENCES customers(customer_id),
+  created_at TIMESTAMP NOT NULL,
+  status VARCHAR(30) NOT NULL,             -- DRAFT, PENDING_CONFIRMATION, CONFIRMED, COMPLETED, CANCELLED
+  source VARCHAR(20) NOT NULL,             -- VOICE or UI
+  current_version INTEGER NOT NULL DEFAULT 1,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  created_by VARCHAR(40) REFERENCES users(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS order_items (
+  order_item_id VARCHAR(40) PRIMARY KEY,
+  order_id VARCHAR(40) NOT NULL REFERENCES orders(order_id),
+  shop_id VARCHAR(40) NOT NULL REFERENCES shops(shop_id),
+  product_id VARCHAR(40) NOT NULL REFERENCES products(product_id),
+  quantity DECIMAL(14,3) NOT NULL,
+  unit VARCHAR(30) NOT NULL,
+  status VARCHAR(20) NOT NULL              -- ACTIVE
+);

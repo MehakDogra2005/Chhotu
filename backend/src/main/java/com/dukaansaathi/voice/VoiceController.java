@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,7 @@ import com.dukaansaathi.auth.ShopContext;
 @RequestMapping("/api/voice")
 public class VoiceController {
     record SpeakRequest(String text) {}
+    record VoiceRequest(String voice) {}
 
     private static final int MAX_AUDIO_BYTES = 4 * 1024 * 1024;  // 60 seconds of 16 kHz speech is about 2 MB
     private static final int MAX_TEXT = 1500;
@@ -35,12 +37,14 @@ public class VoiceController {
     private final GnaniClient gnani;
     private final UsageLimit limit;
     private final VoiceVocabulary vocabulary;
+    private final VoiceService voices;
 
-    public VoiceController(AuthService auth, GnaniClient gnani, UsageLimit limit, VoiceVocabulary vocabulary) {
+    public VoiceController(AuthService auth, GnaniClient gnani, UsageLimit limit, VoiceVocabulary vocabulary, VoiceService voices) {
         this.auth = auth;
         this.gnani = gnani;
         this.limit = limit;
         this.vocabulary = vocabulary;
+        this.voices = voices;
     }
 
     /** gnani is false when no key is set; the browser then uses its own speech instead. */
@@ -73,7 +77,33 @@ public class VoiceController {
         if (body.text() == null || body.text().isBlank()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nothing to say");
         if (body.text().length() > MAX_TEXT) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "That is too long to read out");
         limit.check(who.shopId(), "speak", SPEAKS_PER_MINUTE);
-        byte[] audio = gnani.speak(SpeechText.forSpeech(body.text()));
-        return ResponseEntity.ok().contentType(MediaType.parseMediaType("audio/wav")).body(audio);
+        byte[] audio = voices.speak(who, body.text());
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType("audio/wav")).header("X-Voice", voices.selected(who)).body(audio);
+    }
+
+    /** The voices to choose from (Gnani Timbre v3.0), which one is chosen now, and whether Gnani is set up to speak them. */
+    @GetMapping("/voices")
+    public Map<String, Object> voices(@RequestHeader(value = "Authorization", defaultValue = "") String authHeader) {
+        return catalogue(auth.requireShop(authHeader));
+    }
+
+    /** Saves the chosen voice on the person's profile. It is used for every reply from now on. */
+    @PutMapping("/voice")
+    public Map<String, Object> choose(@RequestHeader(value = "Authorization", defaultValue = "") String authHeader, @RequestBody VoiceRequest body) {
+        ShopContext who = auth.requireShop(authHeader);
+        voices.choose(who, body.voice());
+        return catalogue(who);
+    }
+
+    /** "Play Sample": a fixed sentence in the given voice. It does not change the chosen voice. */
+    @PostMapping("/sample")
+    public ResponseEntity<byte[]> sample(@RequestHeader(value = "Authorization", defaultValue = "") String authHeader, @RequestBody VoiceRequest body) {
+        ShopContext who = auth.requireShop(authHeader);
+        limit.check(who.shopId(), "speak", SPEAKS_PER_MINUTE);
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType("audio/wav")).body(voices.sample(body.voice()));
+    }
+
+    private Map<String, Object> catalogue(ShopContext who) {
+        return Map.of("model", VoiceCatalog.MODEL, "gnani", gnani.configured(), "selected", voices.selected(who), "voices", VoiceCatalog.VOICES);
     }
 }

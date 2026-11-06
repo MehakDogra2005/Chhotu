@@ -29,6 +29,15 @@ public class UserRepository {
         return userId;
     }
 
+    /** The Gnani voice this person chose in Settings, if they have chosen one. */
+    public Optional<String> findVoice(String userId) {
+        return jdbc.queryForList("SELECT tts_voice FROM users WHERE user_id = ? AND tts_voice IS NOT NULL", String.class, userId).stream().findFirst();
+    }
+
+    public void setVoice(String userId, String voice) {
+        jdbc.update("UPDATE users SET tts_voice = ? WHERE user_id = ?", voice, userId);
+    }
+
     public boolean hasShop(String userId) {
         Integer count = jdbc.queryForObject("SELECT COUNT(*) FROM user_shops WHERE user_id = ?", Integer.class, userId);
         return count != null && count > 0;

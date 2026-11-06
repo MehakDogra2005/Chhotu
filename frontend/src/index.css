@@ -22,3 +22,14 @@
 }
 
 body { background: var(--color-cream); color: var(--color-navy); }
+
+/* Saathi's waveform: a few bars that rise and fall. Slow while Saathi speaks, quicker while it listens. */
+@keyframes saathi-wave {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+.saathi-bar { transform-origin: center; animation: saathi-wave 1.1s ease-in-out infinite; }
+.saathi-bar.listening { animation-duration: 0.7s; }
+@media (prefers-reduced-motion: reduce) {
+  .saathi-bar { animation: none; transform: scaleY(0.6); }
+}

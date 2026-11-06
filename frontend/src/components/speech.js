@@ -35,12 +35,18 @@ async function transcribe(blob) {
   return (data.text || '').trim()
 }
 
-/** Listening with the microphone. start() listens for one sentence and gives the words to onText. */
-export function useListening(onText) {
+/**
+ * Listening with the microphone. start() listens for one sentence and gives the words to onText.
+ * events.onNothing runs when nothing was heard; events.onError(message) when the microphone or the voice service failed.
+ * stop() ends the sentence being spoken (it is still sent); cancel() throws it away.
+ */
+export function useListening(onText, events = {}) {
   const recogniser = useRef(null)
   const mic = useRef(null)
   const onTextRef = useRef(onText)
   onTextRef.current = onText
+  const eventsRef = useRef(events)
+  eventsRef.current = events
   const attempt = useRef(0) // a new number for every start; closing or stopping makes the old attempt out of date
   const [listening, setListening] = useState(false)
   const [working, setWorking] = useState(false) // the sentence has been heard and is being turned into words
@@ -50,7 +56,9 @@ export function useListening(onText) {
   // up, and must stop a sentence that is still being turned into words from being acted on.
   useEffect(() => () => {
     attempt.current++
-    recogniser.current?.abort()
+    const r = recogniser.current
+    recogniser.current = null
+    r?.abort()
     mic.current?.close()
     mic.current = null
   }, [])
@@ -67,6 +75,7 @@ export function useListening(onText) {
           mic.current = null
           setListening(false)
           setProblem(NOT_HEARD)
+          eventsRef.current.onNothing?.()
         },
         onSentence: async (blob) => {
           if (!current()) return
@@ -77,9 +86,15 @@ export function useListening(onText) {
             const words = await transcribe(blob)
             if (!current()) return
             if (words) onTextRef.current(words)
-            else setProblem(NOT_HEARD)
+            else {
+              setProblem(NOT_HEARD)
+              eventsRef.current.onNothing?.()
+            }
           } catch (err) {
-            if (current()) setProblem(err.message)
+            if (current()) {
+              setProblem(err.message)
+              eventsRef.current.onError?.(err.message)
+            }
           } finally {
             if (current()) setWorking(false)
           }
@@ -90,7 +105,9 @@ export function useListening(onText) {
     } catch (err) {
       if (!current()) return
       setListening(false)
-      setProblem(microphoneBlocked(err) ? BLOCKED : 'The microphone did not work. You can type instead.')
+      const message = microphoneBlocked(err) ? BLOCKED : 'The microphone did not work. You can type instead.'
+      setProblem(message)
+      eventsRef.current.onError?.(message)
     }
   }
 
@@ -98,9 +115,29 @@ export function useListening(onText) {
     const r = new Recognition()
     r.lang = 'en-IN'
     r.interimResults = false
-    r.onresult = (event) => onTextRef.current(event.results[0][0].transcript)
-    r.onerror = (event) => setProblem(MIC_PROBLEMS[event.error] || 'The microphone did not work. You can type instead.')
-    r.onend = () => setListening(false)
+    let heard = false
+    let failed = false
+    r.onresult = (event) => {
+      heard = true
+      onTextRef.current(event.results[0][0].transcript)
+    }
+    r.onerror = (event) => {
+      if (recogniser.current !== r) return // cancelled on purpose
+      if (event.error === 'no-speech') return // onend below reports it as "nothing heard"
+      failed = true
+      const message = MIC_PROBLEMS[event.error] || 'The microphone did not work. You can type instead.'
+      setProblem(message)
+      eventsRef.current.onError?.(message)
+    }
+    r.onend = () => {
+      const mine = recogniser.current === r
+      if (mine) recogniser.current = null
+      setListening(false)
+      if (mine && !heard && !failed) {
+        setProblem(NOT_HEARD)
+        eventsRef.current.onNothing?.()
+      }
+    }
     recogniser.current = r
     r.start()
     setListening(true)
@@ -122,7 +159,19 @@ export function useListening(onText) {
     }
   }
 
-  return { supported: engine.gnani || !!Recognition, engine: engine.gnani ? 'gnani' : 'voice', listening, working, problem, start, stop }
+  // Switches the microphone off and throws away what was being said (nothing is sent).
+  const cancel = () => {
+    attempt.current++
+    const r = recogniser.current
+    recogniser.current = null
+    r?.abort()
+    mic.current?.close()
+    mic.current = null
+    setListening(false)
+    setWorking(false)
+  }
+
+  return { supported: engine.gnani || !!Recognition, engine: engine.gnani ? 'gnani' : 'voice', listening, working, problem, start, stop, cancel }
 }
 
 /**
@@ -261,19 +310,36 @@ export function stopSpeaking() {
   player = null
 }
 
+const prefetched = new Map() // text -> audio being fetched ahead of time
+
+async function fetchAudio(text) {
+  const res = await fetch('/api/voice/speak', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${engine.token}` },
+    body: JSON.stringify({ text }),
+  })
+  if (!res.ok) throw new Error('no voice')
+  return res.blob()
+}
+
+/** Starts making the audio for text now, so a later speak(text) can begin at once (no pause between two sentences). */
+export function prefetchSpeech(text) {
+  if (!engine.gnani || prefetched.has(text)) return
+  const audio = fetchAudio(text)
+  audio.catch(() => prefetched.delete(text)) // speak() falls back to the browser voice
+  prefetched.set(text, audio)
+}
+
 /** Reads text aloud. The promise comes back when Saathi has finished speaking. */
 export async function speak(text) {
   stopSpeaking()
   const mine = speakingNow
   if (engine.gnani) {
     try {
-      const res = await fetch('/api/voice/speak', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${engine.token}` },
-        body: JSON.stringify({ text }),
-      })
-      if (!res.ok) throw new Error('no voice')
-      const url = URL.createObjectURL(await res.blob())
+      const ahead = prefetched.get(text)
+      prefetched.delete(text)
+      // If the audio made ahead of time failed (the service was busy), ask once more instead of falling silent
+      const url = URL.createObjectURL(await (ahead ? ahead.catch(() => fetchAudio(text)) : fetchAudio(text)))
       if (mine !== speakingNow) return URL.revokeObjectURL(url) // something newer was said or Saathi was stopped
       await new Promise((done, fail) => {
         const audio = new Audio(url)

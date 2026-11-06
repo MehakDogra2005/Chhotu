@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ArrowRight, ChartNoAxesColumnIncreasing, CircleDollarSign, IndianRupee, Percent, PieChart, ShoppingCart, TrendingUp, Wallet } from 'lucide-react'
 import useFetch from '../../useFetch'
 import PageHeader from '../../components/PageHeader'
-import PeriodSelect, { PERIODS } from '../../components/PeriodSelect'
+import PeriodSelect, { LONG_PERIODS, PERIODS } from '../../components/PeriodSelect'
 import { useAssistant } from '../../components/AssistantContext'
 import { Card, Change, StatCard, rupees, shortDate } from '../../components/ui'
 import { Donut, Legend, SERIES, TrendChart } from './Charts'
@@ -47,8 +47,14 @@ function CardTitle({ icon, title, right }) {
   )
 }
 
+// Today and Yesterday are here as well as the longer periods, so Saathi can open the page for "kal ki kamai"
+const ADVISOR_PERIODS = ['today', 'yesterday', ...LONG_PERIODS]
+
 export default function BusinessAdvisor() {
-  const [period, setPeriod] = useState('month')
+  // The period lives in the address (/advisor?period=yesterday), so Saathi or a link can open the page on it
+  const [params, setParams] = useSearchParams()
+  const period = ADVISOR_PERIODS.includes(params.get('period')) ? params.get('period') : 'month'
+  const setPeriod = (next) => setParams({ period: next }, { replace: true })
   const [dialog, setDialog] = useState(null) // 'margins' | 'prices' | 'purchases'
   const { data, error } = useFetch(`/api/advisor?period=${period}`)
   const { ask } = useAssistant()
@@ -67,7 +73,7 @@ export default function BusinessAdvisor() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <PageHeader icon={<ChartNoAxesColumnIncreasing size={48} strokeWidth={2.4} className="text-brand" />}
           title="Business Advisor (Profit & Loss)" subtitle="Understand your business, track profits and get smart recommendations." />
-        <PeriodSelect value={period} onChange={setPeriod} range={data.period} />
+        <PeriodSelect value={period} onChange={setPeriod} range={data.period} keys={ADVISOR_PERIODS} />
       </div>
 
       <div className="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-[1fr_330px]">

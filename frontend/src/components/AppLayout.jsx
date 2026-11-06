@@ -16,7 +16,7 @@ export default function AppLayout() {
 
   return (
     // The window is split into top bar, body and (on a phone) bottom bar. Only the page itself scrolls.
-    <AssistantProvider speakReplies={me.voiceReplies}>
+    <AssistantProvider speakReplies={me.voiceReplies} userName={me.userName}>
       <div className="flex h-dvh flex-col bg-cream">
         <TopBar me={me} />
         <div className="flex min-h-0 flex-1">

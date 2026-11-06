@@ -100,6 +100,8 @@ public class AdvisorService {
 
     public static Period period(String key, LocalDate today) {
         return switch (key) {
+            case "today" -> new Period(key, today, today, today.minusDays(1), today.minusDays(1), "day");
+            case "yesterday" -> new Period(key, today.minusDays(1), today.minusDays(1), today.minusDays(2), today.minusDays(2), "day");
             case "week" -> new Period(key, today.minusDays(6), today, today.minusDays(13), today.minusDays(7), "day");
             case "month" -> {
                 LocalDate from = today.withDayOfMonth(1);
@@ -122,6 +124,7 @@ public class AdvisorService {
     /** What the period is compared with, for sentences: "...than last week". */
     private static String comparedWith(String key) {
         return switch (key) {
+            case "today", "yesterday" -> "the day before";
             case "week" -> "last week";
             case "month" -> "the same days last month";
             case "last-month" -> "the month before";

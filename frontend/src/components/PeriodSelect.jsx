@@ -1,7 +1,11 @@
 import { Calendar, ChevronDown } from 'lucide-react'
 
 // The periods a page can show. The keys match the backend's `period` parameter; `vs` is what it is compared with.
+// A page lists the ones it supports in `keys`; the default is the longer ones.
+export const LONG_PERIODS = ['week', 'month', 'last-month', 'quarter', 'year']
 export const PERIODS = {
+  today: { label: 'Today', vs: 'vs yesterday' },
+  yesterday: { label: 'Yesterday', vs: 'vs the day before' },
   week: { label: 'Last 7 days', vs: 'vs last week' },
   month: { label: 'This Month', vs: 'vs last month' },
   'last-month': { label: 'Last Month', vs: 'vs month before' },
@@ -12,13 +16,13 @@ export const PERIODS = {
 export const longDate = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
 
 /** The period dropdown and, on wider screens, its dates. range is the backend's period ({ from, to }). */
-export default function PeriodSelect({ value, onChange, range }) {
+export default function PeriodSelect({ value, onChange, range, keys = LONG_PERIODS }) {
   return (
     <div className="flex items-center gap-4">
       <label className="relative flex items-center gap-2 rounded-xl border border-edge bg-white px-4 py-2.5 text-[15px] font-medium shadow-sm">
         <Calendar size={18} />
         <select value={value} onChange={(e) => onChange(e.target.value)} className="appearance-none bg-transparent pr-6 outline-none" aria-label="Period">
-          {Object.entries(PERIODS).map(([key, p]) => <option key={key} value={key}>{p.label}</option>)}
+          {keys.map((key) => <option key={key} value={key}>{PERIODS[key].label}</option>)}
         </select>
         <ChevronDown size={16} className="pointer-events-none absolute right-3" />
       </label>
