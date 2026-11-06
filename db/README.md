@@ -1,4 +1,4 @@
-# Dukaan Saathi interconnected demo data
+# Galla interconnected demo data
 
 This package contains synthetic data for six retail shop types: general retail, stationery, grocery, edible-oil retail, convenience store, and household/general retail.
 

@@ -58,7 +58,7 @@ public class GnaniClient {
     }
 
     /**
-     * What the audio says, written the way Saathi reads it: Hinglish in English letters, numbers as digits. "" if nothing was
+     * What the audio says, written the way Munim Ji reads it: Hinglish in English letters, numbers as digits. "" if nothing was
      * heard. boost is a list of single words (letters only, at most 100) the service should listen out for.
      */
     public String transcribe(byte[] audio, String fileName, List<String> boost) {

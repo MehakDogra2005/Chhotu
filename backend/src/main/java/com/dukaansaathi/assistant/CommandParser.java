@@ -29,7 +29,7 @@ public class CommandParser {
     public enum Intent { SALES, PROFIT, EXPENSES, STOCK_LOOKUP, STOCK_ADD, INVENTORY_CHECK, BALANCE, PAYMENT, CREDIT, LOW_STOCK,
         RESTOCK_LIST, INSIGHTS, TOP_SELLER, BEST_MARGIN, REMINDERS, OLD_UDHAAR, PAYMENT_REGISTER, ORDER_START, NAVIGATE, UNKNOWN }
 
-    /** A page of the app: path is its address (it may carry a filter), name is what Saathi says. */
+    /** A page of the app: path is its address (it may carry a filter), name is what Munim Ji says. */
     public record Page(String path, String name) {}
 
     /**

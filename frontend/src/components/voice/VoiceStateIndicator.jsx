@@ -1,6 +1,6 @@
 import { STATE_INFO } from './voiceStates'
 
-/** The one-line status under the title: a coloured dot and what Saathi is doing. */
+/** The one-line status under the title: a coloured dot and what Munim Ji is doing. */
 export default function VoiceStateIndicator({ state }) {
   const info = STATE_INFO[state]
   return (

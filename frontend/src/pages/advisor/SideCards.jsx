@@ -2,7 +2,7 @@ import { ChartNoAxesColumnIncreasing, ClipboardList, Lightbulb, MessageCircleQue
 import { Card } from '../../components/ui'
 import { useAssistant } from '../../components/AssistantContext'
 
-// Questions Saathi can answer from the database (see assistant/CommandParser.java).
+// Questions Munim Ji can answer from the database (see assistant/CommandParser.java).
 const QUESTIONS = [
   'Is mahine ka profit kitna hai?',
   'Kaun sa product sabse zyada bika?',
@@ -15,9 +15,9 @@ export function AskSaathi() {
   return (
     <Card className="bg-panel/60 p-4">
       <div className="flex items-center gap-3">
-        <button onClick={() => ask({ listen: true })} aria-label="Ask Saathi by voice"
+        <button onClick={() => ask({ listen: true })} aria-label="Ask Munim Ji by voice"
           className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand text-white hover:bg-brand-dark"><Mic size={20} /></button>
-        <h3 className="text-[16px] font-bold">Ask Saathi about your business</h3>
+        <h3 className="text-[16px] font-bold">Ask Munim Ji about your business</h3>
       </div>
       <div className="mt-3 space-y-2">
         {QUESTIONS.map((q) => (

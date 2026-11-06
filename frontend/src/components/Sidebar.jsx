@@ -44,7 +44,7 @@ export default function Sidebar() {
         <img src="/images/illustration.jpg" alt="" className="mx-auto h-28 mix-blend-multiply" onError={hideBroken} />
         <div className="mx-2 mb-2 rounded-xl bg-white/90 p-4 text-[14px]">
           <div className="font-bold">Boliye, hum sun rahe hain!</div>
-          <div className="mt-2 text-muted">Dukaan Saathi is always listening to help you.</div>
+          <div className="mt-2 text-muted">Munim Ji is always listening to help you.</div>
         </div>
       </div>
     </aside>

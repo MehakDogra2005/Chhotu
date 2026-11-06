@@ -1,4 +1,4 @@
--- Dukaan Saathi demo schema (PostgreSQL)
+-- Galla demo schema (PostgreSQL)
 -- Backend security rule: derive shop_id from the authenticated session/token.
 -- Never trust shop_id from request payloads or LLM output.
 --

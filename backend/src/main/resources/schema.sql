@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 -- For databases created before phone became optional
 ALTER TABLE users ALTER COLUMN phone DROP NOT NULL;
--- The voice Saathi speaks with for this person (a Gnani Timbre v3.0 voice name); empty until they choose one
+-- The voice Munim Ji speaks with for this person (a Gnani Timbre v3.0 voice name); empty until they choose one
 ALTER TABLE users ADD COLUMN IF NOT EXISTS tts_voice VARCHAR(30);
 
 CREATE TABLE IF NOT EXISTS user_shops (

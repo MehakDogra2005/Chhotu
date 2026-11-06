@@ -2,7 +2,7 @@
 // It keeps a copy of the app's own files (pages, images, scripts). It never stores anything from /api,
 // so shop data is always fresh and never left on the phone by this file.
 
-const CACHE = 'dukaan-saathi-v1'
+const CACHE = 'galla-v1'
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.add('/')))

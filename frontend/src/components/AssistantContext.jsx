@@ -11,9 +11,9 @@ const AssistantContext = createContext(null)
 const KEY = 'saathi-keep-listening'
 
 /**
- * Anything on any page can call ask() to open Saathi: ask({ greet: true }) (the mic button: greets, explains, then listens),
+ * Anything on any page can call ask() to open Munim Ji: ask({ greet: true }) (the mic button: greets, explains, then listens),
  * ask({ text }), ask({ listen: true, hint }), ask({ reply }). A plain ask({ listen: true }) is the same as greet.
- * `draft` is the order Saathi is taking by voice right now, for the Orders screen to show.
+ * `draft` is the order Munim Ji is taking by voice right now, for the Orders screen to show.
  */
 export const useAssistant = () => useContext(AssistantContext)
 
@@ -34,7 +34,7 @@ export function AssistantProvider({ speakReplies, userName, children }) {
   const [engine, setEngine] = useState(null) // null until the server says whether Gnani speech is set up, then 'gnani' or 'browser'
   const working = useRef(false)
   const keepRef = useRef(false) // is Keep listening on right now (also read after waits, so Stop is honoured at once)
-  const dialogRef = useRef(false) // is the Saathi window open
+  const dialogRef = useRef(false) // is the Munim Ji window open
   const queueRef = useRef([]) // sentences heard while another was being answered
   const heardRef = useRef(null)
   const [last, setLast] = useState(null) // { heard, reply } of the last sentence while listening
@@ -53,7 +53,7 @@ export function AssistantProvider({ speakReplies, userName, children }) {
   const setKeepListening = (on) => {
     keepRef.current = on
     if (!on) {
-      queueRef.current = [] // Stop means stop: nothing waiting is acted on and Saathi stops talking
+      queueRef.current = [] // Stop means stop: nothing waiting is acted on and Munim Ji stops talking
       stopSpeaking()
     }
     setKeepListeningState(on)
@@ -64,9 +64,9 @@ export function AssistantProvider({ speakReplies, userName, children }) {
     }
   }
 
-  // One sentence heard while listening: do it, say the answer, or open Saathi to confirm a change.
+  // One sentence heard while listening: do it, say the answer, or open Munim Ji to confirm a change.
   const heard = async (words) => {
-    if (!words || !keepRef.current || dialogRef.current) return // listening was switched off, or the Saathi window is open
+    if (!words || !keepRef.current || dialogRef.current) return // listening was switched off, or the Munim Ji window is open
     if (working.current) { // a sentence is being answered: keep this one for afterwards instead of losing it
       if (queueRef.current.length < 3) queueRef.current.push(words)
       return
@@ -78,7 +78,7 @@ export function AssistantProvider({ speakReplies, userName, children }) {
       if (!keepRef.current) return // Stop was pressed while this was being answered: do not act on it
       if (r.navigate) navigate(r.navigate)
       if (r.options?.length) {
-        setLast({ heard: words, reply: 'Please confirm in Saathi.' })
+        setLast({ heard: words, reply: 'Please confirm in Munim Ji.' })
         ask({ reply: { ...r, heard: words } })
         if (speakReplies) await speak(r.message)
       } else {
@@ -101,7 +101,7 @@ export function AssistantProvider({ speakReplies, userName, children }) {
   dialogRef.current = !!start
 
   // Listening runs only when nothing else is going on: not while a sentence is being answered, and not while
-  // the Saathi window is open (so "yes" for a proposal is not taken as a new sentence).
+  // the Munim Ji window is open (so "yes" for a proposal is not taken as a new sentence).
   const listening = useKeepListening(heard, {
     enabled: keepListening && engine !== null,
     active: keepListening && engine !== null && !start && !busy,
@@ -121,7 +121,7 @@ export function AssistantProvider({ speakReplies, userName, children }) {
           <div className="flex items-center gap-3">
             <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-white ${listening.listening ? 'animate-pulse bg-red-500' : 'bg-muted'}`}><Mic size={18} /></span>
             <div className="min-w-0 flex-1">
-              <div className="font-bold text-heading">{busy ? 'Saathi is working...' : listening.listening ? 'Listening, always on' : 'Not listening'}</div>
+              <div className="font-bold text-heading">{busy ? 'Munim Ji is working...' : listening.listening ? 'Listening, always on' : 'Not listening'}</div>
               <div className="truncate text-muted">
                 {listening.problem || (last ? `You: "${last.heard}". ${last.reply}` : 'Say a command, for example "Inventory kholo".')}
               </div>

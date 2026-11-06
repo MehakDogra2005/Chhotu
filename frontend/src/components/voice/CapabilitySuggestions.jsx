@@ -1,13 +1,13 @@
 import { Box, ChartNoAxesColumnIncreasing, Users } from 'lucide-react'
 
-// The three things Saathi helps with. `say` is the example sentence that is sent when the card is tapped.
+// The three things Munim Ji helps with. `say` is the example sentence that is sent when the card is tapped.
 const CAPABILITIES = [
   { icon: Box, title: 'Inventory', text: 'Stock, low items, restock list', say: 'Mujhe aaj ki inventory check karni hai' },
   { icon: ChartNoAxesColumnIncreasing, title: 'Business Advisor', text: 'Sales, profit, expenses', say: 'Kal ki kamai batao' },
   { icon: Users, title: 'Customers', text: 'Orders, udhaar, payments', say: 'Humein order lene hain' },
 ]
 
-/** Three small cards under the introduction. Tapping one asks Saathi that example. */
+/** Three small cards under the introduction. Tapping one asks Munim Ji that example. */
 export default function CapabilitySuggestions({ onPick, disabled }) {
   return (
     <div className="grid grid-cols-3 gap-2">

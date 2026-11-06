@@ -38,7 +38,7 @@ export default function Landing({ lang, setLang }) {
 
       <div className={photoBox}>
         <div className="absolute left-[46%] top-[8%] whitespace-nowrap rounded-[28px] bg-white px-6 py-4 text-[20px] leading-snug shadow-lg">
-          Saathi, aaj ki<br />sale batao
+          Munim Ji, aaj ki<br />sale batao
           <span className="absolute -bottom-2 right-5 h-5 w-5 rotate-45 bg-white" />
         </div>
         <div className="absolute left-[58%] top-[56%] -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-5 py-2 text-[17px] font-medium shadow-md">

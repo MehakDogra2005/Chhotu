@@ -12,7 +12,7 @@ import java.util.List;
  * @param productId the product just talked about
  * @param customerId the customer just talked about
  * @param mode      ORDER while an order is being taken, INVENTORY after "inventory check karni hai", otherwise null
- * @param choices   customer ids Saathi just asked the shopkeeper to choose between
+ * @param choices   customer ids Munim Ji just asked the shopkeeper to choose between
  * @param lines     items of the order being taken
  */
 public record Context(String intent, String period, String productId, String customerId, String mode, List<String> choices, List<Want> lines) {

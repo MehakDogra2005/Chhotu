@@ -6,8 +6,8 @@ import VoiceWaveform from './VoiceWaveform'
 import { S } from './voiceStates'
 
 /**
- * The small conversation window. It sits in a corner (above the bottom menu on a phone) so the page Saathi opens stays
- * visible behind it, and it stays open while Saathi moves between pages. `voice` is what useVoiceConversation returns.
+ * The small conversation window. It sits in a corner (above the bottom menu on a phone) so the page Munim Ji opens stays
+ * visible behind it, and it stays open while Munim Ji moves between pages. `voice` is what useVoiceConversation returns.
  */
 export default function ConversationPanel({ voice, keepListening, onKeepListening, onClose }) {
   const { state, chat, error, showSuggestions, listening, working, micSupported, speaking } = voice
@@ -34,12 +34,12 @@ export default function ConversationPanel({ voice, keepListening, onKeepListenin
   const isListening = state === S.LISTENING || (state === S.AWAITING_CONFIRMATION && listening)
 
   return (
-    <section aria-label="Saathi conversation" data-state={state}
+    <section aria-label="Munim Ji conversation" data-state={state}
       className="fixed inset-x-3 bottom-20 z-50 flex max-h-[min(72dvh,600px)] flex-col overflow-hidden rounded-3xl border border-edge bg-card shadow-2xl lg:inset-x-auto lg:bottom-4 lg:right-4 lg:w-[400px]">
       <header className="flex items-center gap-3 border-b border-edge px-4 py-3">
         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand text-white"><Sparkles size={18} /></span>
         <div className="min-w-0 flex-1">
-          <h2 className="text-[16px] font-bold leading-tight">Saathi</h2>
+          <h2 className="text-[16px] font-bold leading-tight">Munim Ji</h2>
           <VoiceStateIndicator state={state} />
         </div>
         {state === S.PAUSED ? (
@@ -59,7 +59,7 @@ export default function ConversationPanel({ voice, keepListening, onKeepListenin
         <div className={`flex items-center gap-3 px-4 py-2 ${isListening ? 'bg-red-50' : 'bg-panel'}`}>
           <VoiceWaveform mode={mode} />
           <div className="min-w-0 flex-1 text-[13px] font-semibold">
-            {working ? 'Samajh raha hoon...' : isListening ? 'Ji, boliye, main sun raha hoon...' : 'Saathi bol raha hai...'}
+            {working ? 'Samajh raha hoon...' : isListening ? 'Ji, boliye, main sun raha hoon...' : 'Munim Ji bol raha hai...'}
           </div>
           {isListening && (
             <button onClick={voice.pause} className="flex shrink-0 items-center gap-1 rounded-lg border border-red-200 bg-white px-2.5 py-1.5 text-[12.5px] font-semibold text-red-600 hover:bg-red-50">
@@ -96,7 +96,7 @@ export default function ConversationPanel({ voice, keepListening, onKeepListenin
               </div>
             ))}
             {showSuggestions && <CapabilitySuggestions onPick={voice.send} disabled={busy} />}
-            {state === S.PROCESSING && <div className="text-[13px] text-muted">Saathi soch raha hai...</div>}
+            {state === S.PROCESSING && <div className="text-[13px] text-muted">Munim Ji soch raha hai...</div>}
             {error && (
               <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700">
                 {error}
@@ -117,7 +117,7 @@ export default function ConversationPanel({ voice, keepListening, onKeepListenin
                 <Mic size={22} />
               </button>
             )}
-            <input value={input} onChange={(e) => setInput(e.target.value)} aria-label="Type to Saathi"
+            <input value={input} onChange={(e) => setInput(e.target.value)} aria-label="Type to Munim Ji"
               placeholder={listening ? 'Sun raha hoon...' : 'Ya yahan type kijiye...'}
               className="h-12 min-w-0 flex-1 rounded-full border border-line bg-white px-4 text-[14px] outline-none focus:border-brand" />
             <button disabled={busy || !input.trim()} aria-label="Send" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand text-white disabled:opacity-50"><Send size={20} /></button>

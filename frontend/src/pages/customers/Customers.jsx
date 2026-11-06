@@ -22,7 +22,7 @@ export default function Customers() {
   const [dialog, setDialog] = useState(null)
   const { data, error } = useFetch(`/api/customers?period=${period}`)
 
-  // Saathi can open this page on a customer (?search=Ramesh&open=CUS-1) or on the order-taking part (?view=orders&customer=CUS-1)
+  // Munim Ji can open this page on a customer (?search=Ramesh&open=CUS-1) or on the order-taking part (?view=orders&customer=CUS-1)
   const [params, setParams] = useSearchParams()
   const { key } = useLocation()
   const view = params.get('view') === 'orders' ? 'orders' : 'udhaar'

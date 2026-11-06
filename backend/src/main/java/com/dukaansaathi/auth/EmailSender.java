@@ -33,8 +33,8 @@ public class EmailSender {
         SimpleMailMessage message = new SimpleMailMessage();
         if (!from.isBlank()) message.setFrom(from);
         message.setTo(to);
-        message.setSubject("Your Dukaan Saathi code: " + code);
-        message.setText("Your Dukaan Saathi login code is " + code + ".\n\nIt works for " + validSeconds
+        message.setSubject("Your Galla code: " + code);
+        message.setText("Your Galla login code is " + code + ".\n\nIt works for " + validSeconds
                 + " seconds. If you did not ask for it, you can ignore this email.");
         try {
             sender.send(message);

@@ -233,7 +233,7 @@ export function TransactionsDialog({ transactions, today, onClose }) {
   )
 }
 
-/** A recording: listen to it (when the audio is on this server), read or type what was said, and send it to Saathi. */
+/** A recording: listen to it (when the audio is on this server), read or type what was said, and send it to Munim Ji. */
 export function RecordingDialog({ recording, onClose }) {
   const { token } = useAuth()
   const { ask } = useAssistant()
@@ -287,11 +287,11 @@ export function RecordingDialog({ recording, onClose }) {
           <textarea value={text} onChange={(e) => setText(e.target.value)} rows={4} maxLength={1000}
             placeholder='Type it, e.g. "Ramesh ne 500 rupaye de diye"' className="w-full rounded-xl border border-line bg-white px-4 py-3 text-[14px] outline-none focus:border-brand" />
         </Field>
-        <p className="text-[12px] text-muted">Saathi reads one change at a time: for example "Ramesh ne 500 de diye". A promise to pay later is not a payment, so do not record it as one.</p>
+        <p className="text-[12px] text-muted">Munim Ji reads one change at a time: for example "Ramesh ne 500 de diye". A promise to pay later is not a payment, so do not record it as one.</p>
         {error && <p className="text-red-600">{error}</p>}
         <div className="grid grid-cols-2 gap-2">
           <button onClick={save} disabled={saving || !text.trim()} className="h-11 rounded-xl border border-edge font-semibold disabled:opacity-50">{saving ? 'Saving...' : 'Save text'}</button>
-          <button onClick={sendToSaathi} disabled={saving || !text.trim()} className="flex h-11 items-center justify-center gap-2 rounded-xl bg-brand font-semibold text-white disabled:opacity-50"><Mic size={16} /> Send to Saathi</button>
+          <button onClick={sendToSaathi} disabled={saving || !text.trim()} className="flex h-11 items-center justify-center gap-2 rounded-xl bg-brand font-semibold text-white disabled:opacity-50"><Mic size={16} /> Send to Munim Ji</button>
         </div>
       </div>
     </Modal>

@@ -7,7 +7,7 @@ import { Card, CardHeader } from '../../components/ui'
 import { stopSpeaking } from '../../components/speech'
 
 /**
- * Choose the voice Saathi speaks with. The voices are Gnani's Timbre v3.0 voices (the list comes from the server). Picking a card
+ * Choose the voice Munim Ji speaks with. The voices are Gnani's Timbre v3.0 voices (the list comes from the server). Picking a card
  * saves it at once on your profile, and the server uses it for every spoken reply in every part of the app, so there is nothing
  * to press "Save" for. Play Sample reads one fixed sentence in that voice without choosing it.
  */
@@ -40,7 +40,7 @@ export default function VoiceSelection() {
     try {
       const saved = await put('/api/voice/voice', { voice: name }, token)
       setSelected(saved.selected)
-      setStatus({ ok: true, text: `${saved.selected} is now Saathi's voice. It will be used for every reply, in every section.` })
+      setStatus({ ok: true, text: `${saved.selected} is now Munim Ji's voice. It will be used for every reply, in every section.` })
     } catch (err) {
       setSelected(before)
       setStatus({ ok: false, text: err.message })
@@ -50,7 +50,7 @@ export default function VoiceSelection() {
   const play = async (name) => {
     if (playing === name) return stopSample()
     stopSample()
-    stopSpeaking() // Saathi's own reply must not talk over the sample
+    stopSpeaking() // Munim Ji's own reply must not talk over the sample
     const mine = request.current
     setPlaying(name)
     setLoading(true)
@@ -60,7 +60,7 @@ export default function VoiceSelection() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ voice: name }),
-      }).catch(() => { throw new Error('Cannot reach Dukaan Saathi. Please check your internet connection.') })
+      }).catch(() => { throw new Error('Cannot reach Galla. Please check your internet connection.') })
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).message || 'The sample could not be played.')
       const url = URL.createObjectURL(await res.blob())
       if (mine !== request.current) return URL.revokeObjectURL(url)
@@ -82,19 +82,19 @@ export default function VoiceSelection() {
   return (
     <Card className="p-5">
       <CardHeader icon={<AudioLines size={22} />} tint="bg-[#efeafc] text-[#6250d6]"
-        title="Voice Selection" subtitle="Choose the voice of Dukaan Saathi. It speaks every reply in the voice you pick." />
+        title="Voice Selection" subtitle="Choose the voice of Munim Ji. It speaks every reply in the voice you pick." />
 
       {error && <p className="mt-4 text-[13px] text-red-600">{error}</p>}
       {!data && !error && <p className="mt-4 text-[13px] text-muted">Loading voices...</p>}
       {data && !data.gnani && (
         <p className="mt-4 rounded-xl bg-warm px-3 py-2 text-[13px] text-[#8a5a00]">
-          Gnani speech is not set up on this server, so Saathi is using your browser's own voice for now. You can still choose a voice: it is saved and
+          Gnani speech is not set up on this server, so Munim Ji is using your browser's own voice for now. You can still choose a voice: it is saved and
           used as soon as Gnani is switched on. Samples need Gnani.
         </p>
       )}
 
       {data && (
-        <div role="radiogroup" aria-label="Saathi's voice" className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div role="radiogroup" aria-label="Munim Ji's voice" className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {data.voices.map((v) => {
             const on = v.name === selected
             const thisOne = playing === v.name

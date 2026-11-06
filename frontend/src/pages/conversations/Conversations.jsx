@@ -10,7 +10,7 @@ const STATUS = {
   REJECTED: ['Cancelled', 'bg-stone-100 text-muted'],
 }
 
-/** Everything the shopkeeper has said to Saathi, newest first. */
+/** Everything the shopkeeper has said to Munim Ji, newest first. */
 export default function Conversations() {
   const { data, error } = useFetch('/api/assistant/history?limit=100')
 
@@ -20,7 +20,7 @@ export default function Conversations() {
   return (
     <>
       <PageHeader icon={<MessageSquare size={44} strokeWidth={1.4} className="text-brand" />}
-        title="Conversations" subtitle="Everything you have asked or told Saathi." />
+        title="Conversations" subtitle="Everything you have asked or told Munim Ji." />
       <Card className="mt-5 p-2 sm:p-4">
         {data.length === 0 && <Empty>Nothing yet. Tap the mic and say something.</Empty>}
         <ul className="divide-y divide-edge">

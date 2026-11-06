@@ -12,7 +12,7 @@ import com.dukaansaathi.customers.CustomerRepository;
 import com.dukaansaathi.inventory.InventoryRepository;
 
 /**
- * The words the speech service should listen for: what Saathi understands (kholo, udhaar, bika...) and the names in
+ * The words the speech service should listen for: what Munim Ji understands (kholo, udhaar, bika...) and the names in
  * this shop (customers and products). Boosting them makes the service far less likely to write "caller" for "kholo".
  */
 @Component

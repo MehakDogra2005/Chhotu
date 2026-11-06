@@ -47,11 +47,11 @@ function CardTitle({ icon, title, right }) {
   )
 }
 
-// Today and Yesterday are here as well as the longer periods, so Saathi can open the page for "kal ki kamai"
+// Today and Yesterday are here as well as the longer periods, so Munim Ji can open the page for "kal ki kamai"
 const ADVISOR_PERIODS = ['today', 'yesterday', ...LONG_PERIODS]
 
 export default function BusinessAdvisor() {
-  // The period lives in the address (/advisor?period=yesterday), so Saathi or a link can open the page on it
+  // The period lives in the address (/advisor?period=yesterday), so Munim Ji or a link can open the page on it
   const [params, setParams] = useSearchParams()
   const period = ADVISOR_PERIODS.includes(params.get('period')) ? params.get('period') : 'month'
   const setPeriod = (next) => setParams({ period: next }, { replace: true })

@@ -7,7 +7,7 @@ export default function Help() {
   return (
     <>
       <PageHeader icon={<CircleHelp size={46} strokeWidth={1.4} className="text-[#2563c9]" />}
-        title="Help" subtitle="Quick answers, and what you can ask Saathi." />
+        title="Help" subtitle="Quick answers, and what you can ask Munim Ji." />
 
       <h2 className="mb-3 mt-6 text-[18px] font-bold">Getting started</h2>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-4">
@@ -24,7 +24,7 @@ export default function Help() {
         <div className="self-start rounded-2xl border border-[#d5ecdd] bg-linear-to-b from-[#eaf8ef] to-[#f4fbf6] p-5">
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-full bg-white text-brand shadow-sm"><Mic size={20} /></span>
-            <h2 className="flex-1 text-[16px] font-bold">What you can say to Saathi</h2>
+            <h2 className="flex-1 text-[16px] font-bold">What you can say to Munim Ji</h2>
           </div>
           <div className="mt-4 space-y-4">
             {VOICE_GROUPS.map(([group, examples]) => (

@@ -17,7 +17,7 @@ export function ShopProfile({ form, change }) {
   return (
     <Card className="p-5">
       <CardHeader icon={<Store size={22} />} tint="bg-[#e1f5e8] text-brand"
-        title="Shop Profile" subtitle="How you and your shop appear in Saathi." />
+        title="Shop Profile" subtitle="How you and your shop appear in Galla." />
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <Field label="Your name"><input {...text('ownerName')} /></Field>
         <Field label="Shop name"><input {...text('shopName')} /></Field>
@@ -38,7 +38,7 @@ export function ShopProfile({ form, change }) {
 }
 
 const MIC_STATUS = {
-  granted: ['text-brand', 'Allowed: your browser lets Saathi use the microphone.'],
+  granted: ['text-brand', 'Allowed: your browser lets Munim Ji use the microphone.'],
   denied: ['text-red-600', "Blocked: allow the microphone in your browser's site settings, then reload."],
   prompt: ['text-orange', 'Not allowed yet: your browser will ask when you press Allow.'],
   unknown: ['text-muted', 'Your browser has not said whether the microphone is allowed.'],
@@ -51,11 +51,11 @@ export function VoicePreferences({ form, change }) {
   return (
     <Card className="p-5">
       <CardHeader icon={<Mic size={22} />} tint="bg-[#e3ecfb] text-[#2563c9]"
-        title="Voice Preferences" subtitle="Saathi listens only while you use the mic: tap it to start, tap it again to stop." />
+        title="Voice Preferences" subtitle="Munim Ji listens only while you use the mic: tap it to start, tap it again to stop." />
 
       <div className="mt-2 divide-y divide-edge">
         <Toggle checked={form.voiceReplies} onChange={(v) => change('voiceReplies', v)}
-          label="Speak replies aloud" description="Saathi reads its answers out as well as showing them." />
+          label="Speak replies aloud" description="Munim Ji reads its answers out as well as showing them." />
         <div className="flex flex-wrap items-center gap-4 py-3">
           <div className="min-w-0 flex-1">
             <div className="text-[15px] font-semibold">Microphone access</div>
@@ -76,7 +76,7 @@ export function Notifications({ form, change }) {
   return (
     <Card className="p-5">
       <CardHeader icon={<Bell size={22} />} tint="bg-[#fdebd0] text-orange"
-        title="Notifications" subtitle="Choose what Saathi should tell you about." />
+        title="Notifications" subtitle="Choose what Munim Ji should tell you about." />
       <div className="mt-3 divide-y divide-edge">
         <Toggle checked={form.lowStockAlerts} onChange={(v) => change('lowStockAlerts', v)}
           label="Low-stock alerts" description="Show a red number on the bell when products are low or out of stock." />
@@ -126,7 +126,7 @@ export function NeedHelp() {
         <span className="grid h-10 w-10 place-items-center rounded-full bg-white text-brand shadow-sm"><CircleHelp size={20} /></span>
         <h3 className="text-[16px] font-bold">Need help?</h3>
       </div>
-      <p className="mt-3 text-[13px] text-muted">Quick answers about stock, udhaar and profit, and what you can ask Saathi.</p>
+      <p className="mt-3 text-[13px] text-muted">Quick answers about stock, udhaar and profit, and what you can ask Munim Ji.</p>
       <NavLink to="/help" className="mt-4 flex h-11 items-center justify-center rounded-xl bg-brand text-[14px] font-semibold text-white hover:bg-brand-dark">
         Open Help
       </NavLink>
@@ -150,7 +150,7 @@ export function InstallApp() {
       ) : (
         <>
           <p className="mt-3 text-[13px] leading-relaxed text-muted">
-            Add Dukaan Saathi to your phone's home screen. It opens full-screen, like any other app.
+            Add Galla to your phone's home screen. It opens full-screen, like any other app.
           </p>
           {install ? (
             <button onClick={install} className="mt-4 h-11 w-full rounded-xl bg-brand text-[14px] font-semibold text-white hover:bg-brand-dark">Install app</button>

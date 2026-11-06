@@ -2,7 +2,7 @@ import ConversationPanel from './voice/ConversationPanel'
 import useVoiceConversation from './voice/useVoiceConversation'
 
 /**
- * Talk to Saathi. The panel and its voice conversation live in components/voice/.
+ * Talk to Munim Ji. The panel and its voice conversation live in components/voice/.
  * `start` says how it was opened: { greet: true } greets and explains first, { listen: true } listens at once,
  * { text } sends that sentence now, { hint } replaces the first line, { reply } continues an answer waiting for a yes.
  */

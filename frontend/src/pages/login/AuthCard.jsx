@@ -97,8 +97,8 @@ export default function AuthCard({ mode, setMode, lang, onLogin }) {
     phone: signup ? ['Create Your Account', "Let's set up your shop in a few simple steps."] : ['Welcome Back!', 'Sign in to continue to your shop'],
     email: ['Sign in with Email', "We'll send a 6-digit code to your email."],
     otp: ['Enter OTP', `We sent a 6-digit code to ${method === 'email' ? email : '+91 ' + phone}`],
-    shop: ['Tell us about your shop', 'This helps Saathi set things up for you.'],
-    done: ["You're all set!", 'Saathi is ready to help you run your dukaan.'],
+    shop: ['Tell us about your shop', 'This helps Munim Ji set things up for you.'],
+    done: ["You're all set!", 'Munim Ji is ready to help you run your dukaan.'],
   }[step]
 
   return (
@@ -214,7 +214,7 @@ export default function AuthCard({ mode, setMode, lang, onLogin }) {
           <div className="relative -mx-7 -mb-8 mt-6 h-44 bg-gradient-to-b from-transparent to-warm">
             <img src="/images/illustration.jpg" alt="" className="absolute bottom-0 left-2 h-40 mix-blend-multiply [mask-image:linear-gradient(to_top,black_75%,transparent)]" onError={hideBroken} />
             <div className="absolute bottom-8 right-6 -rotate-6 font-hand text-[19px] italic leading-snug">
-              "Chhoti dukaan,<br />badi ummeedein.<br />Ab Saathi ke saath."
+              "Chhoti dukaan,<br />badi ummeedein.<br />Ab Munim Ji ke saath."
               <svg width="90" height="12" className="ml-6 mt-1"><path d="M2 9C30 3 60 2 88 4" stroke="#f2a93b" strokeWidth="3" fill="none" strokeLinecap="round" /></svg>
             </div>
           </div>

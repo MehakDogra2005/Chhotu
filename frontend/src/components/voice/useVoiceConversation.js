@@ -26,10 +26,10 @@ function firstName(full) {
 }
 
 /**
- * One conversation with Saathi, as a small state machine (see voiceStates.js). Tapping the mic runs
+ * One conversation with Munim Ji, as a small state machine (see voiceStates.js). Tapping the mic runs
  * GREETING -> INTRODUCTION -> LISTENING; after that every sentence goes PROCESSING -> NAVIGATING -> RESPONDING and back to
  * LISTENING. Every step checks that it is still the current one (`run`), so pausing, closing, or a newer sentence
- * cleanly cancels whatever was still speaking or listening: the microphone never opens while Saathi is talking.
+ * cleanly cancels whatever was still speaking or listening: the microphone never opens while Munim Ji is talking.
  *
  * start says how the conversation was opened: { greet } speaks the greeting first, { listen } listens at once,
  * { text } sends that sentence, { reply } continues an answer that is waiting for a yes.
@@ -94,7 +94,7 @@ export default function useVoiceConversation({ start, ready, speakReplies, userN
     openMic()
   }
 
-  /** After Saathi has spoken: wait for a yes/no if a change is pending, otherwise listen again (in a voice conversation). */
+  /** After Munim Ji has spoken: wait for a yes/no if a change is pending, otherwise listen again (in a voice conversation). */
   const afterSpeaking = () => {
     const waiting = !!pending.current
     if (voiceDriven.current && micRef.current.supported) {
@@ -141,7 +141,7 @@ export default function useVoiceConversation({ start, ready, speakReplies, userN
     setShowSuggestions(true)
     add({ from: 'saathi', text: INTRO })
     if (!(await say(INTRO, my))) return
-    listen() // only now, so the microphone never hears Saathi's own greeting
+    listen() // only now, so the microphone never hears Munim Ji's own greeting
   }
 
   // ---- what the shopkeeper says
@@ -264,7 +264,7 @@ export default function useVoiceConversation({ start, ready, speakReplies, userN
 
   // ---- controls
 
-  /** Stops everything: Saathi stops talking, the microphone closes and nothing heard is used. */
+  /** Stops everything: Munim Ji stops talking, the microphone closes and nothing heard is used. */
   const pause = () => {
     run.current++
     stopSpeaking()
@@ -272,7 +272,7 @@ export default function useVoiceConversation({ start, ready, speakReplies, userN
     setState(S.PAUSED)
   }
 
-  /** The microphone button: end the sentence, cut Saathi short and listen, or start listening. */
+  /** The microphone button: end the sentence, cut Munim Ji short and listen, or start listening. */
   const micToggle = () => {
     voiceDriven.current = true
     quiet.current = 0

@@ -11,7 +11,7 @@ const Wave = ({ heights }) => (
   </div>
 )
 
-// The big mic starts listening; each sentence below is sent to Saathi when tapped.
+// The big mic starts listening; each sentence below is sent to Munim Ji when tapped.
 export default function VoicePanel({ firstProduct, firstCustomer }) {
   const { ask } = useAssistant()
   const examples = [
@@ -30,7 +30,7 @@ export default function VoicePanel({ firstProduct, firstCustomer }) {
         <Wave heights={LEFT} />
         <div className="grid h-36 w-36 place-items-center rounded-full bg-brand/10 sm:h-44 sm:w-44">
           <div className="grid h-28 w-28 place-items-center rounded-full bg-brand/15 sm:h-32 sm:w-32">
-            <button onClick={() => ask({ listen: true })} aria-label="Speak to Saathi" className="grid h-20 w-20 place-items-center rounded-full bg-brand text-white shadow-lg hover:bg-brand-dark sm:h-24 sm:w-24"><Mic size={36} /></button>
+            <button onClick={() => ask({ listen: true })} aria-label="Speak to Munim Ji" className="grid h-20 w-20 place-items-center rounded-full bg-brand text-white shadow-lg hover:bg-brand-dark sm:h-24 sm:w-24"><Mic size={36} /></button>
           </div>
         </div>
         <Wave heights={RIGHT} />

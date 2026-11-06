@@ -6,8 +6,8 @@ import { Card } from '../../components/ui'
 import { useAssistant } from '../../components/AssistantContext'
 
 /**
- * Questions Saathi answers from the ledger (see assistant/CommandParser.java), using real customers of this shop who owe
- * money. A customer is named by first name when no one else shares it, else by full name, so Saathi finds just one person.
+ * Questions Munim Ji answers from the ledger (see assistant/CommandParser.java), using real customers of this shop who owe
+ * money. A customer is named by first name when no one else shares it, else by full name, so Munim Ji finds just one person.
  */
 function questions(customers) {
   const count = (key) => (name) => customers.filter((c) => key(c.name) === key(name)).length
@@ -29,9 +29,9 @@ export function AskSaathi({ customers }) {
   return (
     <Card className="bg-panel/60 p-4">
       <div className="flex items-center gap-3">
-        <button onClick={() => ask({ listen: true })} aria-label="Ask Saathi by voice"
+        <button onClick={() => ask({ listen: true })} aria-label="Ask Munim Ji by voice"
           className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand text-white hover:bg-brand-dark"><Mic size={20} /></button>
-        <h3 className="text-[16px] font-bold">Ask Saathi about customers</h3>
+        <h3 className="text-[16px] font-bold">Ask Munim Ji about customers</h3>
       </div>
       <div className="mt-3 space-y-2">
         {questions(customers).map((q) => (
@@ -84,7 +84,7 @@ function RecordingList({ items, onOpen, empty }) {
   )
 }
 
-/** Speak to Saathi, or upload a voice note / call recording to go through later. onOpen opens a recording. */
+/** Speak to Munim Ji, or upload a voice note / call recording to go through later. onOpen opens a recording. */
 export function AddByVoice({ recordings, onOpen }) {
   const { ask } = useAssistant()
   const { token } = useAuth()
@@ -146,7 +146,7 @@ export function AddByVoice({ recordings, onOpen }) {
             <span className="text-[13.5px] font-medium">Click to record or speak naturally</span>
             <span className="text-[11.5px] text-muted">e.g. "Ramesh ne 500 rupaye de diye"<br />"Pooja ka udhaar 200 aur add karo"</span>
           </button>
-          <p className="mt-2 text-[11.5px] text-muted">Saathi shows what it will change and waits for your Yes.</p>
+          <p className="mt-2 text-[11.5px] text-muted">Munim Ji shows what it will change and waits for your Yes.</p>
           <RecordingList items={recordings.filter((r) => r.type === 'VOICE_NOTE')} onOpen={onOpen} empty="No voice notes uploaded yet." />
         </>
       )}
@@ -183,7 +183,7 @@ export function AddByVoice({ recordings, onOpen }) {
               Uploaded <b>{status.done.fileName}</b>. <button onClick={() => onOpen(status.done)} className="font-semibold text-brand underline">Open it</button> to add what was said.
             </p>
           )}
-          <p className="text-[11.5px] text-muted">A short recording is turned into text automatically. Open it, check the text and fix anything wrong, then Send to Saathi. Nothing changes until you confirm it.</p>
+          <p className="text-[11.5px] text-muted">A short recording is turned into text automatically. Open it, check the text and fix anything wrong, then Send to Munim Ji. Nothing changes until you confirm it.</p>
         </div>
       )}
 

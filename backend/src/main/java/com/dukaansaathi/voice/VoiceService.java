@@ -11,13 +11,13 @@ import com.dukaansaathi.auth.ShopContext;
 import com.dukaansaathi.auth.UserRepository;
 
 /**
- * Which voice Saathi speaks with. The choice is saved on the person's profile and read here for every spoken reply, so it is the
+ * Which voice Munim Ji speaks with. The choice is saved on the person's profile and read here for every spoken reply, so it is the
  * same in every part of the app and it survives logging out and in. The browser never says which voice to use for a reply.
  */
 @Service
 public class VoiceService {
     /** What each "Play Sample" button says. It is fixed, so every voice can be compared on the same words. */
-    static final String SAMPLE_TEXT = "Namaste! Main aapka Dukaan Saathi hoon. Boliye, aaj main aapke liye kya kar sakta hoon?";
+    static final String SAMPLE_TEXT = "Namaste! Main aapka Munim Ji hoon. Boliye, aaj main aapke liye kya kar sakta hoon?";
 
     private final UserRepository users;
     private final GnaniClient gnani;
@@ -35,7 +35,7 @@ public class VoiceService {
 
     /** Saves the choice. Only names from Gnani's Timbre v3.0 catalogue are accepted. Returns the name as the catalogue spells it. */
     public String choose(ShopContext who, String name) {
-        String voice = VoiceCatalog.find(name).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Choose one of Saathi's voices"));
+        String voice = VoiceCatalog.find(name).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Choose one of Munim Ji's voices"));
         users.setVoice(who.userId(), voice);
         return voice;
     }

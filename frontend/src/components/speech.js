@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { get } from '../api'
 import { microphoneBlocked, openMic } from './mic'
 
-// Speech has two engines. With a Gnani key on the server (see README) the microphone and Saathi's voice use Gnani:
+// Speech has two engines. With a Gnani key on the server (see README) the microphone and Munim Ji's voice use Gnani:
 // good with Hindi and Hinglish. Without a key the browser's own speech is used (Chrome and Android Chrome; free, no setup).
 // Either way the browser never sees the key: it only talks to this app's /api/voice.
 const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -29,7 +29,7 @@ async function transcribe(blob) {
   const form = new FormData()
   form.append('audio', blob, 'speech.wav')
   const res = await fetch('/api/voice/transcribe', { method: 'POST', headers: { Authorization: `Bearer ${engine.token}` }, body: form })
-    .catch(() => { throw new Error('Cannot reach Dukaan Saathi. Please check your internet connection.') })
+    .catch(() => { throw new Error('Cannot reach Galla. Please check your internet connection.') })
   const data = await res.json().catch(() => ({}))
   if (!res.ok) throw new Error(data.message || 'The voice service did not work. You can type instead.')
   return (data.text || '').trim()
@@ -176,8 +176,8 @@ export function useListening(onText, events = {}) {
 
 /**
  * Keep listening: the microphone stays on, hears each sentence on its own, and hands it to onText.
- * `enabled` keeps the microphone open; `active` is whether it is taking in sound right now (it is switched off while Saathi
- * talks, so Saathi does not hear itself). `gnani` says which engine to use.
+ * `enabled` keeps the microphone open; `active` is whether it is taking in sound right now (it is switched off while Munim Ji
+ * talks, so Munim Ji does not hear itself). `gnani` says which engine to use.
  */
 export function useKeepListening(onText, { enabled, active, gnani }) {
   const onTextRef = useRef(onText)
@@ -302,7 +302,7 @@ function useBrowserKeepListening(onTextRef, active) {
 let player = null // the audio being played now
 let speakingNow = 0 // a new number for every call, so an old call can tell it was replaced
 
-/** Stops whatever Saathi is saying. */
+/** Stops whatever Munim Ji is saying. */
 export function stopSpeaking() {
   speakingNow++
   window.speechSynthesis?.cancel()
@@ -330,7 +330,7 @@ export function prefetchSpeech(text) {
   prefetched.set(text, audio)
 }
 
-/** Reads text aloud. The promise comes back when Saathi has finished speaking. */
+/** Reads text aloud. The promise comes back when Munim Ji has finished speaking. */
 export async function speak(text) {
   stopSpeaking()
   const mine = speakingNow
@@ -340,7 +340,7 @@ export async function speak(text) {
       prefetched.delete(text)
       // If the audio made ahead of time failed (the service was busy), ask once more instead of falling silent
       const url = URL.createObjectURL(await (ahead ? ahead.catch(() => fetchAudio(text)) : fetchAudio(text)))
-      if (mine !== speakingNow) return URL.revokeObjectURL(url) // something newer was said or Saathi was stopped
+      if (mine !== speakingNow) return URL.revokeObjectURL(url) // something newer was said or Munim Ji was stopped
       await new Promise((done, fail) => {
         const audio = new Audio(url)
         player = audio

@@ -32,7 +32,7 @@ import com.dukaansaathi.voice.VoiceVocabulary;
 /**
  * Uploading voice notes and call recordings. The audio is kept on this server for KEEP_DAYS. When the Gnani speech
  * service is set up, a short recording is turned into text on upload; otherwise (or when that fails) the shopkeeper types
- * what it says. Nothing in a recording changes the udhaar until it goes through Saathi and is confirmed.
+ * what it says. Nothing in a recording changes the udhaar until it goes through Munim Ji and is confirmed.
  */
 @Service
 public class RecordingService {

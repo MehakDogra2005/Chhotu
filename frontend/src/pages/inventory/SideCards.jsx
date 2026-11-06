@@ -2,7 +2,7 @@ import { ChartNoAxesColumnIncreasing, CirclePlus, ListChecks, Mic } from 'lucide
 import { useAssistant } from '../../components/AssistantContext'
 import { Card } from '../../components/ui'
 
-/** Sentences to try. Tapping one sends it to Saathi. names are products of this shop. */
+/** Sentences to try. Tapping one sends it to Munim Ji. names are products of this shop. */
 export function TalkToSaathi({ names }) {
   const { ask } = useAssistant()
   const first = names[0] || 'Chocolate'
@@ -18,7 +18,7 @@ export function TalkToSaathi({ names }) {
     <div className="rounded-2xl border border-[#d5ecdd] bg-linear-to-b from-[#eaf8ef] to-[#f4fbf6] p-5">
       <div className="flex items-center gap-3">
         <span className="grid h-10 w-10 place-items-center rounded-full bg-white text-brand shadow-sm"><Mic size={20} /></span>
-        <h3 className="text-[16px] font-bold leading-snug">Talk to Saathi about Inventory</h3>
+        <h3 className="text-[16px] font-bold leading-snug">Talk to Munim Ji about Inventory</h3>
       </div>
       <ul className="mt-4 space-y-2">
         {examples.map((text) => (

@@ -18,7 +18,7 @@ const dateText = (at) => new Date(at).toLocaleDateString('en-IN', { day: 'numeri
 
 /**
  * The order-taking part of Customer Handling. A shopkeeper can take an order here with the form, or by voice
- * ("Ramesh ka order lena hai"): while Saathi is taking one, it shows up in the blue box. Saving an order does not
+ * ("Ramesh ka order lena hai"): while Munim Ji is taking one, it shows up in the blue box. Saving an order does not
  * change stock; stock goes down when the goods are sold.
  */
 export default function OrdersSection({ customers, preselect }) {
@@ -31,7 +31,7 @@ export default function OrdersSection({ customers, preselect }) {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState(null) // { ok, text }
 
-  // Saathi worked out who the customer is: select them here too
+  // Munim Ji worked out who the customer is: select them here too
   useEffect(() => { if (preselect) setCustomerId(preselect) }, [preselect])
 
   const products = stock.data?.items || []
@@ -60,7 +60,7 @@ export default function OrdersSection({ customers, preselect }) {
       <div className="min-w-0 space-y-4">
         {draft && (
           <Card className="border-[#cfe0f7] !bg-[#eef4fd] p-4">
-            <div className="flex items-center gap-2 text-[14px] font-bold text-[#1f5fbf]"><Mic size={16} /> Saathi is taking an order</div>
+            <div className="flex items-center gap-2 text-[14px] font-bold text-[#1f5fbf]"><Mic size={16} /> Munim Ji is taking an order</div>
             <div className="mt-1 text-[14px]">{draft.customerName ? `For ${draft.customerName}` : 'Customer not chosen yet'}</div>
             {draft.lines.length > 0 ? (
               <ul className="mt-1 list-disc pl-5 text-[14px]">{draft.lines.map((l, i) => <li key={i}>{l}</li>)}</ul>

@@ -58,7 +58,7 @@ public class AssistantService {
     /** One thing that can be done once confirmed. label is the text on the confirm button; lines is only used by an ORDER. */
     public record Action(String type, String productId, String customerId, Double quantity, Long amountPaise, String label, List<Want> lines) {}
 
-    /** What is being typed into an order, for the Orders screen to show while Saathi takes it. */
+    /** What is being typed into an order, for the Orders screen to show while Munim Ji takes it. */
     public record Draft(String customerName, List<String> lines) {}
 
     /**
@@ -426,7 +426,7 @@ public class AssistantService {
         return Outcome.say(message).open(customerPage(c)).then(new Context("BALANCE", null, null, c.customerId(), null, List.of(), List.of()));
     }
 
-    /** The shopkeeper picked one of the customers Saathi listed. Null when the sentence is something else. */
+    /** The shopkeeper picked one of the customers Munim Ji listed. Null when the sentence is something else. */
     private Outcome chosen(String text, Context ctx, List<Balance> people, Parsed p) {
         if (p.intent() != Intent.UNKNOWN && p.intent() != Intent.BALANCE) return null;
         Balance picked = parser.pick(text, withIds(people, ctx.choices()));

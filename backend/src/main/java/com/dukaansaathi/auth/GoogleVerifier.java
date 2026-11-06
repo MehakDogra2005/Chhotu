@@ -38,7 +38,7 @@ public class GoogleVerifier {
             Map<?, ?> token = http.get().uri("https://oauth2.googleapis.com/tokeninfo?access_token={t}", accessToken)
                     .retrieve().body(Map.class);
             if (token == null || !clientId.equals(token.get("aud"))) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "This Google login was not meant for Dukaan Saathi");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "This Google login was not meant for Galla");
             }
             // 2. Who is it?
             Map<?, ?> user = http.get().uri("https://www.googleapis.com/oauth2/v3/userinfo")

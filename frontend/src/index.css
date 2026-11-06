@@ -23,7 +23,7 @@
 
 body { background: var(--color-cream); color: var(--color-navy); }
 
-/* Saathi's waveform: a few bars that rise and fall. Slow while Saathi speaks, quicker while it listens. */
+/* Munim Ji's waveform: a few bars that rise and fall. Slow while Munim Ji speaks, quicker while it listens. */
 @keyframes saathi-wave {
   0%, 100% { transform: scaleY(0.25); }
   50% { transform: scaleY(1); }
