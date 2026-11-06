@@ -1,0 +1,10 @@
+# Keep secrets and local junk out of the image
+backend/config/local.properties
+backend/data
+backend/target
+backend/src/main/resources/static
+frontend/node_modules
+frontend/dist
+.git
+.gitignore
+*.log

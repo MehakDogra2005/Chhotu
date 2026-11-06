@@ -20,6 +20,20 @@ npm run dev                  # the page: http://localhost:5173
 
 The first start creates `backend/data/` and loads the sample CSVs from `db/` into it. Delete that folder to start fresh.
 
+## Putting it online (Render, or any host that runs Docker)
+
+The `Dockerfile` builds the website and the Java server into one image. On Render choose **Docker** as the language (not Node: there is no `package.json` at the top of this repo), leave the build and start commands empty, and add your settings as environment variables:
+
+| Name | Value |
+|---|---|
+| `GNANI_API_KEY` | your Gnani key (the `vach_...` string) |
+| `DEMO_EMAIL` | the email that opens the demo shop |
+| `SPRING_MAIL_HOST`, `SPRING_MAIL_PORT`, `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD`, `SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH`, `SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE`, `DUKAAN_MAIL_FROM` | to email login codes (see `backend/config/local.properties.example`) |
+| `DUKAAN_FIXED_CODE` | only for a throwaway test: every login code becomes this, so anyone can log in |
+| `GOOGLE_CLIENT_ID` | only for "Continue with Google" |
+
+Render sets `PORT` itself and the image uses it. `backend/config/local.properties` is never copied into the image (see `.dockerignore`), so the secrets exist only as environment variables. The database lives in `/app/backend/data`; it is erased on every deploy unless you attach a Render Disk mounted at that path. The sample data's "today" is pinned to 18 Oct 2026 (`dukaan.today` in `application.properties`); delete that line for the real date.
+
 ## The voice assistant (Munim Ji)
 
 Tap the mic in the top bar (or any other mic) and Munim Ji opens as a small panel in the corner. **It greets you by name first** ("Haan Rajesh ji! Boliye, aaj main aapke liye kya kar sakta hoon?"), then explains in one breath that it can help with Inventory, Business Advisor and Customer Handling (three small cards on the screen show the same), and **only after it has finished speaking does it open the microphone** and show "Ji, boliye, main sun raha hoon...". After each answer it listens again, so you can just keep talking; after two silent rounds it pauses and waits for a tap. The panel has Pause, Stop, Skip (cut Munim Ji short and talk), Minimise and End buttons and a box to type instead, and it stays open while Munim Ji moves you between pages. If spoken replies are switched off in Settings, Munim Ji shows the greeting without speaking it. **The microphone listens only while that panel is listening**: tap the mic to start, tap it again (or just stop talking, or close the window) to stop. It is never on by itself. **Keep listening** (the switch in the Munim Ji window) is the only way it stays on: a bar at the bottom shows "Listening, always on" with a Stop button, it stays on while you move between pages, and it is off again after you press Stop. The choice is remembered on that browser only. Say it or type it. Listening and Munim Ji's spoken replies use **Gnani speech** when a key is set (see "Voice: Gnani speech" below), and otherwise the browser's own speech (Chrome and Android Chrome). It answers questions and, for changes, shows what it will do and waits for your Yes.
