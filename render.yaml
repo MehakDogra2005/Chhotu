@@ -1,0 +1,18 @@
+# Render "Blueprint": New + > Blueprint, pick this repo, and Render creates the service with these settings.
+# The secrets are not here: Render asks for them when the service is created (sync: false), and they stay in Render.
+services:
+  - type: web
+    name: galla
+    runtime: docker            # the Dockerfile builds the website and the Java server into one image
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: singapore          # the closest Render region to India
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: GNANI_API_KEY     # speech to text and text to speech
+        sync: false
+      - key: GEMINI_API_KEY    # understands other languages and answers questions about the shop
+        sync: false
+      - key: DEMO_EMAIL        # the email that opens the demo shop
+        sync: false

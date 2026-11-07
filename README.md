@@ -27,6 +27,7 @@ The `Dockerfile` builds the website and the Java server into one image. On Rende
 | Name | Value |
 |---|---|
 | `GNANI_API_KEY` | your Gnani key (the `vach_...` string) |
+| `GEMINI_API_KEY` | your Gemini key (understands other languages and answers questions about the shop) |
 | `DEMO_EMAIL` | the email that opens the demo shop |
 | `SPRING_MAIL_HOST`, `SPRING_MAIL_PORT`, `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD`, `SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH`, `SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE`, `DUKAAN_MAIL_FROM` | to email login codes (see `backend/config/local.properties.example`) |
 | `DUKAAN_FIXED_CODE` | only for a throwaway test: every login code becomes this, so anyone can log in |
