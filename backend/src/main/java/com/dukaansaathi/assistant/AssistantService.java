@@ -41,6 +41,8 @@ import com.dukaansaathi.dashboard.DashboardRepository;
 import com.dukaansaathi.dashboard.DashboardRepository.SalesTotals;
 import com.dukaansaathi.inventory.InventoryRepository;
 import com.dukaansaathi.inventory.InventoryRepository.ProductStock;
+import com.dukaansaathi.inventory.ProductForm;
+import com.dukaansaathi.inventory.ProductService;
 import com.dukaansaathi.inventory.InventoryService;
 import com.dukaansaathi.inventory.StockItem;
 import com.dukaansaathi.orders.OrderService;
@@ -56,7 +58,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class AssistantService {
     /** One thing that can be done once confirmed. label is the text on the confirm button; lines is only used by an ORDER. */
-    public record Action(String type, String productId, String customerId, Double quantity, Long amountPaise, String label, List<Want> lines) {}
+    public record Action(String type, String productId, String customerId, Double quantity, Long amountPaise, String label, List<Want> lines,
+                         String name, String unit) {
+        /** name and unit are only used by NEW_ITEM (a product the shop does not have yet). */
+        public Action(String type, String productId, String customerId, Double quantity, Long amountPaise, String label, List<Want> lines) {
+            this(type, productId, customerId, quantity, amountPaise, label, lines, null, null);
+        }
+    }
 
     /** What is being typed into an order, for the Orders screen to show while Munim Ji takes it. */
     public record Draft(String customerName, List<String> lines) {}
@@ -120,10 +128,13 @@ public class AssistantService {
     private final ObjectMapper json;
     private final GeminiClient gemini;
     private final ShopSummary summary;
+    private final ProductService productService;
+    /** A voice-made item starts with this reorder level; the owner can change it (and the prices) in Inventory. */
+    private static final double NEW_ITEM_REORDER = 5;
 
     public AssistantService(AssistantRepository repo, CommandParser parser, InventoryRepository inventory,
                             InventoryService inventoryService, CustomerRepository customers, CustomerService customerService,
-                            DashboardRepository dashboard, AdvisorRepository advisor, OrderService orders, AppClock clock, ObjectMapper json, GeminiClient gemini, ShopSummary summary) {
+                            DashboardRepository dashboard, AdvisorRepository advisor, OrderService orders, AppClock clock, ObjectMapper json, GeminiClient gemini, ShopSummary summary, ProductService productService) {
         this.repo = repo;
         this.parser = parser;
         this.inventory = inventory;
@@ -137,6 +148,7 @@ public class AssistantService {
         this.json = json;
         this.gemini = gemini;
         this.summary = summary;
+        this.productService = productService;
     }
 
     // ------------------------------------------------------------------ understanding
@@ -212,7 +224,7 @@ public class AssistantService {
                 case CREDIT -> credit(p);
                 case LOW_STOCK -> lowStock(shop);
                 case RESTOCK_LIST -> restockList(shop);
-                case INSIGHTS -> insights(shop);
+                case INSIGHTS -> insights(shop, asked, answerIn);
                 case TOP_SELLER -> topSeller(shop, p);
                 case BEST_MARGIN -> bestMargin(shop, p);
                 case REMINDERS -> reminders(shop);
@@ -221,7 +233,7 @@ public class AssistantService {
                 case ORDER_START -> takeOrder(shop, p, text, Context.empty(), products, aliases, people, true);
                 case NAVIGATE -> p.page().path().equals("/inventory") ? inventoryCheck()
                         : Outcome.say("Ji, " + p.page().name() + " khol raha hoon.").open(p.page().path());
-                case UNKNOWN -> Outcome.say(freeAnswer(shop, text, asked, answerIn));
+                case UNKNOWN -> unknown(shop, text, asked, answerIn, p);
             };
         }
 
@@ -241,6 +253,18 @@ public class AssistantService {
     }
 
     /** A sentence nothing matched. If it was clearly about a customer or a product, say that one was not found. */
+    /**
+     * Nothing matched. If it sounds like stock has come in for a product the shop does not have, propose creating it as a new item
+     * (the person confirms first); otherwise answer from the shop's data.
+     */
+    private Outcome unknown(String shop, String text, String asked, String language, Parsed p) {
+        CommandParser.NewItem item = p.products().isEmpty() ? parser.newItem(asked) : null;
+        if (item == null) return Outcome.say(freeAnswer(shop, text, asked, language));
+        String label = "Create new item " + item.name() + " with " + fmt(item.quantity()) + " " + item.unit() + " in stock";
+        return new Outcome(item.name() + " is not in your inventory yet. Create it as a new item?",
+                List.of(new Action("NEW_ITEM", null, null, item.quantity(), null, label, null, item.name(), item.unit())));
+    }
+
     /**
      * None of the ready-made answers fit: give Gemini the shop's numbers (ShopSummary) and the question, and use what it says. If Gemini is
      * not set up or does not answer, say the usual "I did not understand" help. For another language the answer is English here and is
@@ -298,6 +322,12 @@ public class AssistantService {
                 ProductStock now = inventoryService.addStock(who, a.productId(), a.quantity(), utteranceId);
                 yield new Done("Ho gaya ji. " + now.name() + " mein " + fmt(a.quantity()) + " " + now.unit() + " add kar diye. Ab stock " + fmt(now.stock()) + " hai.",
                         "/inventory?search=" + enc(now.name()), new Context("STOCK_ADD", null, now.productId(), null, null, List.of(), List.of()));
+            }
+            case "NEW_ITEM" -> {
+                String id = productService.create(who, new ProductForm(a.name(), "General", a.unit(), 0, 0, NEW_ITEM_REORDER, a.quantity()), "VOICE");
+                yield new Done("Ho gaya ji. Naya item " + a.name() + " add kar diya, " + fmt(a.quantity()) + " " + a.unit() + " stock ke saath. "
+                        + "Iska price abhi ₹0 hai: Inventory mein jaakar daal dijiye.", "/inventory?search=" + enc(a.name()),
+                        new Context("STOCK_ADD", null, id, null, null, List.of(), List.of()));
             }
             case "PAYMENT" -> {
                 Balance now = customerService.recordPayment(who, a.customerId(), a.amountPaise(), "VOICE");
@@ -516,6 +546,21 @@ public class AssistantService {
         return Outcome.say("Restocking list (enough to reach twice the reorder level):\n" + list).open("/inventory?restock=1");
     }
 
+    /**
+     * Business insights: Gemini reads the shop's numbers (ShopSummary) and writes a short paragraph about what the person asked. If Gemini
+     * is not set up or does not answer, the fixed bullet points below are used. For another language the paragraph is English here and
+     * is translated for the person afterwards.
+     */
+    private Outcome insights(String shop, String asked, String language) {
+        if (gemini.configured()) {
+            String paragraph = gemini.answer("The shop owner said: \"" + asked + "\". Give business insights from the data: how sales and profit are going "
+                    + "compared with the 30 days before, what sells best, anything that needs attention (low stock, udhaar, expenses, supplier dues) and "
+                    + "one or two things to do next. If they asked about something specific, focus on that.", summary.build(shop), "Hinglish".equalsIgnoreCase(language));
+            if (paragraph != null) return Outcome.say(paragraph).open("/advisor?period=month");
+        }
+        return insights(shop);
+    }
+
     private Outcome insights(String shop) {
         LocalDate to = clock.today();
         LocalDate from = to.minusDays(29);
@@ -638,13 +683,23 @@ public class AssistantService {
         return new Outcome(actions.size() == 1 ? "Add this stock?" : "Which product did you mean?", actions);
     }
 
+    /** Paying within a rupee of what is owed settles the whole balance, so nobody is left on the udhaar list owing a few paise. */
+    private static final long SETTLE_WITHIN = 100;
+
+    private static long settled(long said, long owed) {
+        return Math.abs(owed - said) < SETTLE_WITHIN ? owed : said;
+    }
+
     private Outcome payment(Parsed p) {
         if (p.amountPaise() == null || p.amountPaise() <= 0) return Outcome.say("How much? For example: \"Ramesh ne 500 de diye\".");
         List<Balance> owing = p.people().stream().filter((c) -> c.balancePaise() > 0).toList();
         if (owing.isEmpty()) return Outcome.say(p.people().get(0).name() + " does not owe anything, so there is no payment to record.");
-        List<Action> actions = owing.stream().limit(MAX_OPTIONS).filter((c) -> p.amountPaise() <= c.balancePaise()).map((c) -> new Action("PAYMENT", null, c.customerId(), null, p.amountPaise(),
-                "Record " + CustomerService.rupees(p.amountPaise()) + " from " + c.name() + " (" + c.phone() + "): pending "
-                        + CustomerService.rupees(c.balancePaise()) + " → " + CustomerService.rupees(c.balancePaise() - p.amountPaise()), null)).toList();
+        List<Action> actions = owing.stream().limit(MAX_OPTIONS).filter((c) -> p.amountPaise() <= c.balancePaise() + SETTLE_WITHIN).map((c) -> {
+            long paid = settled(p.amountPaise(), c.balancePaise());
+            return new Action("PAYMENT", null, c.customerId(), null, paid,
+                    "Record " + CustomerService.rupees(paid) + " from " + c.name() + " (" + c.phone() + "): pending "
+                            + CustomerService.rupees(c.balancePaise()) + " → " + CustomerService.rupees(c.balancePaise() - paid), null);
+        }).toList();
         if (actions.isEmpty()) {
             return Outcome.say(owing.get(0).name() + " owes only " + CustomerService.rupees(owing.get(0).balancePaise())
                     + ", which is less than " + CustomerService.rupees(p.amountPaise()) + ".");

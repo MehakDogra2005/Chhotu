@@ -40,6 +40,49 @@ public class CommandParser {
     public record Parsed(Intent intent, List<ProductStock> products, List<Balance> people, Double quantity, Long amountPaise,
                          String period, boolean periodGiven, Page page, boolean followUp) {}
 
+    /** A product the shop does not have yet, with how many came in. unit is one of the units the Add Item form offers. */
+    public record NewItem(String name, double quantity, String unit) {}
+
+    private static final Set<String> NEW_ITEM_TRIGGERS = Set.of("add", "ad", "naya", "nayi", "naye", "new", "aaya", "aaye", "aayi", "jod", "jodo", "jodna",
+            "mangwaya", "mangwa", "laya", "kharida", "kharidi", "badhao", "received", "arrived", "came", "daal", "daalo", "daalna");
+    private static final Set<String> NEW_ITEM_FILLER = Set.of("item", "items", "product", "products", "aa", "gaya", "gayi", "hai", "hain", "ka", "ki", "ke", "ko",
+            "karo", "kar", "kardo", "do", "dena", "de", "please", "stock", "maal", "samaan", "saman", "mein", "me", "in", "to", "the", "a", "an", "number",
+            "wala", "wali", "aur", "bhi", "has", "have", "is", "are", "come", "humare", "hamare", "apni", "dukaan", "shop", "ye", "yeh", "ek");
+    private static final Map<String, String> UNIT_WORDS = Map.ofEntries(Map.entry("piece", "piece"), Map.entry("pieces", "piece"), Map.entry("pcs", "piece"),
+            Map.entry("pack", "pack"), Map.entry("packs", "pack"), Map.entry("packet", "pack"), Map.entry("packets", "pack"), Map.entry("kg", "kg"),
+            Map.entry("kilo", "kg"), Map.entry("kilos", "kg"), Map.entry("litre", "litre"), Map.entry("liter", "litre"), Map.entry("litres", "litre"),
+            Map.entry("bottle", "bottle"), Map.entry("bottles", "bottle"), Map.entry("box", "box"), Map.entry("boxes", "box"), Map.entry("dozen", "dozen"));
+
+    /**
+     * Reads "Naya item aaya hai, 20 Parle G" or "20 Parle G add karo" when the name is not a product the shop has: the name is what is left
+     * after the number, the unit and the filler words. Null if the sentence is a question or has no number, no add-word or no name.
+     * The caller only asks this when no product of the shop was found in the sentence.
+     */
+    public NewItem newItem(String text) {
+        if (text == null || text.contains("?")) return null;
+        Double quantity = null;
+        String unit = "piece";
+        boolean trigger = false;
+        List<String> name = new ArrayList<>();
+        for (String raw : text.trim().split("\\s+")) {
+            String w = raw.replaceAll("^[^\\p{L}\\p{N}]+|[^\\p{L}\\p{N}]+$", "");
+            if (w.isEmpty()) continue;
+            String lower = w.toLowerCase();
+            if (NEW_ITEM_TRIGGERS.contains(lower)) trigger = true;
+            if (quantity == null && NUMBER.matcher(w).matches()) {
+                quantity = Double.valueOf(w);
+            } else if (UNIT_WORDS.containsKey(lower)) {
+                unit = UNIT_WORDS.get(lower);
+            } else if (!NEW_ITEM_TRIGGERS.contains(lower) && !NEW_ITEM_FILLER.contains(lower)) {
+                name.add(Character.toUpperCase(w.charAt(0)) + w.substring(1));
+            }
+        }
+        String joined = String.join(" ", name);
+        if (!trigger || quantity == null || quantity <= 0 || name.isEmpty() || name.size() > 4 || joined.length() > 60
+                || joined.chars().noneMatch(Character::isLetter)) return null;
+        return new NewItem(joined, quantity, unit);
+    }
+
     /** What an order sentence asked for: the products found, words that matched no product, and products that could be either of several. */
     public record Items(List<Want> found, List<String> missing, List<String> unclear) {}
 

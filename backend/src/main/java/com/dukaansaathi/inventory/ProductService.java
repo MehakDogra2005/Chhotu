@@ -35,10 +35,16 @@ public class ProductService {
 
     @Transactional
     public String create(ShopContext who, ProductForm form) {
+        return create(who, form, "UI");
+    }
+
+    /** source says where the request came from ("UI" or "VOICE"); it goes in the audit log. */
+    @Transactional
+    public String create(ShopContext who, ProductForm form, String source) {
         ProductForm f = checked(form, true);
         if (repo.nameTaken(who.shopId(), f.name(), "")) throw conflict("You already have a product called " + f.name());
         String id = repo.insertProduct(who.shopId(), f);
-        audit.record(who.shopId(), who.userId(), "product", id, "CREATE", null, describe(f), "UI");
+        audit.record(who.shopId(), who.userId(), "product", id, "CREATE", null, describe(f), source);
         return id;
     }
 

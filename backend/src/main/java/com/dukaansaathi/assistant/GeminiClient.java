@@ -37,7 +37,7 @@ public class GeminiClient {
             - stock of a product: "Chocolate ka stock kitna hai?"
             - sales, profit or expenses of a day or period: "Aaj ki sale batao", "is mahine profit batao", "kal ka kharcha batao", "is hafte ki kamai"
             - what a customer owes: "Rahul ka udhaar kitna hai?"
-            - add stock: "10 Chocolate add karo"
+            - add stock, or a new item has arrived: "10 Chocolate add karo", "Naya item aaya hai, 20 Parle G"
             - record a payment received: "Ramesh ne 500 de diye"
             - give credit (udhaar): "Ramesh ko 300 ka udhaar diya"
             - products running low or to reorder: "kaun sa samaan khatam hone wala hai?", "Restocking list bana do"
@@ -91,6 +91,7 @@ public class GeminiClient {
                 + "sentence translated into simple English. "
                 + "Answer as JSON: {\"language\":\"...\",\"fits\":true,\"command\":\"...\"}.\nSentence: " + text, true);
         if (reply == null) return null;
+        log.debug("Gemini understood: {}", reply);
         try {
             JsonNode node = json.readTree(reply);
             return new Understood(node.path("language").asText("").trim(), node.path("command").asText("").trim(), node.path("fits").asBoolean(true));
@@ -107,7 +108,7 @@ public class GeminiClient {
     public String answer(String question, String data, boolean hinglish) {
         String reply = ask("You are Munim Ji, a friendly assistant for a small shop owner in India. Answer the question using ONLY the shop data below. "
                 + "The question may be in any language, but always write your answer in " + (hinglish ? "Hinglish (Hindi in English letters)" : "simple English")
-                + ". Keep it short: one to three sentences, plain words, and name at most three people or products. Use the rupee sign for money. Do the arithmetic carefully. If the data does not contain the answer, say so politely and do not guess. "
+                + ". Keep it short: about three sentences (up to five if they ask for a summary, insights or advice), plain words, and name at most three people or products. Use the rupee sign for money. Do the arithmetic carefully. If the data does not contain the answer, say so politely and do not guess. "
                 + "You cannot change anything in the shop from here: if the question asks to add, change or delete something, say that you can only "
                 + "answer questions for that wording and suggest a short command like \"10 Chocolate add karo\" or \"Ramesh ne 500 de diye\".\n\n"
                 + "SHOP DATA:\n" + data + "\nQUESTION: " + question, false);

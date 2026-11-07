@@ -52,6 +52,7 @@ public class ShopSummary {
         out.append(sales("Yesterday", dashboard.salesTotals(shop, today.minusDays(1), today.minusDays(1))));
         out.append(sales("Last 7 days", dashboard.salesTotals(shop, today.minusDays(6), today)));
         out.append(sales("Last 30 days", dashboard.salesTotals(shop, month, today)));
+        out.append(sales("The 30 days before that", dashboard.salesTotals(shop, month.minusDays(30), month.minusDays(1))));
 
         List<ProductSales> sold = advisor.productSales(shop, month, today);
         out.append("\nBEST SELLING PRODUCTS, last 30 days (quantity, sales, profit):\n");
