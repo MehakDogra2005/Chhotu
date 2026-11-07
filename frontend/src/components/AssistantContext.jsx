@@ -4,7 +4,7 @@ import { post } from '../api'
 import { useAuth } from '../AuthContext'
 import { refreshData } from '../useFetch'
 import AssistantDialog from './AssistantDialog'
-import { loadVoiceEngine, speak, stopSpeaking, useKeepListening } from './speech'
+import { getVoiceLanguage, loadVoiceEngine, speak, stopSpeaking, useKeepListening } from './speech'
 import { Mic, Square } from 'lucide-react'
 
 const AssistantContext = createContext(null)
@@ -74,16 +74,16 @@ export function AssistantProvider({ speakReplies, userName, children }) {
     working.current = true
     setBusy(true)
     try {
-      const r = await post('/api/assistant/interpret', { text: words, via: engine === 'gnani' ? 'gnani' : 'voice' }, token)
+      const r = await post('/api/assistant/interpret', { text: words, via: engine === 'gnani' ? 'gnani' : 'voice', language: getVoiceLanguage() || undefined }, token)
       if (!keepRef.current) return // Stop was pressed while this was being answered: do not act on it
       if (r.navigate) navigate(r.navigate)
       if (r.options?.length) {
         setLast({ heard: words, reply: 'Please confirm in Munim Ji.' })
         ask({ reply: { ...r, heard: words } })
-        if (speakReplies) await speak(r.message)
+        if (speakReplies) await speak(r.message, r.language)
       } else {
         setLast({ heard: words, reply: r.message })
-        if (speakReplies) await speak(r.message)
+        if (speakReplies) await speak(r.message, r.language)
       }
       refreshData()
     } catch (err) {

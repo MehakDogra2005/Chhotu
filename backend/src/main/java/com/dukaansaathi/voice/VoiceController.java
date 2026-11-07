@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.dukaansaathi.assistant.GeminiClient;
 import com.dukaansaathi.auth.AuthService;
 import com.dukaansaathi.auth.ShopContext;
 
@@ -25,7 +26,8 @@ import com.dukaansaathi.auth.ShopContext;
 @RestController
 @RequestMapping("/api/voice")
 public class VoiceController {
-    record SpeakRequest(String text) {}
+    record SpeakRequest(String text, String language) {}
+    record TranslateRequest(String text, String language) {}
     record VoiceRequest(String voice) {}
 
     private static final int MAX_AUDIO_BYTES = 4 * 1024 * 1024;  // 60 seconds of 16 kHz speech is about 2 MB
@@ -38,8 +40,10 @@ public class VoiceController {
     private final UsageLimit limit;
     private final VoiceVocabulary vocabulary;
     private final VoiceService voices;
+    private final GeminiClient gemini;
 
-    public VoiceController(AuthService auth, GnaniClient gnani, UsageLimit limit, VoiceVocabulary vocabulary, VoiceService voices) {
+    public VoiceController(AuthService auth, GnaniClient gnani, UsageLimit limit, VoiceVocabulary vocabulary, VoiceService voices, GeminiClient gemini) {
+        this.gemini = gemini;
         this.auth = auth;
         this.gnani = gnani;
         this.limit = limit;
@@ -57,16 +61,28 @@ public class VoiceController {
     /** The audio (a WAV file of one sentence) as text. An empty text means nothing was heard. */
     @PostMapping(value = "/transcribe", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Map<String, String> transcribe(@RequestHeader(value = "Authorization", defaultValue = "") String authHeader,
-                                          @RequestParam("audio") MultipartFile audio) {
+                                          @RequestParam("audio") MultipartFile audio,
+                                          @RequestParam(value = "language", required = false) String language) {
         ShopContext who = auth.requireShop(authHeader);
         if (audio.isEmpty()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No audio was received");
         if (audio.getSize() > MAX_AUDIO_BYTES) throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "That recording is too long. Keep it under a minute");
         limit.check(who.shopId(), "listen", LISTENS_PER_MINUTE);
         try {
-            return Map.of("text", gnani.transcribe(audio.getBytes(), "speech.wav", vocabulary.forShop(who.shopId())));
+            return Map.of("text", gnani.transcribe(audio.getBytes(), "speech.wav", vocabulary.forShop(who.shopId()), language));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    /** One of Munim Ji's fixed lines (greeting, "I did not hear", ...) in the person's language. Without Gemini the text comes back unchanged. */
+    @PostMapping("/translate")
+    public Map<String, String> translate(@RequestHeader(value = "Authorization", defaultValue = "") String authHeader, @RequestBody TranslateRequest body) {
+        ShopContext who = auth.requireShop(authHeader);
+        String name = GeminiClient.name(body.language());
+        if (body.text() == null || body.text().isBlank() || body.text().length() > MAX_TEXT || name == null) return Map.of("text", body.text() == null ? "" : body.text());
+        limit.check(who.shopId(), "translate", SPEAKS_PER_MINUTE);
+        String text = gemini.translate(body.text(), name);
+        return Map.of("text", text == null ? body.text() : text);
     }
 
     /** The reply read aloud, as a WAV file. */
@@ -77,7 +93,8 @@ public class VoiceController {
         if (body.text() == null || body.text().isBlank()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nothing to say");
         if (body.text().length() > MAX_TEXT) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "That is too long to read out");
         limit.check(who.shopId(), "speak", SPEAKS_PER_MINUTE);
-        byte[] audio = voices.speak(who, body.text());
+        String language = body.language() != null && body.language().matches("[a-z]{2}-[A-Z]{2}") ? body.language() : null;
+        byte[] audio = voices.speak(who, body.text(), language);
         return ResponseEntity.ok().contentType(MediaType.parseMediaType("audio/wav")).header("X-Voice", voices.selected(who)).body(audio);
     }
 

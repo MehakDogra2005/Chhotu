@@ -65,7 +65,7 @@ public class AssistantService {
      * What the browser receives. options is empty for a plain answer; otherwise each option is one action to confirm.
      * navigate is the address of the page to open, or null. context goes back with the next sentence (see Context).
      */
-    public record Reply(String utteranceId, String message, List<String> options, String navigate, Context context, Draft draft) {}
+    public record Reply(String utteranceId, String message, List<String> options, String navigate, Context context, Draft draft, String language) {}
 
     public record Done(String message, String navigate, Context context) {}
 
@@ -118,10 +118,12 @@ public class AssistantService {
     private final OrderService orders;
     private final AppClock clock;
     private final ObjectMapper json;
+    private final GeminiClient gemini;
+    private final ShopSummary summary;
 
     public AssistantService(AssistantRepository repo, CommandParser parser, InventoryRepository inventory,
                             InventoryService inventoryService, CustomerRepository customers, CustomerService customerService,
-                            DashboardRepository dashboard, AdvisorRepository advisor, OrderService orders, AppClock clock, ObjectMapper json) {
+                            DashboardRepository dashboard, AdvisorRepository advisor, OrderService orders, AppClock clock, ObjectMapper json, GeminiClient gemini, ShopSummary summary) {
         this.repo = repo;
         this.parser = parser;
         this.inventory = inventory;
@@ -133,6 +135,8 @@ public class AssistantService {
         this.orders = orders;
         this.clock = clock;
         this.json = json;
+        this.gemini = gemini;
+        this.summary = summary;
     }
 
     // ------------------------------------------------------------------ understanding
@@ -142,7 +146,8 @@ public class AssistantService {
      * sent is the context of the previous reply (null for the first sentence), which lets short follow-ups be understood.
      */
     @Transactional
-    public Reply interpret(ShopContext who, String text, String via, Context sent) {
+    public Reply interpret(ShopContext who, String original, String via, Context sent, String chosenLanguage) {
+        String text = original;
         if (text == null || text.isBlank()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Say or type something first");
         if (text.length() > MAX_TEXT) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "That is too long. Please keep it short");
 
@@ -153,11 +158,37 @@ public class AssistantService {
         List<Balance> people = customers.all(shop);
         Parsed p = parser.parse(text, products, aliases, people, ctx);
 
+        // Another language, or a sentence the keywords do not know. 1) the table of sentences already learned, 2) Gemini maps it to one of
+        // the known requests (and the table remembers it), 3) if it is none of them, a free-form answer from the shop's data (see freeAnswer).
+        String chosen = GeminiClient.name(chosenLanguage); // the language the person picked (null for Auto, Hindi/English): it beats what Gemini guesses
+        String language = chosen;
+        String question = text;
+        boolean nativeScript = text.chars().anyMatch(c -> c > 127 && Character.isLetter(c));
+        if (nativeScript || (p.intent() == Intent.UNKNOWN && !ctx.ordering() && ctx.choices().isEmpty())) {
+            AssistantRepository.Learned known = repo.learned(original);
+            GeminiClient.Understood u = known != null ? new GeminiClient.Understood(known.language(), known.command(), true)
+                    : gemini.configured() ? gemini.understand(original) : null;
+            if (u != null && !u.command().isBlank()) {
+                if (chosen == null) language = u.language();
+                question = u.command();
+                if (u.fits()) {
+                    Parsed again = parser.parse(u.command(), products, aliases, people, ctx);
+                    if (again.intent() != Intent.UNKNOWN) {
+                        p = again;
+                        text = u.command();
+                        if (known == null) repo.learn(original, u.command(), u.language());
+                    }
+                }
+            }
+        }
+        final String asked = question;
+        final String answerIn = language;
+
         // "Aur kal?" asks the same thing again for another day; "aur profit?" asks another thing for the same day
         Intent before = intentOf(ctx.intent());
         if (p.intent() == Intent.UNKNOWN && p.periodGiven() && before != null && PERIODIC.contains(before)) {
             p = new Parsed(before, p.products(), p.people(), p.quantity(), p.amountPaise(), p.period(), true, p.page(), true);
-        } else if (PERIODIC.contains(p.intent()) && !p.periodGiven() && p.followUp() && PERIODS.contains(ctx.period())) {
+        } else if (PERIODIC.contains(p.intent()) && !p.periodGiven() && p.followUp() && ctx.period() != null && PERIODS.contains(ctx.period())) {
             p = new Parsed(p.intent(), p.products(), p.people(), p.quantity(), p.amountPaise(), ctx.period(), false, p.page(), true);
         }
 
@@ -190,20 +221,37 @@ public class AssistantService {
                 case ORDER_START -> takeOrder(shop, p, text, Context.empty(), products, aliases, people, true);
                 case NAVIGATE -> p.page().path().equals("/inventory") ? inventoryCheck()
                         : Outcome.say("Ji, " + p.page().name() + " khol raha hoon.").open(p.page().path());
-                case UNKNOWN -> Outcome.say(notUnderstood(text));
+                case UNKNOWN -> Outcome.say(freeAnswer(shop, text, asked, answerIn));
             };
         }
 
         Context next = outcome.context() != null ? outcome.context() : carry(ctx, p);
         boolean needsConfirm = !outcome.actions().isEmpty();
-        String id = repo.save(shop, text.trim(), HINGLISH.matcher(text.toLowerCase()).find() ? "hinglish" : "en",
+        String id = repo.save(shop, original.trim(), HINGLISH.matcher(text.toLowerCase()).find() ? "hinglish" : "en",
                 "gnani".equals(via) ? "Gnani Prisma" : "voice".equals(via) ? "Browser" : "Typed", stored(p.intent().name(), outcome.actions()),
                 p.products().size() == 1 ? p.products().get(0).productId() : null,
                 p.products().isEmpty() ? "INTENT_ONLY" : "CATALOGUE_MATCH", needsConfirm ? "PENDING" : "NOT_REQUIRED", clock.today().atTime(LocalTime.now()));
-        return new Reply(id, outcome.message(), outcome.actions().stream().map(Action::label).toList(), outcome.navigate(), next, outcome.draft());
+        String message = outcome.message();
+        boolean plain = language == null || language.equalsIgnoreCase("English") || language.equalsIgnoreCase("Hinglish");
+        if (!plain) {
+            String translated = gemini.translate(message, language);
+            if (translated != null) message = translated;
+        }
+        return new Reply(id, message, outcome.actions().stream().map(Action::label).toList(), outcome.navigate(), next, outcome.draft(), plain ? null : GeminiClient.code(language));
     }
 
     /** A sentence nothing matched. If it was clearly about a customer or a product, say that one was not found. */
+    /**
+     * None of the ready-made answers fit: give Gemini the shop's numbers (ShopSummary) and the question, and use what it says. If Gemini is
+     * not set up or does not answer, say the usual "I did not understand" help. For another language the answer is English here and is
+     * translated for the person afterwards.
+     */
+    private String freeAnswer(String shop, String text, String question, String language) {
+        if (!gemini.configured()) return notUnderstood(text);
+        String answer = gemini.answer(question, summary.build(shop), "Hinglish".equalsIgnoreCase(language));
+        return answer != null ? answer : notUnderstood(text);
+    }
+
     private String notUnderstood(String text) {
         if (parser.said(text, "udhaar", "udhar", "baaki", "balance", "hisaab", "hisab")) {
             return "Mujhe is naam ka koi customer nahi mila. Customer ka naam ek baar phir bataiye, ya Customer Handling mein dekh lijiye.";

@@ -16,6 +16,9 @@ public class AssistantRepository {
 
     public record HistoryItem(String text, LocalDate date, String status) {}
 
+    /** A sentence Gemini has already worked out: the command it means, and the language it was said in. */
+    public record Learned(String command, String language) {}
+
     private final JdbcTemplate jdbc;
 
     public AssistantRepository(JdbcTemplate jdbc) {
@@ -25,6 +28,26 @@ public class AssistantRepository {
     public List<Alias> aliases(String shopId) {
         return jdbc.query("SELECT product_id, alias_text FROM product_aliases WHERE shop_id = ?",
                 (rs, i) -> new Alias(rs.getString("product_id"), rs.getString("alias_text")), shopId);
+    }
+
+    /** The same sentence in a plain form, so small differences (capitals, commas, spaces) still find what was learned. */
+    static String normal(String text) {
+        return text.toLowerCase().replaceAll("[^\\p{L}\\p{M}\\p{N}\\s]", " ").replaceAll("\\s+", " ").trim();
+    }
+
+    public Learned learned(String text) {
+        return jdbc.query("SELECT command, language FROM learned_phrases WHERE phrase = ?", (rs, i) -> new Learned(rs.getString(1), rs.getString(2)), normal(text))
+                .stream().findFirst().orElse(null);
+    }
+
+    public void learn(String text, String command, String language) {
+        String phrase = normal(text);
+        if (phrase.isEmpty() || phrase.length() > 300 || command.length() > 300) return;
+        try {
+            jdbc.update("INSERT INTO learned_phrases (phrase, command, language) VALUES (?, ?, ?)", phrase, command, language);
+        } catch (org.springframework.dao.DuplicateKeyException e) {
+            // two people said the same thing at once: it is already learned
+        }
     }
 
     /** status is NOT_REQUIRED (just an answer) or PENDING (waiting for the shopkeeper to confirm a change). */

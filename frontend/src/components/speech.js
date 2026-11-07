@@ -24,10 +24,36 @@ const MIC_PROBLEMS = {
   'no-speech': NOT_HEARD,
 }
 
+/** The languages the person can pick. '' is Auto (Gnani works it out); Hindi/English uses the fast English-and-Hinglish listening. */
+export const VOICE_LANGUAGES = [
+  { code: '', label: 'Auto' },
+  { code: 'en-IN', label: 'Hindi / English' },
+  { code: 'pa-IN', label: 'ਪੰਜਾਬੀ' },
+  { code: 'ta-IN', label: 'தமிழ்' },
+  { code: 'te-IN', label: 'తెలుగు' },
+  { code: 'kn-IN', label: 'ಕನ್ನಡ' },
+  { code: 'ml-IN', label: 'മലയാളം' },
+  { code: 'mr-IN', label: 'मराठी' },
+  { code: 'bn-IN', label: 'বাংলা' },
+  { code: 'gu-IN', label: 'ગુજરાતી' },
+  { code: 'or-IN', label: 'ଓଡ଼ିଆ' },
+]
+const PICK_KEY = 'galla.voicelang'
+
+/** The language the person picked for speaking ('' for Auto). Remembered in this browser only. */
+export function getVoiceLanguage() {
+  try { return localStorage.getItem(PICK_KEY) || '' } catch { return '' }
+}
+
+export function setVoiceLanguage(code) {
+  try { if (code) localStorage.setItem(PICK_KEY, code); else localStorage.removeItem(PICK_KEY) } catch { /* private window: not remembered */ }
+}
+
 /** One recorded sentence as text. "" when the service heard nothing. */
 async function transcribe(blob) {
   const form = new FormData()
   form.append('audio', blob, 'speech.wav')
+  if (getVoiceLanguage()) form.append('language', getVoiceLanguage())
   const res = await fetch('/api/voice/transcribe', { method: 'POST', headers: { Authorization: `Bearer ${engine.token}` }, body: form })
     .catch(() => { throw new Error('Cannot reach Galla. Please check your internet connection.') })
   const data = await res.json().catch(() => ({}))
@@ -312,26 +338,26 @@ export function stopSpeaking() {
 
 const prefetched = new Map() // text -> audio being fetched ahead of time
 
-async function fetchAudio(text) {
+async function fetchAudio(text, language) {
   const res = await fetch('/api/voice/speak', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${engine.token}` },
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({ text, language }),
   })
   if (!res.ok) throw new Error('no voice')
   return res.blob()
 }
 
 /** Starts making the audio for text now, so a later speak(text) can begin at once (no pause between two sentences). */
-export function prefetchSpeech(text) {
+export function prefetchSpeech(text, language) {
   if (!engine.gnani || prefetched.has(text)) return
-  const audio = fetchAudio(text)
+  const audio = fetchAudio(text, language)
   audio.catch(() => prefetched.delete(text)) // speak() falls back to the browser voice
   prefetched.set(text, audio)
 }
 
 /** Reads text aloud. The promise comes back when Munim Ji has finished speaking. */
-export async function speak(text) {
+export async function speak(text, language) {
   stopSpeaking()
   const mine = speakingNow
   if (engine.gnani) {
@@ -339,7 +365,7 @@ export async function speak(text) {
       const ahead = prefetched.get(text)
       prefetched.delete(text)
       // If the audio made ahead of time failed (the service was busy), ask once more instead of falling silent
-      const url = URL.createObjectURL(await (ahead ? ahead.catch(() => fetchAudio(text)) : fetchAudio(text)))
+      const url = URL.createObjectURL(await (ahead ? ahead.catch(() => fetchAudio(text, language)) : fetchAudio(text, language)))
       if (mine !== speakingNow) return URL.revokeObjectURL(url) // something newer was said or Munim Ji was stopped
       await new Promise((done, fail) => {
         const audio = new Audio(url)
@@ -358,7 +384,7 @@ export async function speak(text) {
   return new Promise((done) => {
     if (!('speechSynthesis' in window)) return done()
     const voice = new SpeechSynthesisUtterance(text.replace(/[•\n]+/g, '. '))
-    voice.lang = 'en-IN'
+    voice.lang = language || 'en-IN'
     voice.onend = done
     voice.onerror = done
     window.speechSynthesis.speak(voice)

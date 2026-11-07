@@ -41,8 +41,8 @@ public class VoiceService {
     }
 
     /** A reply read aloud in the chosen voice. */
-    public byte[] speak(ShopContext who, String text) {
-        return gnani.speak(SpeechText.forSpeech(text), selected(who));
+    public byte[] speak(ShopContext who, String text, String language) {
+        return gnani.speak(SpeechText.forSpeech(text), selected(who), language);
     }
 
     /** The sample sentence in any catalogue voice (it does not change the saved choice). */
@@ -50,7 +50,7 @@ public class VoiceService {
         String voice = VoiceCatalog.find(name).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown voice"));
         byte[] cached = samples.get(voice);
         if (cached != null) return cached;
-        byte[] audio = gnani.speak(SpeechText.forSpeech(SAMPLE_TEXT), voice);
+        byte[] audio = gnani.speak(SpeechText.forSpeech(SAMPLE_TEXT), voice, null);
         samples.put(voice, audio);
         return audio;
     }

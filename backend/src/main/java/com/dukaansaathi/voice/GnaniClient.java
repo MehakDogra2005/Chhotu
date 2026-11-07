@@ -62,18 +62,33 @@ public class GnaniClient {
      * heard. boost is a list of single words (letters only, at most 100) the service should listen out for.
      */
     public String transcribe(byte[] audio, String fileName, List<String> boost) {
+        return transcribe(audio, fileName, boost, null);
+    }
+
+    /** Languages Gnani can listen for. "indic-auto" lets it work the language out itself. */
+    private static final java.util.Set<String> LISTEN = java.util.Set.of("as-IN", "bn-IN", "en-IN", "gu-IN", "hi-IN", "kn-IN", "ml-IN", "mr-IN", "pa-IN",
+            "ta-IN", "te-IN", "indic-auto");
+
+    /** language is what the person chose ("pa-IN"); null or a language Gnani cannot listen for (Odia) means the default. */
+    public String transcribe(byte[] audio, String fileName, List<String> boost, String language) {
         requireKey();
         MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
         form.add("audio_file", new NamedBytes(audio, fileName));
-        form.add("language_code", sttLanguage);
+        form.add("language_code", language != null && LISTEN.contains(language) ? language : sttLanguage);
         form.add("format", "transcribe");
         if (!boost.isEmpty()) {
             form.add("bias_list", boost.stream().map((w) -> "\"" + w + "\"").collect(java.util.stream.Collectors.joining(",", "[", "]")));
             form.add("bias_score", "1.0");
         }
         try {
-            JsonNode reply = http.post().uri("/stt/v3").header("X-API-Key-ID", apiKey)
-                    .contentType(MediaType.MULTIPART_FORM_DATA).body(form).retrieve().body(JsonNode.class);
+            JsonNode reply;
+            try {
+                reply = listen(form);
+            } catch (RestClientResponseException e) {
+                if (e.getStatusCode().value() < 500) throw e;
+                log.warn("Gnani speech-to-text answered {}: trying once more", e.getStatusCode().value()); // a passing hiccup on their side
+                reply = listen(form);
+            }
             return reply == null ? "" : reply.path("transcript").asText("").trim();
         } catch (RestClientResponseException e) {
             throw failed("speech-to-text", e);
@@ -82,18 +97,22 @@ public class GnaniClient {
         }
     }
 
+    private JsonNode listen(MultiValueMap<String, Object> form) {
+        return http.post().uri("/stt/v3").header("X-API-Key-ID", apiKey).contentType(MediaType.MULTIPART_FORM_DATA).body(form).retrieve().body(JsonNode.class);
+    }
+
     /**
      * The text spoken as a WAV file, in the given voice. voice must be one of VoiceCatalog's Timbre v3.0 names (Gnani rejects a
      * voice that belongs to another model). Pass the text through SpeechText.forSpeech first.
      */
-    public byte[] speak(String text, String voice) {
+    public byte[] speak(String text, String voice, String language) {
         requireKey();
         log.info("Gnani text-to-speech: model={} voice={}", VoiceCatalog.MODEL, voice);
         Map<String, Object> request = new LinkedHashMap<>();
         request.put("text", text);
         request.put("voice", voice);
         request.put("model", VoiceCatalog.MODEL);
-        request.put("language", ttsLanguage);
+        request.put("language", language == null ? ttsLanguage : language);
         request.put("speed", 1.0);
         request.put("audio_config", Map.of("sample_rate", 24000, "num_channels", 1, "sample_width", 2, "encoding", "linear_pcm", "container", "wav"));
         boolean turn = false;

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { post } from '../../api'
 import { useAuth } from '../../AuthContext'
 import { refreshData } from '../../useFetch'
-import { prefetchSpeech, speak, stopSpeaking, useListening } from '../speech'
+import { getVoiceLanguage, prefetchSpeech, speak, stopSpeaking, useListening } from '../speech'
 import { S, SPEAKING } from './voiceStates'
 
 const INTRO = 'Ji, aap mujhse apni dukaan ki inventory ke baare mein pooch sakte hain, aaj ya kal ki kamai ka hisaab jaan sakte hain, '
@@ -18,6 +18,16 @@ const words = (text) => text.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').spl
 const isYes = (text) => { const w = words(text); return w.length > 0 && w.length <= 4 && YES.has(w[0]) }
 const isNo = (text) => { const w = words(text); return w.length > 0 && w.length <= 3 && NO.has(w[0]) }
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms))
+
+const LANG_KEY = 'galla.language'
+function savedLanguage() {
+  const picked = getVoiceLanguage()
+  if (picked) return picked === 'en-IN' ? null : picked // the person chose a language: Munim Ji's own lines use it from the start
+  try { return localStorage.getItem(LANG_KEY) || null } catch { return null }
+}
+function saveLanguage(code) {
+  try { if (code) localStorage.setItem(LANG_KEY, code); else localStorage.removeItem(LANG_KEY) } catch { /* private window: just do not remember */ }
+}
 
 /** "Rajesh Sharma" -> "Rajesh". Nothing for a name that is not a name (a phone number, empty). */
 function firstName(full) {
@@ -58,6 +68,13 @@ export default function useVoiceConversation({ start, ready, speakReplies, userN
   const lastSent = useRef({ text: '', at: 0 })
   const lastText = useRef('')
   const quiet = useRef(0)
+  const lang = useRef(savedLanguage()) // the Gnani code of the language the person last used ("ta-IN"), or null for English/Hinglish
+
+  /** Munim Ji's own fixed lines, in the person's language (the server translates and remembers them). */
+  const localise = async (text) => {
+    if (!lang.current) return text
+    try { return (await post('/api/voice/translate', { text, language: lang.current }, token)).text || text } catch { return text }
+  }
 
   const setState = (next) => { stateRef.current = next; setStateRaw(next) }
   const add = (message) => setChat((c) => [...c, { id: nextId.current++, ...message }])
@@ -73,8 +90,8 @@ export default function useVoiceConversation({ start, ready, speakReplies, userN
   // ---- speaking and listening
 
   /** Says it, unless spoken replies are switched off in Settings. False when something newer has taken over meanwhile. */
-  const say = async (text, my) => {
-    if (speakReplies) await speak(text)
+  const say = async (text, my, language) => {
+    if (speakReplies) await speak(text, language)
     return run.current === my
   }
 
@@ -115,7 +132,7 @@ export default function useVoiceConversation({ start, ready, speakReplies, userN
       if (run.current !== my) return
     }
     setState(S.RESPONDING)
-    if (!(await say(reply.message, my))) return
+    if (!(await say(reply.message, my, reply.language))) return
     afterSpeaking()
   }
 
@@ -132,15 +149,17 @@ export default function useVoiceConversation({ start, ready, speakReplies, userN
   const greet = async () => {
     const my = ++run.current
     const name = firstName(userName)
-    const hello = `Haan${name ? ` ${name} ji` : ' ji'}! Boliye, aaj main aapke liye kya kar sakta hoon?`
+    const [hello, intro] = await Promise.all([
+      localise(`Haan${name ? ` ${name} ji` : ' ji'}! Boliye, aaj main aapke liye kya kar sakta hoon?`), localise(INTRO)])
+    if (run.current !== my) return
     setState(S.GREETING)
     add({ from: 'saathi', text: hello })
-    if (speakReplies) prefetchSpeech(INTRO) // ready by the time the greeting ends
-    if (!(await say(hello, my))) return
+    if (speakReplies) prefetchSpeech(intro, lang.current) // ready by the time the greeting ends
+    if (!(await say(hello, my, lang.current))) return
     setState(S.INTRODUCTION)
     setShowSuggestions(true)
-    add({ from: 'saathi', text: INTRO })
-    if (!(await say(INTRO, my))) return
+    add({ from: 'saathi', text: intro })
+    if (!(await say(intro, my, lang.current))) return
     listen() // only now, so the microphone never hears Munim Ji's own greeting
   }
 
@@ -173,7 +192,7 @@ export default function useVoiceConversation({ start, ready, speakReplies, userN
 
     let reply
     try {
-      reply = await post('/api/assistant/interpret', { text: sentence, via, context: context.current }, token)
+      reply = await post('/api/assistant/interpret', { text: sentence, via, context: context.current, language: getVoiceLanguage() || undefined }, token)
     } catch (err) {
       busy.current = false
       lastSent.current = { text: '', at: 0 } // so "Try again" is allowed
@@ -183,9 +202,12 @@ export default function useVoiceConversation({ start, ready, speakReplies, userN
     busy.current = false
 
     context.current = reply.context
+    lang.current = reply.language || null
+    saveLanguage(lang.current)
     onDraft?.(reply.draft || null)
+    const options = await Promise.all((reply.options || []).map(localise))
     if (reply.options?.length) pending.current = { utteranceId: reply.utteranceId, count: reply.options.length }
-    add({ from: 'saathi', text: reply.message, options: reply.options, utteranceId: reply.utteranceId })
+    add({ from: 'saathi', text: reply.message, options, utteranceId: reply.utteranceId })
     if (run.current !== my) return // paused or closed while it was thinking: show the answer, but do not speak or listen
     await respond(reply, my)
   }
@@ -201,20 +223,22 @@ export default function useVoiceConversation({ start, ready, speakReplies, userN
     return send(spoken, micRef.current.engine)
   }
 
-  function nothingHeard() {
+  async function nothingHeard() {
     const now = stateRef.current
     if (now !== S.LISTENING && now !== S.AWAITING_CONFIRMATION) return
     quiet.current += 1
     if (quiet.current >= MAX_QUIET_ROUNDS) {
       quiet.current = 0
-      add({ from: 'saathi', text: GAVE_UP })
+      add({ from: 'saathi', text: await localise(GAVE_UP) })
       setState(S.PAUSED)
       return
     }
     const my = ++run.current
     setState(S.RESPONDING)
-    add({ from: 'saathi', text: NOT_HEARD })
-    say(NOT_HEARD, my).then((current) => current && afterSpeaking())
+    const notHeard = await localise(NOT_HEARD)
+    if (run.current !== my) return
+    add({ from: 'saathi', text: notHeard })
+    say(notHeard, my, lang.current).then((current) => current && afterSpeaking())
   }
 
   async function confirm(utteranceId, choice) {
@@ -242,10 +266,11 @@ export default function useVoiceConversation({ start, ready, speakReplies, userN
     settle(utteranceId)
     context.current = done.context
     onDraft?.(null)
-    add({ from: 'saathi', text: done.message })
+    const doneMessage = await localise(done.message)
+    add({ from: 'saathi', text: doneMessage })
     refreshData()
     if (run.current !== my) return
-    await respond(done, my)
+    await respond({ ...done, message: doneMessage, language: lang.current }, my)
   }
 
   async function cancelPending(utteranceId) {
@@ -258,8 +283,9 @@ export default function useVoiceConversation({ start, ready, speakReplies, userN
     const message = context.current?.mode === 'ORDER'
       ? 'Theek hai ji, order abhi save nahi kiya. Kuch badalna ho to bataiye.'
       : 'Theek hai ji, kuch nahi badla.'
-    add({ from: 'saathi', text: message })
-    await respond({ message }, my)
+    const text = await localise(message)
+    add({ from: 'saathi', text })
+    await respond({ message: text, language: lang.current }, my)
   }
 
   // ---- controls

@@ -2,6 +2,14 @@
 -- that runs on H2 (local) and PostgreSQL. Money is whole paise (1 rupee = 100 paise).
 -- Every table that holds shop data has shop_id, and every query filters on it.
 
+-- Sentences Gemini has already worked out (any language), so the same words next time are understood without asking Gemini again.
+CREATE TABLE IF NOT EXISTS learned_phrases (
+  phrase VARCHAR(300) PRIMARY KEY,         -- the sentence, lower case, no punctuation
+  command VARCHAR(300) NOT NULL,           -- the same thing as a short Hinglish/English command the keyword parser understands
+  language VARCHAR(30) NOT NULL,           -- Tamil, Bengali, Hinglish, ...
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS shops (
   shop_id VARCHAR(40) PRIMARY KEY,
   shop_name VARCHAR(200) NOT NULL,

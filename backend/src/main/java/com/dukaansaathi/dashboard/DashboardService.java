@@ -67,7 +67,7 @@ public class DashboardService {
                 new Period(periodKey, from, to),
                 summary,
                 repo.recentUtterances(shop, 4),
-                inventory.lowestStock(shop, true, 3),
+                inventory.lowestStock(shop, true, 4),
                 inventory.lowestStock(shop, false, 4),
                 advisor,
                 repo.topDebtors(shop, 4),
