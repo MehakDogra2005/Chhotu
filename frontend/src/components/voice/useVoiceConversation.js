@@ -44,7 +44,7 @@ function firstName(full) {
  * start says how the conversation was opened: { greet } speaks the greeting first, { listen } listens at once,
  * { text } sends that sentence, { reply } continues an answer that is waiting for a yes.
  */
-export default function useVoiceConversation({ start, ready, speakReplies, userName, onDraft }) {
+export default function useVoiceConversation({ start, request, ready, speakReplies, userName, onDraft }) {
   const { token } = useAuth()
   const navigate = useNavigate()
   const [state, setStateRaw] = useState(start.reply ? S.AWAITING_CONFIRMATION : S.IDLE)
@@ -332,6 +332,20 @@ export default function useVoiceConversation({ start, ready, speakReplies, userN
       micRef.current.cancel()
     }
   }, [ready])
+
+  // A button pressed on a page while this chat is open: same chat, same history
+  useEffect(() => {
+    if (!request || !ready) return
+    if (request.text) {
+      send(request.text, 'typed')
+    } else {
+      if (request.hint) add({ from: 'saathi', text: request.hint })
+      voiceDriven.current = true
+      run.current++
+      stopSpeaking()
+      listen()
+    }
+  }, [request?.id])
 
   return {
     state,

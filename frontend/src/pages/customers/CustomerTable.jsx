@@ -102,7 +102,7 @@ export default function CustomerTable({ customers, today, tab, setTab, search, s
                 </td>
                 <td className={`${cell(2)} text-muted`}>{c.phone || '—'}</td>
                 <td className={cell(3)}>{rupees(c.totalCreditPaise)}</td>
-                <td className={`${cell(4)} text-brand`}>{rupees(c.paidPaise)}</td>
+                <td className={`${cell(4)} text-brand`} title={c.waivedPaise > 0 ? `${rupees(c.paidPaise)} paid + ${rupees(c.waivedPaise)} waived (round-offs, discounts)` : undefined}>{rupees(c.paidPaise + c.waivedPaise)}</td>
                 <td className={cell(5)}>
                   <PendingPill customer={c} />
                   {c.daysOverdue > 0 && <div className="mt-1 whitespace-nowrap text-[11px] text-red-600">{c.daysOverdue} days late</div>}

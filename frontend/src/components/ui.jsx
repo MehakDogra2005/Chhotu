@@ -1,3 +1,4 @@
+import { dateLocale } from '../i18n'
 import { Link } from 'react-router-dom'
 import { ArrowDown, ArrowRight, ArrowUp, CircleCheck, CircleX, TriangleAlert } from 'lucide-react'
 
@@ -5,7 +6,7 @@ import { ArrowDown, ArrowRight, ArrowUp, CircleCheck, CircleX, TriangleAlert } f
 export const rupees = (paise) => '₹' + Math.round(paise / 100).toLocaleString('en-IN')
 export const toPaise = (rupees) => Math.round(Number(rupees || 0) * 100)
 export const number = (n) => Number(n).toLocaleString('en-IN', { maximumFractionDigits: 1 })
-export const shortDate = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+export const shortDate = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString(dateLocale(), { day: 'numeric', month: 'short' })
 
 export function Card({ className = '', children }) {
   return <div className={`rounded-2xl border border-edge bg-white/80 shadow-[0_1px_4px_rgba(0,0,0,0.04)] ${className}`}>{children}</div>
@@ -50,7 +51,7 @@ export function relativeDay(iso, today) {
   const days = Math.round((new Date(today) - new Date(iso)) / 86400000)
   if (days === 0) return 'Today'
   if (days === 1) return 'Yesterday'
-  return new Date(iso + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+  return new Date(iso + 'T00:00:00').toLocaleDateString(dateLocale(), { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 export function ViewAll({ to }) {

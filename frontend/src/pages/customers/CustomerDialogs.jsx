@@ -5,7 +5,7 @@ import { useAuth } from '../../AuthContext'
 import useFetch, { refreshData } from '../../useFetch'
 import Modal from '../../components/Modal'
 import useSubmit from '../../components/useSubmit'
-import { Field, inputStyle, rupees, shortDate, toPaise } from '../../components/ui'
+import { Field, inputStyle, number, rupees, shortDate, toPaise } from '../../components/ui'
 import { useAssistant } from '../../components/AssistantContext'
 import { Avatar, PendingPill, ago } from './CustomerTable'
 import { KindPill, TransactionRows } from './BottomCards'
@@ -99,7 +99,7 @@ export function CustomerDetailDialog({ customer, today, onPick, onClose }) {
           <div className="text-[13px] text-muted">{[c.phone, c.type].filter(Boolean).join(' · ')}</div>
         </div>
         <div className="grid grid-cols-3 gap-2 text-center">
-          {[['Total udhaar', rupees(c.totalCreditPaise), ''], ['Paid', rupees(c.paidPaise), 'text-brand'], ['Pending', <PendingPill key="p" customer={c} />, '']].map(([label, value, tone]) => (
+          {[['Total udhaar', rupees(c.totalCreditPaise), ''], ['Paid', rupees(c.paidPaise + c.waivedPaise), 'text-brand'], ['Pending', <PendingPill key="p" customer={c} />, '']].map(([label, value, tone]) => (
             <div key={label} className="rounded-xl bg-white p-3">
               <div className="text-[11.5px] text-muted">{label}</div>
               <div className={`mt-1 text-[16px] font-bold ${tone}`}>{value}</div>
@@ -109,7 +109,7 @@ export function CustomerDetailDialog({ customer, today, onPick, onClose }) {
         {(c.overduePaise > 0 || c.waivedPaise > 0 || c.lastReminded) && (
           <ul className="space-y-1 text-[12.5px]">
             {c.overduePaise > 0 && <li className="text-red-600">{rupees(c.overduePaise)} is overdue ({c.daysOverdue} days late).</li>}
-            {c.waivedPaise > 0 && <li className="text-muted">{rupees(c.waivedPaise)} was waived (round-offs, discounts).</li>}
+            {c.waivedPaise > 0 && <li className="text-muted">Paid includes {rupees(c.waivedPaise)} waived (round-offs, discounts).</li>}
             {c.lastReminded && <li className="text-muted">Last reminder sent {ago(c.lastReminded, today).toLowerCase()}.</li>}
           </ul>
         )}
@@ -130,7 +130,23 @@ export function CustomerDetailDialog({ customer, today, onPick, onClose }) {
                   <div className="w-16 shrink-0 text-muted">{shortDate(l.date)}</div>
                   <div className="min-w-0 flex-1">
                     <KindPill kind={l.kind} />
-                    {l.note && <div className="mt-1 truncate text-muted" title={l.note}>{l.note}</div>}
+                    {l.kind === 'CREDIT' && l.items?.length > 0 ? (
+                      <table className="mt-1.5 w-full text-[12px]">
+                        <tbody>
+                          {l.items.map((it, i) => (
+                            <tr key={i}>
+                              <td className="py-0.5 pr-2">{number(it.quantity)} {it.unit} {it.name}</td>
+                              <td className="py-0.5 pr-2 text-right text-muted">@ {rupees(it.unitPricePaise)}</td>
+                              <td className="py-0.5 text-right font-medium">{rupees(it.amountPaise)}</td>
+                            </tr>
+                          ))}
+                          <tr className="border-t border-edge/60 font-bold">
+                            <td className="pt-1" colSpan={2}>Bill total</td>
+                            <td className="pt-1 text-right">{rupees(l.amountPaise)}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    ) : l.note && <div className="mt-1 truncate text-muted" title={l.note}>{l.note}</div>}
                     {l.dueDate && <div className="text-[11px] text-muted">Due {shortDate(l.dueDate)}</div>}
                   </div>
                   <div className="text-right">

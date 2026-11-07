@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.dukaansaathi.translations.NameTranslations;
 import com.dukaansaathi.audit.AuditRepository;
 import com.dukaansaathi.auth.ShopContext;
 import com.dukaansaathi.inventory.InventoryRepository.Movement;
@@ -23,9 +24,12 @@ public class ProductService {
     private final InventoryRepository repo;
     private final AuditRepository audit;
 
-    public ProductService(InventoryRepository repo, AuditRepository audit) {
+    private final NameTranslations translations;
+
+    public ProductService(InventoryRepository repo, AuditRepository audit, NameTranslations translations) {
         this.repo = repo;
         this.audit = audit;
+        this.translations = translations;
     }
 
     public ProductDetails get(ShopContext who, String productId) {
@@ -45,6 +49,7 @@ public class ProductService {
         if (repo.nameTaken(who.shopId(), f.name(), "")) throw conflict("You already have a product called " + f.name());
         String id = repo.insertProduct(who.shopId(), f);
         audit.record(who.shopId(), who.userId(), "product", id, "CREATE", null, describe(f), source);
+        translations.warm(f.name());
         return id;
     }
 
@@ -54,6 +59,7 @@ public class ProductService {
         ProductForm f = checked(form, false);
         if (repo.nameTaken(who.shopId(), f.name(), productId)) throw conflict("You already have a product called " + f.name());
         repo.updateProduct(who.shopId(), productId, f);
+        translations.warm(f.name());
         audit.record(who.shopId(), who.userId(), "product", productId, "UPDATE", before, describe(f), "UI");
     }
 

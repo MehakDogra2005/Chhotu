@@ -1,5 +1,7 @@
 import { Box, ChartNoAxesColumnIncreasing, ChevronDown, Globe, Languages, Mic, Smartphone, Users, Zap } from 'lucide-react'
+import { useState } from 'react'
 import Logo, { hideBroken } from '../../components/Logo'
+import { getPageLanguage, PAGE_LANGUAGES, setPageLanguage } from '../../i18n'
 
 function ShieldCheckFilled() {
   return (
@@ -28,6 +30,7 @@ const perks = [
 const photoBox = 'absolute right-0 top-0 h-full aspect-[557/637]'
 
 export default function Landing({ lang, setLang }) {
+  const [page, setPage] = useState(getPageLanguage())
   return (
     <section className="relative hidden h-screen min-h-205 overflow-hidden min-[1400px]:block min-[1400px]:w-[52%]">
       <div className={photoBox}>
@@ -51,10 +54,8 @@ export default function Landing({ lang, setLang }) {
           <Logo />
           <label className="relative flex items-center gap-2 rounded-full bg-white py-2.5 pl-4 pr-9 text-[15px] font-medium shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
             <Globe size={18} />
-            <select value={lang} onChange={(e) => setLang(e.target.value)} className="appearance-none bg-transparent outline-none">
-              <option>English</option>
-              <option>हिन्दी</option>
-              <option>Hinglish</option>
+            <select value={page} data-notranslate onChange={(e) => { setPage(e.target.value); setLang(e.target.value === 'hi' ? 'हिन्दी' : 'English'); setPageLanguage(e.target.value) }} aria-label="Language" className="appearance-none bg-transparent outline-none">
+              {PAGE_LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
             </select>
             <ChevronDown size={16} className="pointer-events-none absolute right-4" />
           </label>

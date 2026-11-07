@@ -4,7 +4,6 @@ import CapabilitySuggestions from './CapabilitySuggestions'
 import VoiceStateIndicator from './VoiceStateIndicator'
 import VoiceWaveform from './VoiceWaveform'
 import { S } from './voiceStates'
-import { getVoiceLanguage, setVoiceLanguage, VOICE_LANGUAGES } from '../speech'
 
 /**
  * The small conversation window. It sits in a corner (above the bottom menu on a phone) so the page Munim Ji opens stays
@@ -14,7 +13,6 @@ export default function ConversationPanel({ voice, keepListening, onKeepListenin
   const { state, chat, error, showSuggestions, listening, working, micSupported, speaking } = voice
   const [input, setInput] = useState('')
   const [minimized, setMinimized] = useState(false)
-  const [pick, setPick] = useState(getVoiceLanguage())
   const bottom = useRef(null)
   const busy = state === S.PROCESSING || state === S.NAVIGATING
 
@@ -44,10 +42,6 @@ export default function ConversationPanel({ voice, keepListening, onKeepListenin
           <h2 className="text-[16px] font-bold leading-tight">Munim Ji</h2>
           <VoiceStateIndicator state={state} />
         </div>
-        <select value={pick} onChange={(e) => { setVoiceLanguage(e.target.value); setPick(e.target.value) }} aria-label="Language you speak" title="Language you speak"
-          className="max-w-[110px] shrink-0 rounded-lg border border-edge bg-white px-1.5 py-1.5 text-[12.5px] font-semibold">
-          {VOICE_LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
-        </select>
         {state === S.PAUSED ? (
           <button onClick={voice.resume} aria-label="Resume" title="Resume" className="grid h-9 w-9 place-items-center rounded-full hover:bg-stone-100"><Play size={18} /></button>
         ) : (

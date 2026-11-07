@@ -14,6 +14,7 @@ import com.dukaansaathi.config.AppClock;
 import com.dukaansaathi.customers.CustomerRepository;
 import com.dukaansaathi.customers.CustomerRepository.Balance;
 import com.dukaansaathi.customers.CustomerService;
+import com.dukaansaathi.customers.UdhaarBook;
 import com.dukaansaathi.dashboard.DashboardRepository;
 import com.dukaansaathi.dashboard.DashboardRepository.SalesTotals;
 import com.dukaansaathi.inventory.InventoryRepository;
@@ -54,6 +55,10 @@ public class ShopSummary {
         out.append(sales("Last 30 days", dashboard.salesTotals(shop, month, today)));
         out.append(sales("The 30 days before that", dashboard.salesTotals(shop, month.minusDays(30), month.minusDays(1))));
 
+        out.append("\nSALES PER DAY, last 14 days (sales, gross profit):\n");
+        advisor.daily(shop, today.minusDays(13), today).forEach((d) -> out.append("- ").append(d.date()).append(": ").append(CustomerService.rupees(d.money().salesPaise()))
+                .append(", profit ").append(CustomerService.rupees(d.money().profitPaise())).append('\n'));
+
         List<ProductSales> sold = advisor.productSales(shop, month, today);
         out.append("\nBEST SELLING PRODUCTS, last 30 days (quantity, sales, profit):\n");
         sold.stream().limit(8).forEach((s) -> out.append("- ").append(s.name()).append(": ").append(num(s.quantity())).append(' ').append(s.unit())
@@ -72,12 +77,22 @@ public class ShopSummary {
         List<Balance> owing = customers.all(shop).stream().filter((b) -> b.balancePaise() > 0).limit(MAX_PEOPLE).toList();
         out.append("\nUDHAAR (customers who owe money): ").append(dashboard.udhaarSummary(shop).customers()).append(" customers owe ")
                 .append(CustomerService.rupees(dashboard.udhaarSummary(shop).totalPaise())).append(" in all\n");
-        owing.forEach((b) -> out.append("- ").append(b.name()).append(" owes ").append(CustomerService.rupees(b.balancePaise())).append('\n'));
+        out.append("The shop has ").append(customers.all(shop).size()).append(" customers in all. Customers with the same name are told apart by phone.\n");
+        UdhaarBook.accounts(customers.people(shop), customers.ledger(shop, null), null, today).stream().filter((a) -> a.pendingPaise() > 0)
+                .sorted((a, b) -> Long.compare(b.pendingPaise(), a.pendingPaise())).limit(MAX_PEOPLE)
+                .forEach((a) -> out.append("- ").append(a.name()).append(" (").append(a.phone()).append(") owes ").append(CustomerService.rupees(a.pendingPaise()))
+                        .append(", has taken ").append(CustomerService.rupees(a.totalCreditPaise())).append(" on udhaar in all and paid ").append(CustomerService.rupees(a.paidPaise()))
+                        .append(", oldest unpaid since ").append(a.oldestUnpaid())
+                        .append(a.overduePaise() > 0 ? ", OVERDUE " + CustomerService.rupees(a.overduePaise()) + " since " + a.overdueSince() : ", nothing overdue").append('\n'));
 
         List<ProductStock> products = inventory.products(shop);
         out.append("\nPRODUCTS (stock now, reorder level; a product at or below its reorder level needs restocking), ").append(products.size()).append(" in all:\n");
         products.stream().limit(MAX_PRODUCTS).forEach((p) -> out.append("- ").append(p.name()).append(": ").append(num(p.stock())).append(' ').append(p.unit())
                 .append(", reorder at ").append(num(p.reorderLevel())).append('\n'));
+        out.append("\nPRICES (buying price, selling price, margin):\n");
+        advisor.activePrices(shop).stream().limit(MAX_PRODUCTS).forEach((p) -> out.append("- ").append(p.name()).append(": buy ").append(CustomerService.rupees(p.purchasePricePaise()))
+                .append(", sell ").append(CustomerService.rupees(p.sellingPricePaise())).append(", margin ")
+                .append(p.sellingPricePaise() > 0 ? Math.round(100.0 * (p.sellingPricePaise() - p.purchasePricePaise()) / p.sellingPricePaise()) : 0).append("%\n"));
         return out.toString();
     }
 

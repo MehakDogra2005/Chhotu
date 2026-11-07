@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.dukaansaathi.translations.NameTranslations;
 import com.dukaansaathi.audit.AuditRepository;
 import com.dukaansaathi.auth.ShopContext;
 import com.dukaansaathi.config.AppClock;
@@ -22,7 +23,9 @@ import com.dukaansaathi.customers.CustomerRepository.Entry;
 @Service
 public class CustomerService {
     /** One line of a customer's history. balanceAfterPaise is what they owed after this line. */
-    public record HistoryLine(String id, LocalDate date, String kind, long amountPaise, long balanceAfterPaise, LocalDate dueDate, String note) {}
+    /** items are the products on the bill when this line is udhaar given for goods (null otherwise). */
+    public record HistoryLine(String id, LocalDate date, String kind, long amountPaise, long balanceAfterPaise, LocalDate dueDate, String note,
+                              List<CustomerRepository.SaleLine> items) {}
 
     public record History(Balance customer, String type, List<HistoryLine> lines) {}
 
@@ -35,7 +38,10 @@ public class CustomerService {
     private final AuditRepository audit;
     private final AppClock clock;
 
-    public CustomerService(CustomerRepository customers, AuditRepository audit, AppClock clock) {
+    private final NameTranslations translations;
+
+    public CustomerService(CustomerRepository customers, AuditRepository audit, AppClock clock, NameTranslations translations) {
+        this.translations = translations;
         this.customers = customers;
         this.audit = audit;
         this.clock = clock;
@@ -64,6 +70,7 @@ public class CustomerService {
 
         String id = customers.create(who.shopId(), cleanName, cleanPhone.isEmpty() ? null : cleanPhone, type == null ? "Regular" : type);
         audit.record(who.shopId(), who.userId(), "customer", id, "CREATE", null, Map.of("name", cleanName), "UI");
+        translations.warm(cleanName);
         if (openingPaise > 0) {
             String entry = customers.addEntry(who.shopId(), id, "CREDIT_ISSUED", openingPaise, clock.today(), clock.today().plusDays(DAYS_TO_PAY), "Udhaar from before");
             audit.record(who.shopId(), who.userId(), "credit_transaction", entry, "CREATE", null,
@@ -77,13 +84,15 @@ public class CustomerService {
         Balance customer = get(who, customerId);
         String type = customers.people(who.shopId()).stream().filter((p) -> p.customerId().equals(customerId)).findFirst().map((p) -> p.type()).orElse(null);
         Map<String, String> items = customers.creditSaleItems(who.shopId());
+        Map<String, List<CustomerRepository.SaleLine>> products = customers.creditSaleLines(who.shopId(), customerId);
         List<HistoryLine> lines = new ArrayList<>();
         long balance = 0;
         for (Entry e : customers.ledger(who.shopId(), customerId)) {
             UdhaarBook.Kind kind = UdhaarBook.kind(e);
             balance += switch (kind) { case CREDIT, PAYMENT_REVERSED -> e.amountPaise(); default -> -e.amountPaise(); };
             lines.add(new HistoryLine(e.id(), e.date(), kind.name(), e.amountPaise(), balance,
-                    kind == UdhaarBook.Kind.CREDIT ? UdhaarBook.dueDate(e) : null, noteOf(e, items)));
+                    kind == UdhaarBook.Kind.CREDIT ? UdhaarBook.dueDate(e) : null, noteOf(e, items),
+                    e.saleId() == null ? null : products.get(e.saleId())));
         }
         Collections.reverse(lines);
         return new History(customer, type, lines);

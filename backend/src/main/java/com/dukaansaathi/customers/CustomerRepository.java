@@ -18,6 +18,9 @@ public class CustomerRepository {
 
     public record Person(String customerId, String name, String phone, String type) {}
 
+    /** One product on a bill that went on udhaar: how many, the price each, and what that line came to. */
+    public record SaleLine(String name, double quantity, String unit, long unitPricePaise, long amountPaise) {}
+
     /** One RECORDED row of the credit ledger. direction and reverses are only set for adjustments. */
     public record Entry(String id, String customerId, String type, long amountPaise, LocalDate date, LocalDate dueDate,
                         String direction, String reverses, String saleId, String note) {}
@@ -78,6 +81,46 @@ public class CustomerRepository {
         return items;
     }
 
+    /** customer's credit bills: sale id -> the products on it (quantity, price, amount). */
+    public Map<String, List<SaleLine>> creditSaleLines(String shopId, String customerId) {
+        Map<String, List<SaleLine>> lines = new HashMap<>();
+        jdbc.query("""
+                SELECT si.sale_id, p.product_name, si.quantity, si.unit, si.unit_selling_price_paise, si.net_amount_paise
+                FROM sale_items si
+                JOIN sales s ON s.sale_id = si.sale_id
+                JOIN products p ON p.product_id = si.product_id
+                WHERE s.shop_id = ? AND s.customer_id = ?
+                  AND si.sale_id IN (SELECT sale_id FROM credit_transactions WHERE shop_id = ? AND sale_id IS NOT NULL)
+                ORDER BY si.sale_id, si.sale_item_id
+                """,
+                (rs) -> { lines.computeIfAbsent(rs.getString(1), (k) -> new java.util.ArrayList<>())
+                        .add(new SaleLine(rs.getString(2), rs.getDouble(3), rs.getString(4), rs.getLong(5), rs.getLong(6))); },
+                shopId, customerId, shopId);
+        return lines;
+    }
+
+    /** A sale paid for later. Money is whole paise; there is no discount, so gross and net are the same. */
+    public String insertCreditSale(String shopId, String customerId, LocalDate date, long netPaise, long costPaise) {
+        String id = "SAL-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        jdbc.update("""
+                INSERT INTO sales (sale_id, shop_id, customer_id, sale_date, status, gross_amount_paise, discount_amount_paise, net_amount_paise,
+                                   cost_amount_paise, gross_profit_paise, payment_method, amount_paid_paise)
+                VALUES (?, ?, ?, ?, 'COMPLETED', ?, 0, ?, ?, ?, 'Credit', 0)
+                """, id, shopId, customerId, date, netPaise, netPaise, costPaise, netPaise - costPaise);
+        return id;
+    }
+
+    public String insertSaleItem(String shopId, String saleId, String productId, double quantity, String unit, long unitPricePaise, long unitCostPaise,
+                                 long amountPaise, long costPaise) {
+        String id = "SLI-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        jdbc.update("""
+                INSERT INTO sale_items (sale_item_id, sale_id, shop_id, product_id, quantity, unit, unit_selling_price_paise, unit_cost_at_sale_paise,
+                                        gross_amount_paise, discount_amount_paise, net_amount_paise, cost_amount_paise)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+                """, id, saleId, shopId, productId, quantity, unit, unitPricePaise, unitCostPaise, amountPaise, amountPaise, costPaise);
+        return id;
+    }
+
     public String create(String shopId, String name, String phone, String type) {
         String id = "CUS-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         jdbc.update("INSERT INTO customers (customer_id, shop_id, customer_name, phone_masked, customer_type) VALUES (?, ?, ?, ?, ?)",
@@ -92,12 +135,17 @@ public class CustomerRepository {
 
     /** Adds one row to the credit ledger. Rows are never changed or deleted; mistakes are fixed by a new row. */
     public String addEntry(String shopId, String customerId, String type, long amountPaise, LocalDate date, LocalDate dueDate, String note) {
+        return addEntry(shopId, customerId, type, amountPaise, date, dueDate, note, null);
+    }
+
+    /** saleId links a credit to the bill (and so to the products) it came from; null for a plain udhaar entry. */
+    public String addEntry(String shopId, String customerId, String type, long amountPaise, LocalDate date, LocalDate dueDate, String note, String saleId) {
         String id = "CRD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         jdbc.update("""
-                INSERT INTO credit_transactions (credit_txn_id, shop_id, customer_id, transaction_type, amount_paise,
+                INSERT INTO credit_transactions (credit_txn_id, shop_id, customer_id, sale_id, transaction_type, amount_paise,
                                                  transaction_date, status, due_date, note)
-                VALUES (?, ?, ?, ?, ?, ?, 'RECORDED', ?, ?)
-                """, id, shopId, customerId, type, amountPaise, date, dueDate, note);
+                VALUES (?, ?, ?, ?, ?, ?, ?, 'RECORDED', ?, ?)
+                """, id, shopId, customerId, saleId, type, amountPaise, date, dueDate, note);
         return id;
     }
 

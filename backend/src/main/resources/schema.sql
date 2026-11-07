@@ -58,6 +58,14 @@ CREATE TABLE IF NOT EXISTS suppliers (
   payment_terms_days INTEGER DEFAULT 0 NOT NULL
 );
 
+-- Names of products and customers written in each page language (hi, ta, ...), made by Gemini when a name is added.
+CREATE TABLE IF NOT EXISTS name_translations (
+  text VARCHAR(200) NOT NULL,
+  language VARCHAR(5) NOT NULL,
+  translated VARCHAR(400) NOT NULL,
+  PRIMARY KEY (text, language)
+);
+
 CREATE TABLE IF NOT EXISTS customers (
   customer_id VARCHAR(40) PRIMARY KEY,
   shop_id VARCHAR(40) NOT NULL REFERENCES shops(shop_id),

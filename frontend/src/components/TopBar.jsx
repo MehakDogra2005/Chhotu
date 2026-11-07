@@ -5,11 +5,13 @@ import { hideBroken } from './Logo'
 import { useAuth } from '../AuthContext'
 import { useAssistant } from './AssistantContext'
 import NotificationsMenu from './NotificationsMenu'
+import { getPageLanguage, PAGE_LANGUAGES, setPageLanguage } from '../i18n'
 
 export default function TopBar({ me }) {
   const { logout } = useAuth()
   const { ask } = useAssistant()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [language, setLanguage] = useState(getPageLanguage())
 
   return (
     <header className="flex items-center justify-between gap-3 border-b border-edge bg-card px-4 py-3 lg:px-6">
@@ -36,11 +38,9 @@ export default function TopBar({ me }) {
       </div>
 
       <div className="flex items-center gap-3 sm:gap-5">
-        <label className="relative hidden items-center rounded-xl border border-edge bg-white px-4 py-2 text-[14px] font-medium shadow-sm sm:flex">
-          <select className="appearance-none bg-transparent pr-6 outline-none">
-            <option>Hindi</option>
-            <option>English</option>
-            <option>Hinglish</option>
+        <label className="relative flex items-center rounded-xl border border-edge bg-white px-3 py-2 text-[14px] font-medium shadow-sm sm:px-4" data-notranslate>
+          <select value={language} onChange={(e) => { setLanguage(e.target.value); setPageLanguage(e.target.value) }} aria-label="Language" className="appearance-none bg-transparent pr-6 outline-none">
+            {PAGE_LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
           </select>
           <ChevronDown size={15} className="pointer-events-none absolute right-3" />
         </label>

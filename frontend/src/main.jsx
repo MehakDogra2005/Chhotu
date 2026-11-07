@@ -1,6 +1,9 @@
 import { createRoot } from 'react-dom/client'
 import App from './App'
 import './index.css'
+import { startTranslator } from './i18n'
+
+startTranslator()
 
 // Keep the browser's "install this app" offer until the Settings page asks for it.
 window.addEventListener('beforeinstallprompt', (event) => {

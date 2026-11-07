@@ -7,10 +7,12 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.regex.Pattern;
 
 import org.springframework.http.HttpStatus;
@@ -34,6 +36,7 @@ import com.dukaansaathi.customers.CustomerRepository;
 import com.dukaansaathi.customers.CustomerRepository.Balance;
 import com.dukaansaathi.customers.CustomerRepository.Entry;
 import com.dukaansaathi.customers.CustomerRepository.Person;
+import com.dukaansaathi.customers.CreditSaleService;
 import com.dukaansaathi.customers.CustomerService;
 import com.dukaansaathi.customers.UdhaarBook;
 import com.dukaansaathi.customers.UdhaarBook.Account;
@@ -101,6 +104,17 @@ public class AssistantService {
     private static final int MAX_OPTIONS = 6;
     private static final int LIST_SIZE = 8;
     private static final String NL = "\n";
+
+    /** Answers that only read the shop's data. */
+    private static final Set<Intent> READ_ONLY = Set.of(Intent.SALES, Intent.PROFIT, Intent.EXPENSES, Intent.STOCK_LOOKUP, Intent.BALANCE, Intent.LOW_STOCK,
+            Intent.RESTOCK_LIST, Intent.TOP_SELLER, Intent.BEST_MARGIN, Intent.REMINDERS, Intent.OLD_UDHAAR, Intent.PAYMENT_REGISTER);
+
+    /** Words that make a sentence a real question about the data, not one of the short ready-made requests. */
+    private boolean needsAnswer(String text) {
+        return parser.said(text, "price", "prices", "kimat", "keemat", "cost", "rate", "supplier", "suppliers", "compare", "comparison", "lowest", "least", "average",
+                "growth", "badhi", "badha", "overdue", "margin", "how", "kitne", "why", "kyun", "kyon", "day") && !parser.said(text, "sabse") // "sabse zyada margin" is a ready-made answer
+                || text.trim().split("\\s+").length >= 10;
+    }
     private static final DateTimeFormatter DAY = DateTimeFormatter.ofPattern("d MMM");
     private static final Pattern HINGLISH = Pattern.compile("\\b(ka|ki|ke|hai|karo|batao|ne|ko|diye|diya|kitna|kitni|bacha|aaj|hafte|mahine)\\b");
     private static final String HELP = "Maaf kijiye, main samajh nahi paaya. Aap aise keh sakte hain: \"Chocolate ka stock kitna hai?\", "
@@ -129,12 +143,13 @@ public class AssistantService {
     private final GeminiClient gemini;
     private final ShopSummary summary;
     private final ProductService productService;
+    private final CreditSaleService creditSales;
     /** A voice-made item starts with this reorder level; the owner can change it (and the prices) in Inventory. */
     private static final double NEW_ITEM_REORDER = 5;
 
     public AssistantService(AssistantRepository repo, CommandParser parser, InventoryRepository inventory,
                             InventoryService inventoryService, CustomerRepository customers, CustomerService customerService,
-                            DashboardRepository dashboard, AdvisorRepository advisor, OrderService orders, AppClock clock, ObjectMapper json, GeminiClient gemini, ShopSummary summary, ProductService productService) {
+                            DashboardRepository dashboard, AdvisorRepository advisor, OrderService orders, AppClock clock, ObjectMapper json, GeminiClient gemini, ShopSummary summary, ProductService productService, CreditSaleService creditSales) {
         this.repo = repo;
         this.parser = parser;
         this.inventory = inventory;
@@ -149,6 +164,7 @@ public class AssistantService {
         this.gemini = gemini;
         this.summary = summary;
         this.productService = productService;
+        this.creditSales = creditSales;
     }
 
     // ------------------------------------------------------------------ understanding
@@ -175,14 +191,20 @@ public class AssistantService {
         String chosen = GeminiClient.name(chosenLanguage); // the language the person picked (null for Auto, Hindi/English): it beats what Gemini guesses
         String language = chosen;
         String question = text;
+        String direct = null; // Gemini's answer, already in the person's language (from the same call that understood the sentence)
+        // A question the keywords would answer wrongly ("price of Soft Drink" is not a stock question): Gemini decides instead
+        if (READ_ONLY.contains(p.intent()) && !ctx.ordering() && ctx.choices().isEmpty() && needsAnswer(text)) {
+            p = new Parsed(Intent.UNKNOWN, p.products(), p.people(), p.quantity(), p.amountPaise(), p.period(), p.periodGiven(), p.page(), p.followUp());
+        }
         boolean nativeScript = text.chars().anyMatch(c -> c > 127 && Character.isLetter(c));
         if (nativeScript || (p.intent() == Intent.UNKNOWN && !ctx.ordering() && ctx.choices().isEmpty())) {
             AssistantRepository.Learned known = repo.learned(original);
-            GeminiClient.Understood u = known != null ? new GeminiClient.Understood(known.language(), known.command(), true)
-                    : gemini.configured() ? gemini.understand(original) : null;
+            GeminiClient.Understood u = known != null ? new GeminiClient.Understood(known.language(), known.command(), true, "")
+                    : gemini.configured() ? gemini.understand(original, summary.build(shop)) : null;
             if (u != null && !u.command().isBlank()) {
                 if (chosen == null) language = u.language();
                 question = u.command();
+                if (!u.fits() && u.answer() != null && !u.answer().isBlank()) direct = u.answer();
                 if (u.fits()) {
                     Parsed again = parser.parse(u.command(), products, aliases, people, ctx);
                     if (again.intent() != Intent.UNKNOWN) {
@@ -195,6 +217,7 @@ public class AssistantService {
         }
         final String asked = question;
         final String answerIn = language;
+        final String directAnswer = direct;
 
         // "Aur kal?" asks the same thing again for another day; "aur profit?" asks another thing for the same day
         Intent before = intentOf(ctx.intent());
@@ -206,11 +229,13 @@ public class AssistantService {
 
         Outcome outcome = null;
         if (ctx.ordering()) outcome = ordering(shop, text, p, ctx, products, aliases, people);
-        else if (!ctx.choices().isEmpty()) outcome = chosen(text, ctx, people, p);
+        else if (!ctx.choices().isEmpty()) outcome = chosen(who, text, ctx, people, p);
         else if (Context.INVENTORY.equals(ctx.mode()) && p.products().isEmpty()
                 && parser.said(text, "poori", "puri", "pura", "sab", "saari", "saara", "sabhi", "all", "whole", "full", "complete")) {
             outcome = Outcome.say("Ji, poori inventory aapke saamne hai. Kuch aur dekhna ho to bataiye.").open("/inventory");
         }
+        if (outcome == null && !ctx.ordering() && ctx.choices().isEmpty()) outcome = creditSale(shop, asked, products, aliases, people);
+        if (outcome == null && !ctx.ordering() && ctx.choices().isEmpty()) outcome = customerItems(who, asked, people);
         if (outcome == null) {
             outcome = switch (p.intent()) {
                 case SALES -> sales(shop, p);
@@ -233,7 +258,7 @@ public class AssistantService {
                 case ORDER_START -> takeOrder(shop, p, text, Context.empty(), products, aliases, people, true);
                 case NAVIGATE -> p.page().path().equals("/inventory") ? inventoryCheck()
                         : Outcome.say("Ji, " + p.page().name() + " khol raha hoon.").open(p.page().path());
-                case UNKNOWN -> unknown(shop, text, asked, answerIn, p);
+                case UNKNOWN -> unknown(shop, text, asked, answerIn, p, directAnswer);
             };
         }
 
@@ -245,7 +270,7 @@ public class AssistantService {
                 p.products().isEmpty() ? "INTENT_ONLY" : "CATALOGUE_MATCH", needsConfirm ? "PENDING" : "NOT_REQUIRED", clock.today().atTime(LocalTime.now()));
         String message = outcome.message();
         boolean plain = language == null || language.equalsIgnoreCase("English") || language.equalsIgnoreCase("Hinglish");
-        if (!plain) {
+        if (!plain && !message.equals(directAnswer)) { // Gemini's own answer is already in the person's language
             String translated = gemini.translate(message, language);
             if (translated != null) message = translated;
         }
@@ -257,9 +282,9 @@ public class AssistantService {
      * Nothing matched. If it sounds like stock has come in for a product the shop does not have, propose creating it as a new item
      * (the person confirms first); otherwise answer from the shop's data.
      */
-    private Outcome unknown(String shop, String text, String asked, String language, Parsed p) {
+    private Outcome unknown(String shop, String text, String asked, String language, Parsed p, String direct) {
         CommandParser.NewItem item = p.products().isEmpty() ? parser.newItem(asked) : null;
-        if (item == null) return Outcome.say(freeAnswer(shop, text, asked, language));
+        if (item == null) return Outcome.say(direct != null ? direct : freeAnswer(shop, text, asked, language));
         String label = "Create new item " + item.name() + " with " + fmt(item.quantity()) + " " + item.unit() + " in stock";
         return new Outcome(item.name() + " is not in your inventory yet. Create it as a new item?",
                 List.of(new Action("NEW_ITEM", null, null, item.quantity(), null, label, null, item.name(), item.unit())));
@@ -328,6 +353,13 @@ public class AssistantService {
                 yield new Done("Ho gaya ji. Naya item " + a.name() + " add kar diya, " + fmt(a.quantity()) + " " + a.unit() + " stock ke saath. "
                         + "Iska price abhi ₹0 hai: Inventory mein jaakar daal dijiye.", "/inventory?search=" + enc(a.name()),
                         new Context("STOCK_ADD", null, id, null, null, List.of(), List.of()));
+            }
+            case "CREDIT_SALE" -> {
+                CreditSaleService.Done bill = creditSales.record(who, a.customerId(), a.name(),
+                        a.lines().stream().map((w) -> new CreditSaleService.Line(w.productId(), w.quantity())).toList(), "VOICE");
+                yield new Done("Ho gaya ji. " + ji(bill.customer().name()) + " ke khate mein " + String.join(", ", bill.items()) + " (" + CustomerService.rupees(bill.totalPaise())
+                        + ") likh diya aur stock kam kar diya. Ab kul " + CustomerService.rupees(bill.customer().balancePaise()) + " baaki hai.",
+                        customerPage(bill.customer()), new Context("CREDIT", null, null, bill.customer().customerId(), null, List.of(), List.of()));
             }
             case "PAYMENT" -> {
                 Balance now = customerService.recordPayment(who, a.customerId(), a.amountPaise(), "VOICE");
@@ -505,10 +537,49 @@ public class AssistantService {
     }
 
     /** The shopkeeper picked one of the customers Munim Ji listed. Null when the sentence is something else. */
-    private Outcome chosen(String text, Context ctx, List<Balance> people, Parsed p) {
+    private Outcome chosen(ShopContext who, String text, Context ctx, List<Balance> people, Parsed p) {
         if (p.intent() != Intent.UNKNOWN && p.intent() != Intent.BALANCE) return null;
         Balance picked = parser.pick(text, withIds(people, ctx.choices()));
-        return picked == null ? null : balanceOf(picked);
+        if (picked == null) return null;
+        return "ITEMS".equals(ctx.intent()) ? itemsOf(who, picked) : balanceOf(picked);
+    }
+
+    /**
+     * "Rahul ne kya kya saman liya hai?": what a customer took on udhaar, bill by bill, so they can see why the money is owed. Null when the
+     * sentence is not that question. With two customers of the same name it asks which one (an amount like "Rahul 719" already tells).
+     */
+    private Outcome customerItems(ShopContext who, String text, List<Balance> people) {
+        boolean question = parser.said(text, "kya", "kaun", "kaunsa", "kaunse", "konsa", "what", "which", "list", "dikhao", "dikha", "batao", "bata", "show", "tell",
+                "breakdown", "bill", "hisaab", "hisab");
+        boolean goods = parser.said(text, "saman", "samaan", "saaman", "items", "item", "goods", "liya", "liye", "lia", "kharida", "kharide", "bought", "took", "taken",
+                "purchase", "products", "product", "bacha", "bachi", "baki", "baaki", "left");
+        if (!question || !goods) return null;
+        List<Balance> named = parser.people(text, people);
+        if (named.isEmpty()) return null;
+        if (named.size() > 1) return askWhich(named, Context.empty(), "ITEMS", null);
+        return itemsOf(who, named.get(0));
+    }
+
+    private Outcome itemsOf(ShopContext who, Balance c) {
+        CustomerService.History history = customerService.history(who, c.customerId());
+        StringBuilder bills = new StringBuilder();
+        for (int i = history.lines().size() - 1; i >= 0; i--) { // oldest first
+            CustomerService.HistoryLine line = history.lines().get(i);
+            if (!"CREDIT".equals(line.kind())) continue;
+            bills.append(NL).append("• ").append(line.date().format(java.time.format.DateTimeFormatter.ofPattern("d MMM", java.util.Locale.ENGLISH))).append(": ");
+            if (line.items() != null && !line.items().isEmpty()) {
+                bills.append(line.items().stream().map((it) -> fmt(it.quantity()) + " " + it.unit() + " " + it.name() + " (" + CustomerService.rupees(it.amountPaise()) + ")")
+                        .collect(Collectors.joining(", ")));
+            } else {
+                bills.append(line.note() == null || line.note().isBlank() ? "udhaar" : line.note());
+            }
+            bills.append(" = ").append(CustomerService.rupees(line.amountPaise()));
+        }
+        String head = c.balancePaise() == 0 ? "Ji, " + ji(c.name()) + " ka koi udhaar baaki nahi hai."
+                : "Ji, " + ji(c.name()) + " ka " + CustomerService.rupees(c.balancePaise()) + " udhaar baaki hai.";
+        String message = bills.length() == 0 ? head + " Mere paas unke saman ki list nahi hai."
+                : head + " Unhone udhaar mein ye liya:" + bills;
+        return Outcome.say(message).then(new Context("BALANCE", null, null, c.customerId(), null, List.of(), List.of()));
     }
 
     /** Several customers share the name: list them (with phone numbers) and ask which one. mode is kept for an order. */
@@ -688,6 +759,60 @@ public class AssistantService {
 
     private static long settled(long said, long owed) {
         return Math.abs(owed - said) < SETTLE_WITHIN ? owed : said;
+    }
+
+    /**
+     * "Ramesh ne 2 doodh, 1 pencil aur 5 notebook udhaar mein liye": goods taken without paying. Proposes one bill: the customer (an existing
+     * account, or a new one if the name is not in the book), the products with today's prices, and the total. Null when the sentence is not
+     * about udhaar for products, so the other answers still work ("Ramesh ko 300 ka udhaar diya" has no products).
+     */
+    private Outcome creditSale(String shop, String text, List<ProductStock> products, List<Alias> aliases, List<Balance> people) {
+        boolean cue = parser.said(text, "udhaar", "udhar", "udhari", "khata", "khate", "khaata", "account", "credit")
+                || (parser.said(text, "paise", "paisa") && parser.said(text, "nahi", "nahin", "na"));
+        if (!cue) return null;
+        List<Balance> named = parser.people(text, people);
+        String newName = named.isEmpty() ? parser.newCustomerName(text) : null;
+        Set<String> ignore = new HashSet<>(parser.nameWords(named));
+        ignore.addAll(Set.of("udhaar", "udhar", "udhari", "khata", "khate", "khaata", "account", "credit", "liye", "liya", "le", "gaya", "gayi", "gaye", "likh",
+                "likhna", "paise", "paisa", "nahi", "nahin", "diye", "diya", "purane", "purana", "puraane", "naam", "baad", "mein", "add", "jod", "jodo"));
+        if (newName != null) for (String w : newName.toLowerCase().split(" ")) ignore.add(w);
+        Items items = parser.items(text, products, aliases, ignore);
+        if (items.found().isEmpty()) return null;
+
+        if (named.size() > 1) {
+            return Outcome.say("More than one " + named.get(0).name() + " found: " + named.stream().limit(MAX_OPTIONS).map((c) -> c.name() + " (" + c.phone() + ")")
+                    .collect(Collectors.joining(", ")) + ". Say it again with the last digits of their phone number.");
+        }
+        if (!items.missing().isEmpty() || !items.unclear().isEmpty()) {
+            return Outcome.say("I could not match " + Stream.concat(items.missing().stream(), items.unclear().stream()).map((s) -> "\"" + s + "\"").collect(Collectors.joining(", "))
+                    + " to a product in your inventory. Say the full product name, or add it to Inventory first.");
+        }
+        if (named.isEmpty() && newName == null) return Outcome.say("Whose udhaar should I write this in? For example: \"Ramesh ne 2 doodh udhaar mein liye\".");
+
+        Map<String, ProductStock> byId = products.stream().collect(Collectors.toMap(ProductStock::productId, (s) -> s, (a, b) -> a));
+        Map<String, Long> prices = advisor.activePrices(shop).stream().collect(Collectors.toMap(AdvisorRepository.Price::productId, AdvisorRepository.Price::sellingPricePaise, (a, b) -> a));
+        List<Want> lines = merge(items.found());
+        long total = 0;
+        for (Want w : lines) {
+            ProductStock s = byId.get(w.productId());
+            long price = prices.getOrDefault(w.productId(), 0L);
+            if (price <= 0) return Outcome.say(s.name() + " has no selling price yet. Set it in Inventory first, then say this again.");
+            if (s.stock() < w.quantity()) return Outcome.say("Only " + fmt(s.stock()) + " " + s.unit() + " of " + s.name() + " in stock, not " + fmt(w.quantity()) + ". Add the stock first.");
+            total += Math.round(w.quantity() * price);
+        }
+        Balance customer = named.isEmpty() ? null : named.get(0);
+        String who = customer != null ? customer.name() : newName;
+        String label = "Write " + CustomerService.rupees(total) + " in " + who + "'s udhaar: " + describe(lines, byId) + " (stock goes down too)"
+                + (customer == null ? " [new customer]" : " [now owes " + CustomerService.rupees(customer.balancePaise()) + " → " + CustomerService.rupees(customer.balancePaise() + total) + "]");
+        Action action = new Action("CREDIT_SALE", null, customer == null ? null : customer.customerId(), null, total, label, lines, customer == null ? newName : null, null);
+        return new Outcome(customer == null ? who + " is not in your udhaar book. Add them and write this udhaar?" : "Add this to " + who + "'s udhaar?", List.of(action));
+    }
+
+    /** The same product said twice becomes one line. */
+    private static List<Want> merge(List<Want> lines) {
+        Map<String, Double> sum = new java.util.LinkedHashMap<>();
+        for (Want w : lines) sum.merge(w.productId(), w.quantity(), Double::sum);
+        return sum.entrySet().stream().map((e) -> new Want(e.getKey(), e.getValue())).toList();
     }
 
     private Outcome payment(Parsed p) {

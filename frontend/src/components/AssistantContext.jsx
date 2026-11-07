@@ -29,6 +29,7 @@ export function AssistantProvider({ speakReplies, userName, children }) {
   const { token } = useAuth()
   const navigate = useNavigate()
   const [start, setStart] = useState(null) // null = closed
+  const [request, setRequest] = useState(null) // something asked while the chat is already open: it goes into the same chat
   const [keepListening, setKeepListeningState] = useState(readKeepListening)
   const [busy, setBusy] = useState(false)
   const [engine, setEngine] = useState(null) // null until the server says whether Gnani speech is set up, then 'gnani' or 'browser'
@@ -45,10 +46,14 @@ export function AssistantProvider({ speakReplies, userName, children }) {
   }, [token])
 
   const ask = useCallback((options = {}) => {
-    const greet = options.greet || (options.listen && !options.hint)
-    setStart({ ...options, greet, id: Date.now() })
+    const greet = options.greet || options.listen // every mic button on every page opens the same Munim Ji as the home page: greeting, then listening
+    if (dialogRef.current) setRequest({ ...options, greet, id: Date.now() }) // one chat box: never a second one, never a fresh one
+    else {
+      setRequest(null)
+      setStart({ ...options, greet, id: Date.now() })
+    }
   }, [])
-  const close = useCallback(() => { setStart(null); setDraft(null) }, [])
+  const close = useCallback(() => { setStart(null); setRequest(null); setDraft(null) }, [])
 
   const setKeepListening = (on) => {
     keepRef.current = on
@@ -113,7 +118,7 @@ export function AssistantProvider({ speakReplies, userName, children }) {
       {children}
       {/* a new id makes a fresh conversation each time it is opened, and keeps this one while it stays open */}
       {start && (
-        <AssistantDialog key={start.id} start={start} ready={engine !== null} speakReplies={speakReplies} userName={userName}
+        <AssistantDialog key={start.id} start={start} request={request} ready={engine !== null} speakReplies={speakReplies} userName={userName}
           keepListening={keepListening} onKeepListening={setKeepListening} onDraft={setDraft} onClose={close} />
       )}
       {keepListening && !start && (

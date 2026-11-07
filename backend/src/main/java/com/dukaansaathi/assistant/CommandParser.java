@@ -83,6 +83,35 @@ public class CommandParser {
         return new NewItem(joined, quantity, unit);
     }
 
+    private static final Set<String> NAME_MARKERS = Set.of("ne", "ko", "ka", "ki", "ke", "se");
+    private static final Pattern NAME_BEFORE_NAAM = Pattern.compile("(?i)(\\p{L}+(?:\\s+\\p{L}+)?)\\s+(?:ke|ki)\\s+naam");
+
+    /**
+     * The name of a customer who is not in the book: "Suresh ne 2 doodh liye" gives Suresh, "... Suresh ke naam" too. It is the words
+     * before ne / ko / ka / ke (at most three, letters only). Null when the sentence does not start with a name.
+     */
+    public String newCustomerName(String text) {
+        Matcher by = NAME_BEFORE_NAAM.matcher(text);
+        if (by.find()) return titleCase(List.of(by.group(1).trim().split("\\s+")));
+        List<String> before = new ArrayList<>();
+        for (String raw : text.trim().split("\\s+")) {
+            String w = raw.replaceAll("^[^\\p{L}\\p{N}]+|[^\\p{L}\\p{N}]+$", "");
+            if (w.isEmpty()) continue;
+            if (NAME_MARKERS.contains(w.toLowerCase())) break;
+            before.add(w);
+        }
+        if (before.isEmpty() || before.size() > 3) return null;
+        for (String w : before) {
+            String lower = w.toLowerCase();
+            if (!w.chars().allMatch(Character::isLetter) || NUMBER_WORDS.containsKey(lower) || FILLER.contains(lower)) return null;
+        }
+        return titleCase(before);
+    }
+
+    private static String titleCase(List<String> words) {
+        return words.stream().map((w) -> Character.toUpperCase(w.charAt(0)) + w.substring(1)).collect(java.util.stream.Collectors.joining(" "));
+    }
+
     /** What an order sentence asked for: the products found, words that matched no product, and products that could be either of several. */
     public record Items(List<Want> found, List<String> missing, List<String> unclear) {}
 
@@ -110,11 +139,19 @@ public class CommandParser {
     private static final Set<String> VERBS_AFTER_DO = Set.of("karo", "kar", "likh", "likho", "de", "dena", "dijiye", "rakh", "add", "hai", "hain", "na", "ji", "please");
 
     public Parsed parse(String text, List<ProductStock> products, List<Alias> aliases, List<Balance> customers, Context ctx) {
-        String t = normalize(text);
+        String t = spokenNumbers(normalize(text));
         Double number = firstNumber(t);
-        Long paise = number == null ? null : Math.round(number * 100);
         List<ProductStock> foundProducts = findProducts(t, products, aliases);
         List<Balance> foundPeople = findPeople(t, customers);
+        // "719 mein se 500 de diye": 719 is what they owed, 500 is what they paid
+        Matcher outOf = OUT_OF.matcher(t);
+        if (outOf.find()) number = Double.valueOf(outOf.group(1));
+        // "Rahul ne poora de diya": no amount said, so it is everything they owe
+        if (number == null && foundPeople.size() == 1 && has(t, "poora", "pura", "puri", "poori", "saara", "saare", "sara", "sab", "full", "entire", "all", "complete")
+                && has(t, "diye", "diya", "de", "paid", "pay", "chuka", "chukaya", "jama", "lauta", "lautaya", "lautaye", "wapas", "bhare", "clear")) {
+            number = foundPeople.get(0).balancePaise() / 100.0;
+        }
+        Long paise = number == null ? null : Math.round(number * 100);
 
         boolean weekWord = has(t, "hafte", "hafta", "week", "saptah");
         boolean monthWord = has(t, "mahine", "mahina", "month");
@@ -124,7 +161,7 @@ public class CommandParser {
         boolean periodGiven = weekWord || monthWord || yesterdayWord || todayWord;
 
         boolean udhaarWord = has(t, "udhaar", "udhar", "credit", "samaan", "saman");
-        boolean paidWord = has(t, "diye", "diya", "paid", "payment", "chuka", "chukaya", "jama", "received", "mile", "wapas", "bhare");
+        boolean paidWord = has(t, "diye", "diya", "paid", "payment", "chuka", "chukaya", "jama", "received", "mile", "wapas", "bhare", "lauta", "lautaya", "lautaye", "lautana", "returned", "hata", "hatao", "hatado", "ghata", "ghatao", "minus", "subtract");
         boolean addWord = has(t, "add", "ad", "aaye", "aaya", "aa", "jod", "jodo", "badhao", "increase", "received", "mangwa", "kharida", "laya", "mein");
         boolean most = has(t, "sabse", "most", "best", "top", "highest");
 
@@ -244,7 +281,21 @@ public class CommandParser {
             if (hasPhrase(t, name)) exact.add(c);
             else if (hasPhrase(t, name.split(" ")[0])) byFirstName.add(c);
         }
-        return exact.isEmpty() ? byFirstName : exact;
+        return narrowByBalance(t, exact.isEmpty() ? byFirstName : exact);
+    }
+
+    /**
+     * Two customers with the same name, and the sentence says an amount that is what one of them owes ("Rahul 719"): that one is meant.
+     * Within one rupee, because the speech service says 719 for ₹718.75. When no amount fits just one of them, all stay.
+     */
+    private static List<Balance> narrowByBalance(String t, List<Balance> found) {
+        if (found.size() < 2) return found;
+        List<Double> said = new ArrayList<>();
+        Matcher m = NUMBER.matcher(t);
+        while (m.find()) said.add(Double.valueOf(m.group()));
+        List<Balance> fits = found.stream().filter((c) -> c.balancePaise() > 0
+                && said.stream().anyMatch((n) -> Math.abs(c.balancePaise() / 100.0 - n) <= 1.0)).toList();
+        return fits.size() == 1 ? fits : found;
     }
 
     /** Does the sentence contain any of these words or phrases? */
@@ -261,7 +312,7 @@ public class CommandParser {
 
     /** The customers named in a sentence (used while taking an order, where the sentence is not otherwise parsed). */
     public List<Balance> people(String text, List<Balance> customers) {
-        return findPeople(normalize(text), customers);
+        return findPeople(spokenNumbers(normalize(text)), customers);
     }
 
     /**
@@ -349,6 +400,66 @@ public class CommandParser {
         // A full stop from the speech service ("diye.") must not stick to the word; dots stay only inside numbers (1.5)
         return text.toLowerCase().replaceAll("(?<=\\d),(?=\\d)", "").replaceAll("[^\\p{L}\\p{N}.]+", " ")
                 .replaceAll("(?<!\\d)\\.|\\.(?!\\d)", " ").replaceAll("\\s+", " ").trim();
+    }
+
+    private static final Pattern OUT_OF = Pattern.compile("\\d+(?:\\.\\d+)? (?:mein|me|main) se (\\d+(?:\\.\\d+)?)");
+
+    private static final Map<String, Integer> SPOKEN = new HashMap<>();
+    static {
+        String[][] rows = {
+            {"1", "ek one"}, {"2", "do two"}, {"3", "teen three"}, {"4", "char chaar four"}, {"5", "paanch panch five"}, {"6", "chhe chhah chah six"},
+            {"7", "saat seven"}, {"8", "aath eight"}, {"9", "nau nine"}, {"10", "das ten"},
+            {"11", "gyarah gyaarah giyarah eleven"}, {"12", "barah baarah twelve"}, {"13", "terah terha thirteen"}, {"14", "chaudah chaudaha fourteen"},
+            {"15", "pandrah pandra fifteen"}, {"16", "solah sola sixteen"}, {"17", "satrah satra seventeen"}, {"18", "atharah athaarah eighteen"},
+            {"19", "unnis unnees unis unnish nineteen"}, {"20", "bees twenty"}, {"21", "ikkis ikkees ikis"}, {"22", "baais baaees bayis"},
+            {"23", "teis teees teyis"}, {"24", "chaubees chaubis"}, {"25", "pachchis pachees pachis"}, {"26", "chhabbis chabbis"},
+            {"27", "sattais sattaees satais"}, {"28", "atthais athaais athais"}, {"29", "untis unatees unatis"}, {"30", "tees thirty"},
+            {"31", "ikatis iktis"}, {"32", "battis battees"}, {"33", "tentis taintis tentees"}, {"34", "chauntis chauntees"},
+            {"35", "paintis painteis paintees"}, {"36", "chhattis chhatees"}, {"37", "saintis saintees"}, {"38", "adtis artis adtees"},
+            {"39", "unchalis untalis unataalis"}, {"40", "chalis chaalis forty"}, {"41", "iktalis ikatalis"}, {"42", "bayalis bayalees"},
+            {"43", "tetalis tretalis"}, {"44", "chauvalis chavalis"}, {"45", "paintalis paitalis"}, {"46", "chhiyalis chiyalis"},
+            {"47", "saintalis saitalis"}, {"48", "adtalis artalis"}, {"49", "unchaas unanchas unanchaas"}, {"50", "pachas pachaas fifty"},
+            {"51", "ikyavan ikyaavan"}, {"52", "baavan bawan bavan"}, {"53", "tirpan trepan tirpun"}, {"54", "chauvan chavan"},
+            {"55", "pachpan pachappan pachchan"}, {"56", "chhappan chhapan"}, {"57", "sattavan satavan"}, {"58", "atthavan athavan"},
+            {"59", "unsath unasath"}, {"60", "sixty"}, {"61", "iksath iksaath"}, {"62", "baasath basath"}, {"63", "tirsath"}, {"64", "chausath"},
+            {"65", "painsath"}, {"66", "chhiyasath"}, {"67", "sadsath"}, {"68", "adsath"}, {"69", "unhattar unahattar"}, {"70", "sattar seventy"},
+            {"71", "ikahattar"}, {"72", "bahattar"}, {"73", "tihattar"}, {"74", "chauhattar"}, {"75", "pachhattar pachattar"}, {"76", "chhihattar"},
+            {"77", "satattar sathattar"}, {"78", "athattar"}, {"79", "unnasi unasi"}, {"80", "assi eighty"}, {"81", "ikyasi"}, {"82", "bayasi bayaasi"},
+            {"83", "tirasi"}, {"84", "chaurasi"}, {"85", "pachasi"}, {"86", "chhiyasi"}, {"87", "sattasi"}, {"88", "atthasi athasi"},
+            {"89", "navasi nawasi"}, {"90", "nabbe navve ninety"}, {"91", "ikyanave"}, {"92", "baanave"}, {"93", "tiranave"}, {"94", "chauranave"},
+            {"95", "pachanave"}, {"96", "chhiyanave"}, {"97", "sattanave"}, {"98", "atthanave"}, {"99", "ninyanave ninnanave"},
+            {"100", "sau hundred"}, {"1000", "hazaar hazar hajaar hajar thousand"}, {"100000", "lakh"}};
+        for (String[] row : rows) for (String word : row[1].split(" ")) SPOKEN.put(word, Integer.valueOf(row[0]));
+    }
+
+    /**
+     * Turns spoken amounts into digits: "saat sau unnis" becomes 719, "paanch sau" 500, "five hundred" 500. The speech service often writes
+     * numbers as words. A lone small word (ek, do ... das) is left alone, because it may just be a word ("de do"); only amounts of 11 or more
+     * and anything with sau / hazaar are changed.
+     */
+    static String spokenNumbers(String t) {
+        String[] words = t.split(" ");
+        List<String> out = new ArrayList<>();
+        int i = 0;
+        while (i < words.length) {
+            int j = i;
+            while (j < words.length && SPOKEN.containsKey(words[j])) j++;
+            if (j > i) {
+                long total = 0;
+                long current = 0;
+                boolean big = false;
+                for (int k = i; k < j; k++) {
+                    int v = SPOKEN.get(words[k]);
+                    if (v == 100) { current = (current == 0 ? 1 : current) * 100; big = true; }
+                    else if (v >= 1000) { total += (current == 0 ? 1 : current) * v; current = 0; big = true; }
+                    else { current += v; if (v > 10) big = true; }
+                }
+                if (big) { out.add(String.valueOf(total + current)); i = j; continue; }
+            }
+            out.add(words[i]);
+            i++;
+        }
+        return String.join(" ", out);
     }
 
     private static Double firstNumber(String t) {
