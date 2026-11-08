@@ -46,16 +46,22 @@ public class AuthService {
     private final EmailSender email;
     private final int validSeconds;
     private final String fixedCode;
+    private final Map<String, String> demoLogins = new java.util.HashMap<>(); // phone -> the code that always works for it
 
     public AuthService(UserRepository users, SessionStore sessions, GoogleVerifier google, EmailSender email,
                        @Value("${dukaan.code-valid-seconds:60}") int validSeconds,
-                       @Value("${dukaan.fixed-code:}") String fixedCode) {
+                       @Value("${dukaan.fixed-code:}") String fixedCode,
+                       @Value("${dukaan.demo-logins:}") String demoLogins) {
         this.users = users;
         this.sessions = sessions;
         this.google = google;
         this.email = email;
         this.validSeconds = validSeconds;
         this.fixedCode = fixedCode;
+        for (String pair : demoLogins.split(",")) { // "9999900001:123456,9999900002:123456"
+            String[] parts = pair.trim().split(":");
+            if (parts.length == 2 && parts[0].matches("[6-9]\\d{9}") && !parts[1].isBlank()) this.demoLogins.put(parts[0], parts[1].trim());
+        }
     }
 
     // ---- phone
@@ -121,13 +127,13 @@ public class AuthService {
 
     /** Makes a 6-digit code, valid for validSeconds, and sends it. emailAddress is null for a phone number. */
     private CodeSent sendCode(String key, String emailAddress) {
-        PendingCode old = codes.get(key);
+        PendingCode old = demoLogins.containsKey(key) ? null : codes.get(key); // demo phones may ask again at once
         if (old != null) { // stops someone asking for code after code (and flooding an inbox)
             long wait = validSeconds / 2 - Duration.between(old.sentAt, Instant.now()).getSeconds();
             if (wait > 0) throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Please wait " + wait + " seconds before asking for another code");
         }
 
-        String code = fixedCode.isBlank() ? String.format("%06d", random.nextInt(1_000_000)) : fixedCode;
+        String code = demoLogins.containsKey(key) ? demoLogins.get(key) : fixedCode.isBlank() ? String.format("%06d", random.nextInt(1_000_000)) : fixedCode;
         codes.put(key, new PendingCode(code));
 
         String delivery = "log";
@@ -144,6 +150,7 @@ public class AuthService {
 
     /** Checks the code the person typed. A code works once, only for validSeconds, and only for a few wrong tries. */
     private void useCode(String key, String entered) {
+        if (demoLogins.containsKey(key) && demoLogins.get(key).equals(entered)) return; // a demo login: its code always works, never expires
         PendingCode pending = codes.get(key);
         if (pending == null) throw bad("Ask for a code first");
         if (Instant.now().isAfter(pending.sentAt.plusSeconds(validSeconds))) {

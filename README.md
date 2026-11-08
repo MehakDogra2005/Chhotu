@@ -30,6 +30,7 @@ The `Dockerfile` builds the website and the Java server into one image. On Rende
 | `GEMINI_API_KEY` | your Gemini key (understands other languages and answers questions about the shop) |
 | `DEMO_EMAIL` | the email that opens the demo shop |
 | `SPRING_MAIL_HOST`, `SPRING_MAIL_PORT`, `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD`, `SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH`, `SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE`, `DUKAAN_MAIL_FROM` | to email login codes (see `backend/config/local.properties.example`) |
+| `DEMO_LOGINS` | optional. Fixed logins for demos: `phone:code,phone:code`. The default is `9999900001:123456,9999900002:123456` (Rajesh Sharma and Anita Mehra), so you can always log in without reading the server log. Set it to `-` to switch them off |
 | `DUKAAN_FIXED_CODE` | only for a throwaway test: every login code becomes this, so anyone can log in |
 | `GOOGLE_CLIENT_ID` | only for "Continue with Google" |
 
