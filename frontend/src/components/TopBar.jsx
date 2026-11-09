@@ -14,10 +14,10 @@ export default function TopBar({ me }) {
   const [language, setLanguage] = useState(getPageLanguage())
 
   return (
-    <header className="flex items-center justify-between gap-3 border-b border-edge bg-card px-4 py-3 lg:px-6">
-      <div className="flex min-w-0 items-center gap-3">
+    <header className="flex items-center justify-between gap-2 border-b border-edge bg-card px-4 py-3 lg:px-6">
+      <div className="flex shrink-0 items-center gap-3">
         <img src="/images/logo.jpg" alt="" className="h-10 mix-blend-multiply lg:h-12" onError={hideBroken} />
-        <div className="min-w-0">
+        <div className="hidden min-w-0 sm:block">
           <div className="text-[18px] font-extrabold leading-tight tracking-tight lg:text-[21px]">Galla</div>
           <div className="hidden text-[12.5px] text-muted sm:block">Aapki dukaan ka AI Munim Ji</div>
         </div>
@@ -37,8 +37,8 @@ export default function TopBar({ me }) {
         <div className="mt-1 text-[12px] text-muted">Munim Ji greets you, then listens. Tap again to stop</div>
       </div>
 
-      <div className="flex items-center gap-3 sm:gap-5">
-        <label className="relative flex items-center rounded-xl border border-edge bg-white px-3 py-2 text-[14px] font-medium shadow-sm sm:px-4" data-notranslate>
+      <div className="flex items-center gap-2 sm:gap-5">
+        <label className="relative flex items-center rounded-xl border border-edge bg-white px-2.5 py-2 text-[13px] font-medium shadow-sm sm:px-4 sm:text-[14px]" data-notranslate>
           <select value={language} onChange={(e) => { setLanguage(e.target.value); setPageLanguage(e.target.value) }} aria-label="Language" className="appearance-none bg-transparent pr-6 outline-none">
             {PAGE_LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
           </select>
