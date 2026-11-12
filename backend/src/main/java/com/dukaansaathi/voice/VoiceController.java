@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.dukaansaathi.assistant.GeminiClient;
 import com.dukaansaathi.auth.AuthService;
 import com.dukaansaathi.auth.ShopContext;
+import com.dukaansaathi.voicelock.VoiceLock;
 
 /** Speech for the browser: turns a recorded sentence into text, and a reply into audio. Both need a login. */
 @RestController
@@ -41,9 +42,12 @@ public class VoiceController {
     private final VoiceVocabulary vocabulary;
     private final VoiceService voices;
     private final GeminiClient gemini;
+    private final VoiceLock voiceLock;
 
-    public VoiceController(AuthService auth, GnaniClient gnani, UsageLimit limit, VoiceVocabulary vocabulary, VoiceService voices, GeminiClient gemini) {
+    public VoiceController(AuthService auth, GnaniClient gnani, UsageLimit limit, VoiceVocabulary vocabulary, VoiceService voices, GeminiClient gemini,
+                           VoiceLock voiceLock) {
         this.gemini = gemini;
+        this.voiceLock = voiceLock;
         this.auth = auth;
         this.gnani = gnani;
         this.limit = limit;
@@ -58,7 +62,7 @@ public class VoiceController {
         return Map.of("gnani", gnani.configured());
     }
 
-    /** The audio (a WAV file of one sentence) as text. An empty text means nothing was heard. */
+    /** The audio (a WAV file of one sentence) as text. An empty text means nothing was heard, or the voice is not the owner's (Voice lock). */
     @PostMapping(value = "/transcribe", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Map<String, String> transcribe(@RequestHeader(value = "Authorization", defaultValue = "") String authHeader,
                                           @RequestParam("audio") MultipartFile audio,
@@ -68,6 +72,7 @@ public class VoiceController {
         if (audio.getSize() > MAX_AUDIO_BYTES) throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "That recording is too long. Keep it under a minute");
         limit.check(who.shopId(), "listen", LISTENS_PER_MINUTE);
         try {
+            if (!voiceLock.isOwner(who.userId(), audio.getBytes())) return Map.of("text", ""); // not the owner's voice: nothing was heard
             return Map.of("text", gnani.transcribe(audio.getBytes(), "speech.wav", vocabulary.forShop(who.shopId()), language));
         } catch (IOException e) {
             throw new UncheckedIOException(e);

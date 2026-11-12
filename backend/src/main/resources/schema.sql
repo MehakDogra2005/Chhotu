@@ -34,6 +34,14 @@ ALTER TABLE users ALTER COLUMN phone DROP NOT NULL;
 -- The voice Munim Ji speaks with for this person (a Gnani Timbre v3.0 voice name); empty until they choose one
 ALTER TABLE users ADD COLUMN IF NOT EXISTS tts_voice VARCHAR(30);
 
+-- Voice lock: the numbers (a "voiceprint", never the recording) of the voice of the person who owns the login. When a row exists,
+-- only that voice can speak to Munim Ji.
+CREATE TABLE IF NOT EXISTS voiceprints (
+  user_id VARCHAR(40) PRIMARY KEY REFERENCES users(user_id),
+  voiceprint TEXT NOT NULL,                -- 256 numbers separated by commas
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS user_shops (
   user_id VARCHAR(40) NOT NULL REFERENCES users(user_id),
   shop_id VARCHAR(40) NOT NULL REFERENCES shops(shop_id),

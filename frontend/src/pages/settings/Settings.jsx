@@ -8,6 +8,7 @@ import PageHeader from '../../components/PageHeader'
 import { Card } from '../../components/ui'
 import { AccountCard, InstallApp, NeedHelp, Notifications, ShopProfile, VoicePreferences } from './SettingsCards'
 import VoiceSelection from './VoiceSelection'
+import VoiceLock from './VoiceLock'
 
 export default function Settings() {
   const { reloadMe } = useOutletContext() // refreshes the name and shop in the top bar after saving
@@ -49,6 +50,7 @@ export default function Settings() {
         <div className="space-y-4">
           <ShopProfile form={form} change={change} />
           <VoiceSelection />
+          <VoiceLock />
           <VoicePreferences form={form} change={change} />
           <Notifications form={form} change={change} />
 

@@ -28,4 +28,4 @@ COPY --from=server /app/backend/target/backend-0.0.1.jar ./app.jar
 COPY db /app/db
 EXPOSE 8080
 # Render says which port to use in $PORT. -XX:MaxRAMPercentage keeps Java inside the memory of a small instance.
-CMD ["sh", "-c", "exec java -XX:MaxRAMPercentage=65 -Dserver.port=${PORT:-8080} -jar app.jar"]
+CMD ["sh", "-c", "exec java -XX:MaxRAMPercentage=50 -Dserver.port=${PORT:-8080} -jar app.jar"]

@@ -195,6 +195,10 @@ export default function AuthCard({ mode, setMode, lang, onLogin }) {
             <div className="space-y-6">
               <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-mint text-brand"><Check size={32} /></div>
               <button onClick={() => onLogin(token)} className={buttonCls}>Go to my dashboard</button>
+              {/* Voice lock: the new owner records their voice first, so only they can speak to Munim Ji. It lives in Settings. */}
+              <button onClick={() => { localStorage.setItem('token', token); window.location.assign('/settings') }} className={outlineCls}>
+                Record my voice first (Voice lock)
+              </button>
             </div>
           )}
 

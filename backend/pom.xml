@@ -27,6 +27,12 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-mail</artifactId>
     </dependency>
+    <!-- Runs the small speaker model that turns a voice into numbers (see the voicelock package) -->
+    <dependency>
+      <groupId>com.microsoft.onnxruntime</groupId>
+      <artifactId>onnxruntime</artifactId>
+      <version>1.20.0</version>
+    </dependency>
     <!-- Local database. To move to PostgreSQL, swap this for the postgresql driver and change spring.datasource.* -->
     <dependency>
       <groupId>com.h2database</groupId>

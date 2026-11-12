@@ -93,7 +93,8 @@ public class NameTranslations {
         }
         for (Map.Entry<String, List<String>> language : result.entrySet()) {
             for (int i = 0; i < names.size(); i++) {
-                jdbc.update("MERGE INTO name_translations (text, language, translated) KEY (text, language) VALUES (?, ?, ?)", names.get(i), language.getKey(), language.getValue().get(i));
+                jdbc.update("DELETE FROM name_translations WHERE text = ? AND language = ?", names.get(i), language.getKey());
+                jdbc.update("INSERT INTO name_translations (text, language, translated) VALUES (?, ?, ?)", names.get(i), language.getKey(), language.getValue().get(i));
             }
         }
         return true;

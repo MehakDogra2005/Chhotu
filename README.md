@@ -1,5 +1,7 @@
 # Galla
 
+**One-page pitch:** [PITCH.md](PITCH.md)  |  **Live app:** https://chhotu.onrender.com
+
 Voice-first business assistant for small shopkeepers. So far: login / sign-up and the Home dashboard.
 
 ## Run it

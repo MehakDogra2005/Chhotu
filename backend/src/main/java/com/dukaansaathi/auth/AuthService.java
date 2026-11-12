@@ -44,11 +44,12 @@ public class AuthService {
     private final SessionStore sessions;
     private final GoogleVerifier google;
     private final EmailSender email;
+    private final EmailCheck emailCheck;
     private final int validSeconds;
     private final String fixedCode;
     private final Map<String, String> demoLogins = new java.util.HashMap<>(); // phone -> the code that always works for it
 
-    public AuthService(UserRepository users, SessionStore sessions, GoogleVerifier google, EmailSender email,
+    public AuthService(UserRepository users, SessionStore sessions, GoogleVerifier google, EmailSender email, EmailCheck emailCheck,
                        @Value("${dukaan.code-valid-seconds:60}") int validSeconds,
                        @Value("${dukaan.fixed-code:}") String fixedCode,
                        @Value("${dukaan.demo-logins:}") String demoLogins) {
@@ -56,6 +57,7 @@ public class AuthService {
         this.sessions = sessions;
         this.google = google;
         this.email = email;
+        this.emailCheck = emailCheck;
         this.validSeconds = validSeconds;
         this.fixedCode = fixedCode;
         for (String pair : demoLogins.split(",")) { // "9999900001:123456,9999900002:123456"
@@ -81,6 +83,8 @@ public class AuthService {
 
     public CodeSent sendEmailOtp(String emailAddress) {
         String address = checkEmail(emailAddress);
+        String problem = emailCheck.problem(address); // a made-up address is refused here, before any code is made or sent
+        if (problem != null) throw bad(problem);
         return sendCode(address, address);
     }
 

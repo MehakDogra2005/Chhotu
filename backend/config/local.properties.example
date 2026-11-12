@@ -13,6 +13,10 @@ spring.mail.properties.mail.smtp.starttls.enable=true
 # The "from" address on the email (usually the same as the username)
 dukaan.mail-from=your.address@gmail.com
 
+# Or, instead of Gmail, send over https with Brevo (needed on Render's free plan, which blocks the mail ports above):
+# brevo.api-key=xkeysib-...
+# dukaan.mail-from=the sender address you verified in Brevo
+
 # ---- 2. A demo account with data ----------------------------------------------------------------
 # Logging in with this email opens "Sharma General Store", which already has products, sales and udhaar.
 # Use an email address you can read.
