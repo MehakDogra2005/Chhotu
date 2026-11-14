@@ -36,7 +36,7 @@ The `Dockerfile` builds the website and the Java server into one image. On Rende
 | `DUKAAN_FIXED_CODE` | only for a throwaway test: every login code becomes this, so anyone can log in |
 | `GOOGLE_CLIENT_ID` | only for "Continue with Google" |
 
-Render sets `PORT` itself and the image uses it. `backend/config/local.properties` is never copied into the image (see `.dockerignore`), so the secrets exist only as environment variables. The database lives in `/app/backend/data`; it is erased on every deploy unless you attach a Render Disk mounted at that path. The sample data's "today" is pinned to 18 Oct 2026 (`dukaan.today` in `application.properties`); delete that line for the real date.
+Render sets `PORT` itself and the image uses it. `backend/config/local.properties` is never copied into the image (see `.dockerignore`), so the secrets exist only as environment variables. The database lives in `/app/backend/data`; it is erased on every deploy unless you attach a Render Disk mounted at that path. "Today" is the real date. The sample data ends on 18 Oct 2026, so to make a demo look full of recent data set the `DUKAAN_TODAY` environment variable to `2026-10-18`.
 
 ## The voice assistant (Munim Ji)
 
